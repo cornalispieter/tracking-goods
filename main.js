@@ -197,7 +197,6 @@ function exportSummaryToCsv() {
   }
   const btnExportCsv = document.getElementById("btn-export-csv");
 
-...
 
 // export CSV
 if (btnExportCsv) {
