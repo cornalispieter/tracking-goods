@@ -38,6 +38,7 @@ export function clearInputs() {
   document.getElementById("kodebarang").value = "";
   document.getElementById("lokasi").value = "";
 }
+
 export function exportToCSV(data) {
   if (!data || data.length === 0) {
     alert("Tidak ada data untuk diexport!");
@@ -62,10 +63,18 @@ export function exportToCSV(data) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  export function showPopup(message = "Data berhasil disimpan!") {
+}
+
+export function showPopup(message = "Data berhasil disimpan!") {
   const popup = document.getElementById("popup");
   const text = document.getElementById("popup-message");
   const okBtn = document.getElementById("popup-ok");
+
+  if (!popup || !text || !okBtn) {
+    // Biar gak error kalau elemen belum ada
+    alert(message);
+    return;
+  }
 
   text.textContent = message;
   popup.style.display = "flex";
@@ -78,5 +87,4 @@ export function exportToCSV(data) {
   setTimeout(() => {
     popup.style.display = "none";
   }, 2000);
-
 }
