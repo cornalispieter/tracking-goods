@@ -1,3 +1,7 @@
+import { loadData, saveRecord } from './db.js';
+import { renderTable, clearInputs } from './ui.js';
+import { startScanner } from './scan.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
   const data = await loadData();
   renderTable(data);
