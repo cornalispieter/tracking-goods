@@ -51,19 +51,23 @@ document.addEventListener("DOMContentLoaded", () => {
     btnSaveUpdate.addEventListener("click", async () => {
       const code = codeInput.value.trim();
       const location = locationInput.value.trim();
+      const dict = window.translations[window.currentLang];
+
       if (!code || !location) {
-        alert(window.translations[window.currentLang].errorMissingFields);
+        alert(dict.errorMissingFields);
         return;
       }
+
       const ok = await saveUpdateToSupabase(code, location);
       if (ok) {
-    await loadSummaryList(tableBody, summaryCount, emptyState);
-    alert(window.translations[currentLang].toastSaved);
+        await loadSummaryList(tableBody, summaryCount, emptyState);
+        alert(dict.toastSaved);
 
-    // NEW: reset form
-    resetForm();
-}
-
+        // reset form & unlock input
+        resetForm();
+      } else {
+        alert(dict.toastErrorSave);
+      }
     });
   }
 
@@ -101,32 +105,36 @@ document.addEventListener("DOMContentLoaded", () => {
     historyBackdrop.classList.add("show");
   };
 
+  // --- helper: reset form setelah save ---
   function resetForm() {
-  const codeInput = document.getElementById("code-input");
-  const locationInput = document.getElementById("location-input");
-  const step1Label = document.getElementById("step1-label");
+    const dict = window.translations[window.currentLang];
 
-  // Clear values
-  codeInput.value = "";
-  locationInput.value = "";
+    const codeInputEl = document.getElementById("code-input");
+    const locationInputEl = document.getElementById("location-input");
+    const step1LabelEl = document.getElementById("step1-label");
 
-  // Remove readOnly locks
-  codeInput.readOnly = false;
-  locationInput.readOnly = false;
+    if (!codeInputEl || !locationInputEl || !step1LabelEl) return;
 
-  // Remove locked UI style
-  codeInput.classList.remove("locked-input");
-  locationInput.classList.remove("locked-input");
-  step1Label.classList.remove("locked");
+    // Clear values
+    codeInputEl.value = "";
+    locationInputEl.value = "";
 
-  // Reset scanner status text
-  document.getElementById("scanner-status-code").textContent =
-    translations[currentLang].scannerIdle;
-  document.getElementById("scanner-status-location").textContent =
-    translations[currentLang].scannerIdle;
+    // Remove readOnly locks
+    codeInputEl.readOnly = false;
+    locationInputEl.readOnly = false;
 
-  // Put cursor back to first step
-  codeInput.focus();
-}
+    // Remove locked UI style
+    codeInputEl.classList.remove("locked-input");
+    locationInputEl.classList.remove("locked-input");
+    step1LabelEl.classList.remove("locked");
 
+    // Reset scanner status text ke "Idle" (pakai bahasa aktif)
+    const statusCode = document.getElementById("scanner-status-code");
+    const statusLoc = document.getElementById("scanner-status-location");
+    if (statusCode) statusCode.textContent = dict.scannerIdle;
+    if (statusLoc) statusLoc.textContent = dict.scannerIdle;
+
+    // Fokus balik ke kode barang
+    codeInputEl.focus();
+  }
 });
