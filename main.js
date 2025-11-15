@@ -57,15 +57,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const ok = await saveUpdateToSupabase(code, location);
       if (ok) {
-        locationInput.readOnly = false;
-        locationInput.classList.remove("locked-input");
-        locationInput.value = "";
-        await loadSummaryList(tableBody, summaryCount, emptyState);
-        alert(window.translations[window.currentLang].toastSaved);
-        locationInput.focus();
-      } else {
-        alert(window.translations[window.currentLang].toastErrorSave);
-      }
+    await loadSummaryList(tableBody, summaryCount, emptyState);
+    alert(window.translations[currentLang].toastSaved);
+
+    // NEW: reset form
+    resetForm();
+}
+
     });
   }
 
@@ -102,4 +100,33 @@ document.addEventListener("DOMContentLoaded", () => {
     await loadHistoryForCode(code, historyList, historyCodeLabel, historyCountTag);
     historyBackdrop.classList.add("show");
   };
+
+  function resetForm() {
+  const codeInput = document.getElementById("code-input");
+  const locationInput = document.getElementById("location-input");
+  const step1Label = document.getElementById("step1-label");
+
+  // Clear values
+  codeInput.value = "";
+  locationInput.value = "";
+
+  // Remove readOnly locks
+  codeInput.readOnly = false;
+  locationInput.readOnly = false;
+
+  // Remove locked UI style
+  codeInput.classList.remove("locked-input");
+  locationInput.classList.remove("locked-input");
+  step1Label.classList.remove("locked");
+
+  // Reset scanner status text
+  document.getElementById("scanner-status-code").textContent =
+    translations[currentLang].scannerIdle;
+  document.getElementById("scanner-status-location").textContent =
+    translations[currentLang].scannerIdle;
+
+  // Put cursor back to first step
+  codeInput.focus();
+}
+
 });
