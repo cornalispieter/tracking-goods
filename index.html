@@ -5,82 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tracking Goods App</title>
 
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0d0d0d;
-            color: #e6e6e6;
-        }
-        header {
-            padding: 15px;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            background: #1a1a1a;
-            border-bottom: 1px solid #333;
-            position: relative;
-        }
-        .lang-picker {
-            position: absolute;
-            right: 15px;
-            top: 12px;
-            background: #111;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid #333;
-        }
-        .container {
-            padding: 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 7px 0;
-            background: #1a1a1a;
-            border: 1px solid #444;
-            color: white;
-            border-radius: 6px;
-        }
-        button {
-            padding: 10px 15px;
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin: 5px 2px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 18px;
-        }
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #333;
-        }
-        th {
-            background: #111;
-        }
-        .history-btn {
-            background: #444;
-            padding: 6px 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-
 <header>
     <span id="titleText">Tracking Goods</span>
     <select id="languageSelect" class="lang-picker">
@@ -90,7 +19,6 @@
 </header>
 
 <div class="container">
-
     <h2 id="sectionInput">Input</h2>
     <input id="kodeInput" placeholder="Item Code" />
     <input id="lokasiInput" placeholder="Location" />
@@ -125,174 +53,11 @@
         </thead>
         <tbody id="historyBody"></tbody>
     </table>
-
 </div>
 
-<script>
-// =============================================
-//                SUPABASE CLIENT
-// =============================================
-const SUPABASE_URL = "https://ifynrranqixyoxombfck.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmeW5ycmFucWl4eW94b21iZmNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNjgwNzIsImV4cCI6MjA3ODc0NDA3Mn0.UqDQd0rrE4vsYjjj5hHNKsBU3c62lgvNjYp4uUEu2GY";
-
-// FIX: rename to db → no more variable conflict
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// =============================================
-//               MULTI LANGUAGE TEXT
-// =============================================
-const lang = {
-    en: {
-        title:"Tracking Goods",
-        input:"Input",
-        search:"Search",
-        data:"Data Overview",
-        history:"History",
-        item:"Item Code",
-        loc:"Location",
-        updated:"Updated",
-        save:"Save"
-    },
-    nl: {
-        title:"Goederen Tracking",
-        input:"Invoer",
-        search:"Zoeken",
-        data:"Gegevensoverzicht",
-        history:"Historiek",
-        item:"Artikelcode",
-        loc:"Locatie",
-        updated:"Bijgewerkt",
-        save:"Opslaan"
-    }
-};
-
-function applyLanguage() {
-    const t = lang[languageSelect.value];
-    titleText.innerText = t.title;
-    sectionInput.innerText = t.input;
-    sectionSearch.innerText = t.search;
-    sectionData.innerText = t.data;
-    sectionHistory.innerText = t.history;
-
-    thKode.innerText = t.item;
-    thLokasi.innerText = t.loc;
-    thWaktu.innerText = t.updated;
-
-    thHKode.innerText = t.item;
-    thHLokasi.innerText = t.loc;
-    thHWaktu.innerText = t.updated;
-
-    saveBtn.innerHTML = `<i class="fa fa-save"></i> ${t.save}`;
-}
-
-languageSelect.onchange = applyLanguage;
-
-// =============================================
-//            LOAD MAIN DATA (UNIQUE)
-// =============================================
-async function loadData() {
-    const { data, error } = await db.from("tracking").select("*");
-    if (error) return console.error(error);
-
-    // keep only latest record per kodebarang
-    const unique = {};
-    data.forEach(r => {
-        if (!unique[r.kodebarang]) unique[r.kodebarang] = r;
-        else {
-            if (new Date(r.updated_at) > new Date(unique[r.kodebarang].updated_at)) {
-                unique[r.kodebarang] = r;
-            }
-        }
-    });
-
-    const tbody = document.getElementById("dataBody");
-    tbody.innerHTML = "";
-
-    Object.values(unique).forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${row.kodebarang}</td>
-            <td>${row.lokasi}</td>
-            <td>${new Date(row.updated_at).toLocaleString()}</td>
-            <td><button class="history-btn" onclick="loadHistory('${row.kodebarang}')"><i class='fa fa-clock'></i></button></td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-// =============================================
-//                  SAVE INPUT
-// =============================================
-saveBtn.onclick = async () => {
-    const kode = kodeInput.value.trim();
-    const lokasi = lokasiInput.value.trim();
-    if (!kode || !lokasi) return;
-
-    await db.from("tracking").insert({ kodebarang:kode, lokasi:lokasi });
-
-    kodeInput.value = "";
-    lokasiInput.value = "";
-
-    loadData();
-};
-
-// =============================================
-//                 SEARCH FILTER
-// =============================================
-searchInput.addEventListener("input", () => {
-    const term = searchInput.value.toLowerCase();
-    document.querySelectorAll("#dataBody tr").forEach(tr => {
-        tr.style.display = tr.innerText.toLowerCase().includes(term) ? "" : "none";
-    });
-});
-
-// =============================================
-//                LOAD HISTORY
-// =============================================
-async function loadHistory(kode) {
-    const { data } = await db
-        .from("tracking")
-        .select("*")
-        .eq("kodebarang", kode)
-        .order("updated_at", { ascending:false });
-
-    const tbody = document.getElementById("historyBody");
-    tbody.innerHTML = "";
-
-    data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${row.kodebarang}</td>
-            <td>${row.lokasi}</td>
-            <td>${new Date(row.updated_at).toLocaleString()}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-// =============================================
-//                EXPORT CSV
-// =============================================
-exportCSV.onclick = () => {
-    let rows = [];
-    document.querySelectorAll("#dataBody tr").forEach(tr => {
-        const cols = [...tr.children].map(td => td.innerText);
-        rows.push(cols.join(","));
-    });
-
-    const blob = new Blob([rows.join("\n")], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "tracking_data.csv";
-    a.click();
-};
-
-// INITIAL BOOT
-applyLanguage();
-loadData();
-</script>
-
+<script src="db.js"></script>
+<script src="lang.js"></script>
+<script src="ui.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
