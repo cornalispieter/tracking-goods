@@ -1,17 +1,8 @@
 /* ============================================================
-   main.js — Control full UI logic
+   main.js — UI Logic
    ============================================================ */
 
-/*
-  Dependencies available:
-  - translations (from i18n.js)
-  - loadSummaryList(), saveUpdateToSupabase() (data.js)
-  - startScannerForCode(), startScannerForLocation() (scanner.js)
-*/
-
 document.addEventListener("DOMContentLoaded", () => {
-
-  /* DOM Reference */
   const codeInput = document.getElementById("code-input");
   const locationInput = document.getElementById("location-input");
 
@@ -28,75 +19,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const langSelect = document.getElementById("lang-select");
 
-  /* ============================================================
-     INITIALIZATION
-     ============================================================ */
-
-  // Fill language dropdown
+  /* INIT LANGUAGE LIST */
   Object.keys(translations).forEach((lang) => {
     const opt = document.createElement("option");
     opt.value = lang;
     opt.textContent = lang.toUpperCase();
     langSelect.appendChild(opt);
   });
-  langSelect.value = window.currentLang;
+  langSelect.value = currentLang;
 
   applyTranslations();
-  loadSummaryList(); // load initial data
+  loadSummaryList();
 
 
-  /* ============================================================
-     STEP 1 — LOCK CODE
-     ============================================================ */
-  btnLockCode.addEventListener("click", () => {
-    const code = codeInput.value.trim();
-    if (!code) return;
+  /* STEP 1: Lock Code */
+  btnLockCode.onclick = () => {
+    if (!codeInput.value.trim()) return;
 
-    codeInput.classList.add("locked-input");
     codeInput.disabled = true;
-
-    // highlight step 1 as done
+    codeInput.classList.add("locked-input");
     step1Label.classList.add("locked");
 
-    // enable step 2
     locationInput.disabled = false;
     btnScanLocation.disabled = false;
     btnLockLocation.disabled = false;
-  });
+  };
 
 
-  /* ============================================================
-     STEP 2 — LOCK LOCATION
-     ============================================================ */
-  btnLockLocation.addEventListener("click", () => {
-    const loc = locationInput.value.trim();
-    if (!loc) return;
+  /* STEP 2: Lock Location */
+  btnLockLocation.onclick = () => {
+    if (!locationInput.value.trim()) return;
 
-    locationInput.classList.add("locked-input");
     locationInput.disabled = true;
+    locationInput.classList.add("locked-input");
     step2Label.classList.add("locked");
 
     btnSave.disabled = false;
-  });
+  };
 
 
-  /* ============================================================
-     SCANNER BUTTONS
-     ============================================================ */
-
-  btnScanCode.addEventListener("click", () => {
-    startScannerForCode();
-  });
-
-  btnScanLocation.addEventListener("click", () => {
-    startScannerForLocation();
-  });
+  /* Scanner */
+  btnScanCode.onclick = startScannerForCode;
+  btnScanLocation.onclick = startScannerForLocation;
 
 
-  /* ============================================================
-     SAVE UPDATE
-     ============================================================ */
-  btnSave.addEventListener("click", async () => {
+  /* SAVE */
+  btnSave.onclick = async () => {
     const code = codeInput.value.trim();
     const loc = locationInput.value.trim();
 
@@ -110,31 +78,25 @@ document.addEventListener("DOMContentLoaded", () => {
       resetForm();
       loadSummaryList();
     } else {
-      alert("Failed to save. Check Supabase.");
+      alert("Failed to save");
       btnSave.disabled = false;
     }
-  });
+  };
 
 
-  /* ============================================================
-     LANGUAGE CHANGE
-     ============================================================ */
-  langSelect.addEventListener("change", () => {
-    window.currentLang = langSelect.value;
+  /* LANGUAGE CHANGE */
+  langSelect.onchange = () => {
+    currentLang = langSelect.value;
     applyTranslations();
     loadSummaryList();
-  });
+  };
 
 
-  /* ============================================================
-     RESET FORM AFTER SAVE
-     ============================================================ */
+  /* RESET AFTER SAVE */
   function resetForm() {
-    // stop any scanners
     stopScannerForCode();
     stopScannerForLocation();
 
-    // reset input
     codeInput.value = "";
     locationInput.value = "";
 
@@ -144,30 +106,22 @@ document.addEventListener("DOMContentLoaded", () => {
     codeInput.classList.remove("locked-input");
     locationInput.classList.remove("locked-input");
 
-    // reset step labels
     step1Label.classList.remove("locked");
     step2Label.classList.remove("locked");
 
-    // disable step 2 controls
     btnScanLocation.disabled = true;
     btnLockLocation.disabled = true;
-
-    // disable save
     btnSave.disabled = true;
   }
 
 
-  /* ============================================================
-     APPLY TRANSLATIONS
-     ============================================================ */
+  /* APPLY I18N */
   function applyTranslations() {
     const dict = translations[currentLang];
 
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.getAttribute("data-i18n");
-      if (dict[key]) {
-        el.textContent = dict[key];
-      }
+      if (dict[key]) el.textContent = dict[key];
     });
   }
 
