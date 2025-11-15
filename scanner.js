@@ -1,29 +1,23 @@
 /* ============================================================
-   scanner.js — Two independent QR scanners
+   scanner.js — Two QR Scanners
    ============================================================ */
 
 let qrScannerCode = null;
 let qrScannerLocation = null;
 
-/* CODE SCANNER */
 function startScannerForCode() {
-  const box = document.getElementById("scanner-code-box");
-  box.classList.remove("hidden");
-
+  document.getElementById("scanner-code-box").classList.remove("hidden");
   stopScannerForLocation();
 
-  if (qrScannerCode) {
-    qrScannerCode.stop();
-    qrScannerCode = null;
-  }
+  if (qrScannerCode) qrScannerCode.stop();
 
   qrScannerCode = new Html5Qrcode("qr-reader-code");
 
   qrScannerCode.start(
     { facingMode: { ideal: "environment" } },
     { fps: 10, qrbox: 200 },
-    (decoded) => {
-      document.getElementById("code-input").value = decoded;
+    (text) => {
+      document.getElementById("code-input").value = text;
       stopScannerForCode();
     }
   );
@@ -38,25 +32,19 @@ function stopScannerForCode() {
   });
 }
 
-/* LOCATION SCANNER */
 function startScannerForLocation() {
-  const box = document.getElementById("scanner-location-box");
-  box.classList.remove("hidden");
-
+  document.getElementById("scanner-location-box").classList.remove("hidden");
   stopScannerForCode();
 
-  if (qrScannerLocation) {
-    qrScannerLocation.stop();
-    qrScannerLocation = null;
-  }
+  if (qrScannerLocation) qrScannerLocation.stop();
 
   qrScannerLocation = new Html5Qrcode("qr-reader-location");
 
   qrScannerLocation.start(
     { facingMode: { ideal: "environment" } },
     { fps: 10, qrbox: 200 },
-    (decoded) => {
-      document.getElementById("location-input").value = decoded;
+    (text) => {
+      document.getElementById("location-input").value = text;
       stopScannerForLocation();
     }
   );

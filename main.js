@@ -19,20 +19,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const langSelect = document.getElementById("lang-select");
 
-  /* INIT LANGUAGE LIST */
+  // Load languages
   Object.keys(translations).forEach((lang) => {
     const opt = document.createElement("option");
     opt.value = lang;
     opt.textContent = lang.toUpperCase();
     langSelect.appendChild(opt);
   });
+
   langSelect.value = currentLang;
 
   applyTranslations();
   loadSummaryList();
 
-
-  /* STEP 1: Lock Code */
   btnLockCode.onclick = () => {
     if (!codeInput.value.trim()) return;
 
@@ -45,8 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
     btnLockLocation.disabled = false;
   };
 
-
-  /* STEP 2: Lock Location */
   btnLockLocation.onclick = () => {
     if (!locationInput.value.trim()) return;
 
@@ -57,13 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
     btnSave.disabled = false;
   };
 
-
-  /* Scanner */
   btnScanCode.onclick = startScannerForCode;
   btnScanLocation.onclick = startScannerForLocation;
 
-
-  /* SAVE */
   btnSave.onclick = async () => {
     const code = codeInput.value.trim();
     const loc = locationInput.value.trim();
@@ -73,26 +66,21 @@ document.addEventListener("DOMContentLoaded", () => {
     btnSave.disabled = true;
 
     const ok = await saveUpdateToSupabase(code, loc);
-
     if (ok) {
       resetForm();
       loadSummaryList();
     } else {
-      alert("Failed to save");
+      alert("Save failed");
       btnSave.disabled = false;
     }
   };
 
-
-  /* LANGUAGE CHANGE */
   langSelect.onchange = () => {
     currentLang = langSelect.value;
     applyTranslations();
     loadSummaryList();
   };
 
-
-  /* RESET AFTER SAVE */
   function resetForm() {
     stopScannerForCode();
     stopScannerForLocation();
@@ -114,15 +102,11 @@ document.addEventListener("DOMContentLoaded", () => {
     btnSave.disabled = true;
   }
 
-
-  /* APPLY I18N */
   function applyTranslations() {
     const dict = translations[currentLang];
-
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.getAttribute("data-i18n");
       if (dict[key]) el.textContent = dict[key];
     });
   }
-
 });

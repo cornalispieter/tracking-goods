@@ -1,10 +1,9 @@
 /* ============================================================
-   data.js — Supabase + Data Rendering
+   data.js — Supabase + Rendering
    ============================================================ */
 
 let summaryRows = [];
 
-/* Load summary list */
 async function loadSummaryList() {
   const tableBody = document.getElementById("table-body");
   const summaryCount = document.getElementById("summary-count");
@@ -24,62 +23,51 @@ async function loadSummaryList() {
   data.forEach((row) => {
     if (!map.has(row.code)) {
       map.set(row.code, row);
-    } else {
-      const current = map.get(row.code);
-      if (new Date(row.updated_at) > new Date(current.updated_at)) {
-        map.set(row.code, row);
-      }
+    } else if (new Date(row.updated_at) > new Date(map.get(row.code).updated_at)) {
+      map.set(row.code, row);
     }
   });
 
-  summaryRows = [...map.values()].sort(
-    (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
-  );
-
+  summaryRows = [...map.values()];
   renderSummaryList();
 }
 
-/* Render table */
 function renderSummaryList() {
   const tableBody = document.getElementById("table-body");
   const summaryCount = document.getElementById("summary-count");
   const emptyState = document.getElementById("empty-state");
 
-  const dict = translations[currentLang];
   const search = document.getElementById("search-input").value.toLowerCase();
 
-  const filtered = summaryRows.filter((r) => {
-    return (
-      r.code.toLowerCase().includes(search) ||
-      r.location.toLowerCase().includes(search)
-    );
-  });
+  const filtered = summaryRows.filter((r) =>
+    r.code.toLowerCase().includes(search) ||
+    r.location.toLowerCase().includes(search)
+  );
 
   summaryCount.textContent = filtered.length;
 
   if (filtered.length === 0) {
-    emptyState.style.display = "block";
     tableBody.innerHTML = "";
+    emptyState.style.display = "block";
     return;
   }
 
   emptyState.style.display = "none";
 
   tableBody.innerHTML = filtered
-    .map((row) => {
-      return `
+    .map(
+      (r) => `
       <tr>
-        <td>${row.code}</td>
-        <td>${row.location}</td>
-        <td>${new Date(row.updated_at).toLocaleString()}</td>
-        <td><button class="btn-history" onclick="openHistoryForCode('${row.code}')">⋯</button></td>
+        <td>${r.code}</td>
+        <td>${r.location}</td>
+        <td>${new Date(r.updated_at).toLocaleString()}</td>
+        <td><button class="btn-history" onclick="openHistoryForCode('${r.code}')">⋯</button></td>
       </tr>
-    `;
-    })
+    `
+    )
     .join("");
 }
 
-/* Save */
 async function saveUpdateToSupabase(code, location) {
   const { error } = await window.supabaseClient.from("goods_updates").insert([
     {
@@ -89,14 +77,9 @@ async function saveUpdateToSupabase(code, location) {
     },
   ]);
 
-  if (error) {
-    console.error("Save error:", error);
-    return false;
-  }
-  return true;
+  return !error;
 }
 
-/* Open history */
 async function openHistoryForCode(code) {
   const modal = document.getElementById("history-modal");
   const historyList = document.getElementById("history-list");
@@ -108,10 +91,7 @@ async function openHistoryForCode(code) {
     .eq("code", code)
     .order("updated_at", { ascending: false });
 
-  if (error) {
-    console.error("History error:", error);
-    return;
-  }
+  if (error) return;
 
   document.getElementById("history-code-label").textContent = code;
   document.getElementById("history-count-tag").textContent =
@@ -128,10 +108,10 @@ async function openHistoryForCode(code) {
       <tbody>
         ${data
           .map(
-            (row) => `
+            (r) => `
           <tr>
-            <td>${row.location}</td>
-            <td>${new Date(row.updated_at).toLocaleString()}</td>
+            <td>${r.location}</td>
+            <td>${new Date(r.updated_at).toLocaleString()}</td>
           </tr>`
           )
           .join("")}
@@ -142,8 +122,7 @@ async function openHistoryForCode(code) {
   modal.classList.add("show");
 }
 
-document.getElementById("close-history").onclick = () => {
+document.getElementById("close-history").onclick = () =>
   document.getElementById("history-modal").classList.remove("show");
-};
 
 document.getElementById("search-input").oninput = renderSummaryList;

@@ -13,149 +13,139 @@
   <!-- QR Scanner -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
+
 <body>
+  <div class="app">
 
-<div class="app">
-
-  <header>
-    <div class="title-block">
-      <h1>TrackFlow</h1>
-      <p data-i18n="subtitle">Simple goods tracking system</p>
-    </div>
-
-    <div class="lang-select">
-      <label data-i18n="languageLabel">Lang</label>
-      <select id="lang-select"></select>
-    </div>
-  </header>
-
-  <main>
-
-    <!-- UPDATE FORM -->
-    <section class="card">
-      <div class="card-header-title" data-i18n="inputSectionTitle">New update</div>
-      <div class="card-header-subtitle" data-i18n="inputSectionSubtitle">
-        Step 1: code · Step 2: location
+    <header>
+      <div class="title-block">
+        <h1>TrackFlow</h1>
+        <p data-i18n="subtitle">Simple goods tracking</p>
       </div>
 
-      <!-- STEP 1 -->
-      <div class="step-block">
-        <div class="step-label" id="step1-label">
-          <span class="step-number">1</span>
-          <span data-i18n="step1Label">Step 1 · Item code</span>
-        </div>
-
-        <div class="field-group">
-          <label data-i18n="labelCode">Item code</label>
-          <input id="code-input" type="text" placeholder="Enter item code" />
-        </div>
-
-        <div class="button-row">
-          <button class="btn btn-primary" id="start-scan-code" data-i18n="btnScan">Scan</button>
-          <button class="btn btn-secondary" id="lock-code">Lock</button>
-        </div>
-
-        <div id="scanner-code-box" class="scanner-box hidden">
-          <div id="qr-reader-code"></div>
-        </div>
+      <div class="lang-select">
+        <label data-i18n="languageLabel">Lang</label>
+        <select id="lang-select"></select>
       </div>
+    </header>
 
-      <!-- STEP 2 -->
-      <div class="step-block">
-        <div class="step-label" id="step2-label">
-          <span class="step-number">2</span>
-          <span data-i18n="step2Label">Step 2 · Location</span>
-        </div>
+    <main>
 
-        <div class="field-group">
-          <label data-i18n="labelLocation">Location</label>
-          <input id="location-input" type="text" placeholder="Enter location" disabled />
-        </div>
+      <!-- UPDATE FORM -->
+      <section class="card">
+        <div class="card-header-title" data-i18n="inputSectionTitle">New update</div>
+        <div class="card-header-subtitle" data-i18n="inputSectionSubtitle">Step 1 & 2</div>
 
-        <div class="button-row">
-          <button class="btn btn-primary" id="start-scan-location" data-i18n="btnScan" disabled>Scan</button>
-          <button class="btn btn-secondary" id="lock-location" disabled>Lock</button>
-        </div>
+        <!-- STEP 1 -->
+        <div class="step-block">
+          <div class="step-label" id="step1-label">
+            <span class="step-number">1</span>
+            <span data-i18n="step1Label">Item code</span>
+          </div>
 
-        <div id="scanner-location-box" class="scanner-box hidden">
-          <div id="qr-reader-location"></div>
-        </div>
+          <div class="field-group">
+            <label data-i18n="labelCode">Item code</label>
+            <input id="code-input" type="text" />
+          </div>
 
-        <button class="btn btn-primary full" id="save-update" disabled data-i18n="btnSaveUpdate">
-          Save
-        </button>
-      </div>
+          <div class="button-row">
+            <button class="btn btn-primary" id="start-scan-code" data-i18n="btnScan">Scan</button>
+            <button class="btn btn-secondary" id="lock-code">Lock</button>
+          </div>
 
-    </section>
-
-    <!-- TRACKED ITEMS -->
-    <section class="card">
-      <div class="list-header">
-        <div>
-          <div class="list-header-title" data-i18n="listTitle">Tracked items</div>
-          <div class="list-header-subtitle" data-i18n="listSubtitle">
-            Latest update per item code
+          <div id="scanner-code-box" class="scanner-box hidden">
+            <div id="qr-reader-code"></div>
           </div>
         </div>
-        <div class="count-pill">
-          <span id="summary-count">0</span>
-          <span data-i18n="itemsLabel">items</span>
+
+        <!-- STEP 2 -->
+        <div class="step-block">
+          <div class="step-label" id="step2-label">
+            <span class="step-number">2</span>
+            <span data-i18n="step2Label">Location</span>
+          </div>
+
+          <div class="field-group">
+            <label data-i18n="labelLocation">Location</label>
+            <input id="location-input" type="text" disabled />
+          </div>
+
+          <div class="button-row">
+            <button class="btn btn-primary" id="start-scan-location" disabled data-i18n="btnScan">Scan</button>
+            <button class="btn btn-secondary" id="lock-location" disabled>Lock</button>
+          </div>
+
+          <div id="scanner-location-box" class="scanner-box hidden">
+            <div id="qr-reader-location"></div>
+          </div>
+
+          <button class="btn btn-primary full" id="save-update" disabled data-i18n="btnSaveUpdate">Save</button>
         </div>
+
+      </section>
+
+      <!-- TRACKED ITEMS LIST -->
+      <section class="card">
+        <div class="list-header">
+          <div>
+            <div class="list-header-title" data-i18n="listTitle">Tracked items</div>
+            <div class="list-header-subtitle" data-i18n="listSubtitle">Latest update</div>
+          </div>
+          <div class="count-pill">
+            <span id="summary-count">0</span>
+            <span data-i18n="itemsLabel">items</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label data-i18n="searchLabel">Search</label>
+          <input id="search-input" type="text" placeholder="Search…" />
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th data-i18n="colCode">Code</th>
+              <th data-i18n="colLocation">Location</th>
+              <th data-i18n="colTime">Updated</th>
+              <th data-i18n="colActions">History</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+
+        <div class="empty-state" id="empty-state">
+          <span data-i18n="emptyState">No items.</span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- HISTORY MODAL -->
+  <div class="modal-backdrop" id="history-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div data-i18n="historyTitle">History</div>
+          <small id="history-code-label">CODE</small>
+        </div>
+        <button class="btn-close" id="close-history">✕</button>
       </div>
+      <div class="modal-body" id="history-list"></div>
 
-      <div class="field-group">
-        <label data-i18n="searchLabel">Search</label>
-        <input id="search-input" type="text" placeholder="Search…" />
+      <div class="modal-footer">
+        <span class="tag" data-i18n="historyHint">Latest first</span>
+        <span class="tag" id="history-count-tag">0 logs</span>
       </div>
-
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th data-i18n="colCode">Code</th>
-            <th data-i18n="colLocation">Location</th>
-            <th data-i18n="colTime">Updated</th>
-            <th data-i18n="colActions">History</th>
-          </tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-      </table>
-
-      <div class="empty-state" id="empty-state">
-        <span data-i18n="emptyState">No items yet.</span>
-      </div>
-    </section>
-
-  </main>
-</div>
-
-
-<!-- HISTORY MODAL -->
-<div class="modal-backdrop" id="history-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div>
-        <div data-i18n="historyTitle">History</div>
-        <small id="history-code-label">CODE</small>
-      </div>
-      <button class="btn-close" id="close-history">✕</button>
-    </div>
-
-    <div class="modal-body" id="history-list"></div>
-
-    <div class="modal-footer">
-      <span class="tag" data-i18n="historyHint">Latest first</span>
-      <span class="tag" id="history-count-tag">0 logs</span>
     </div>
   </div>
-</div>
 
-
-<!-- SCRIPTS -->
-<script src="db.js"></script>
-<script src="i18n.js"></script>
-<script src="data.js"></script>
-<script src="scanner.js"></script>
-<script src="main.js"></script>
+  <!-- SCRIPTS ORDER BENAR -->
+  <script src="db.js"></script>
+  <script src="i18n.js"></script>
+  <script src="data.js"></script>
+  <script src="scanner.js"></script>
+  <script src="main.js"></script>
 
 </body>
 </html>
