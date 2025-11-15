@@ -46,7 +46,7 @@ export function startScanner(targetFieldId = 'kodebarang') {
     .decodeFromVideoDevice(null, preview, (result, err) => {
       if (result) {
         // PLAY BEEP SOUND
-          const beep = new Audio("beep.mp3");
+          const beep = new Audio("wood_plank_flicks.ogg");
           beep.play();
         const text = result.text;
 
