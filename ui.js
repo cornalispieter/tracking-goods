@@ -1,4 +1,6 @@
-// Render table with History buttons (modern UI)
+// ==============================
+// Render Table
+// ==============================
 export function renderTable(data) {
   const tbody = document.getElementById("data-body");
 
@@ -21,7 +23,6 @@ export function renderTable(data) {
         <td>${item.kodebarang}</td>
         <td>${item.lokasi}</td>
         <td>${new Date(item.updated).toLocaleString()}</td>
-
         <td>
           <button class="btn-history" onclick="showHistory('${item.kodebarang}')">
             📜 History
@@ -33,12 +34,17 @@ export function renderTable(data) {
     .join("");
 }
 
-// Clear inputs after save
+// ==============================
+// Clear Inputs
+// ==============================
 export function clearInputs() {
   document.getElementById("kodebarang").value = "";
   document.getElementById("lokasi").value = "";
 }
 
+// ==============================
+// Export to CSV
+// ==============================
 export function exportToCSV(data) {
   if (!data || data.length === 0) {
     alert("Tidak ada data untuk diexport!");
@@ -65,16 +71,13 @@ export function exportToCSV(data) {
   document.body.removeChild(link);
 }
 
+// ==============================
+// Popup Message
+// ==============================
 export function showPopup(message = "Data berhasil disimpan!") {
   const popup = document.getElementById("popup");
   const text = document.getElementById("popup-message");
   const okBtn = document.getElementById("popup-ok");
-
-  if (!popup || !text || !okBtn) {
-    // Biar gak error kalau elemen belum ada
-    alert(message);
-    return;
-  }
 
   text.textContent = message;
   popup.style.display = "flex";
@@ -83,7 +86,7 @@ export function showPopup(message = "Data berhasil disimpan!") {
     popup.style.display = "none";
   };
 
-  // Auto close setelah 2 detik (opsional)
+  // Auto close (opsional)
   setTimeout(() => {
     popup.style.display = "none";
   }, 2000);
