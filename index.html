@@ -148,8 +148,74 @@
   </style>
 
   <!-- html5-qrcode (scanner) -->
- <script type="module" src="./script.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
   <h1>Tracking Goods</h1>
-  <p>Scan or enter production code and location, then save to track movements.</p
+  <p>Scan or enter production code and location, then save to track movements.</p>
+
+  <!-- Input + scanner -->
+  <div class="card">
+    <form id="scan-form">
+      <div class="form-row">
+        <div>
+          <label for="code">Production Code</label>
+          <input type="text" id="code" autocomplete="off" required />
+        </div>
+        <div>
+          <label for="location">Location</label>
+          <input type="text" id="location" autocomplete="off" required />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <button type="submit" class="primary" id="save-btn">Save Movement</button>
+        <button type="button" class="secondary" id="start-scan-btn">Start Scanner</button>
+        <button type="button" class="secondary" id="stop-scan-btn" disabled>Stop Scanner</button>
+      </div>
+
+      <div id="status"></div>
+
+      <div id="scanner-container">
+        <label>Camera Scanner</label>
+        <div id="reader"></div>
+      </div>
+    </form>
+  </div>
+
+  <!-- List latest records -->
+  <div class="card">
+    <h2>Latest Location by Production Code</h2>
+    <p style="font-size:0.85rem;color:#6b7280;">
+      Each production code is shown once with its latest location.  
+      Click <span class="badge">History</span> to view full movement history.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Production Code</th>
+          <th>Location</th>
+          <th>Last Updated</th>
+          <th>History</th>
+        </tr>
+      </thead>
+      <tbody id="records-body">
+        <!-- Filled by script.js -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- History dialog -->
+  <dialog id="history-dialog">
+    <h3 id="history-title">History</h3>
+    <ul id="history-list"></ul>
+    <div style="margin-top:0.75rem;text-align:right;">
+      <button type="button" class="secondary" id="close-history-btn">Close</button>
+    </div>
+  </dialog>
+
+  <!-- Main JS (module) -->
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
