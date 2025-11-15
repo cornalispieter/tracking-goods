@@ -39,7 +39,6 @@ const translations = {
     searchLabel: "Search",
     noResultsSearch: "No items match your search.",
     errorMissingFields: "Please fill code and location first.",
-    errorNoCodeLocked: "Lock item code first (step 1).",
     toastSaved: "Update saved.",
     toastErrorSave: "Failed to save update.",
     toastErrorLoad: "Failed to load items.",
@@ -83,7 +82,6 @@ const translations = {
     searchLabel: "Zoeken",
     noResultsSearch: "Geen items komen overeen met je zoekopdracht.",
     errorMissingFields: "Vul eerst code en locatie in.",
-    errorNoCodeLocked: "Zet eerst de artikelcode vast (stap 1).",
     toastSaved: "Update opgeslagen.",
     toastErrorSave: "Opslaan van update is mislukt.",
     toastErrorLoad: "Items laden is mislukt.",
@@ -127,7 +125,6 @@ const translations = {
     searchLabel: "Cari",
     noResultsSearch: "Tidak ada data yang cocok dengan pencarian.",
     errorMissingFields: "Isi dulu kode barang dan lokasi.",
-    errorNoCodeLocked: "Kunci dulu kode barang di step 1.",
     toastSaved: "Update tersimpan.",
     toastErrorSave: "Gagal menyimpan update.",
     toastErrorLoad: "Gagal memuat daftar barang.",
@@ -174,7 +171,6 @@ const translations = {
     noResultsSearch: "Brak pozycji pasujących do wyszukiwania.",
     errorMissingFields:
       "Najpierw wprowadź kod towaru i lokalizację.",
-    errorNoCodeLocked: "Najpierw zablokuj kod towaru (krok 1).",
     toastSaved: "Zapisano aktualizację.",
     toastErrorSave:
       "Nie udało się zapisać aktualizacji.",
@@ -193,10 +189,6 @@ let html5QrCodeCode = null;
 let html5QrCodeLocation = null;
 let isScanningCode = false;
 let isScanningLocation = false;
-
-// step state
-let currentCode = null;
-let isCodeLocked = false;
 
 function applyTranslations() {
   const dict = translations[currentLang] || translations.en;
@@ -217,12 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const step1Label = document.getElementById("step1-label");
 
   const btnStartScanCode = document.getElementById("btn-start-scan-code");
-  const btnStopScanCode = document.getElementById("btn-stop-scan-code");
   const btnStartScanLocation = document.getElementById("btn-start-scan-location");
-  const btnStopScanLocation = document.getElementById("btn-stop-scan-location");
-
-  const btnLockCode = document.getElementById("btn-lock-code");
-  const btnResetCode = document.getElementById("btn-reset-code");
   const btnSaveUpdate = document.getElementById("btn-save-update");
 
   const tableBody = document.getElementById("table-body");
@@ -244,34 +231,9 @@ document.addEventListener("DOMContentLoaded", () => {
     renderSummaryList(tableBody, summaryCount, emptyState);
   });
 
-  // Step 1: lock code
-  btnLockCode.addEventListener("click", () => {
-    const code = codeInput.value.trim();
-    if (!code) {
-      alert(translations[currentLang].errorMissingFields);
-      return;
-    }
-    currentCode = code;
-    isCodeLocked = true;
-    codeInput.readOnly = true;
-    codeInput.classList.add("locked-input");
-    step1Label.classList.add("locked");
-    stopScannerForCode();
-    document.getElementById("location-input").focus();
-  });
-
-  // reset code
-  btnResetCode.addEventListener("click", () => {
-    resetCodeStep(codeInput, locationInput, step1Label);
-  });
-
   // scanner code
   btnStartScanCode.addEventListener("click", () => {
-    startScannerForCode(codeInput);
-  });
-
-  btnStopScanCode.addEventListener("click", () => {
-    stopScannerForCode();
+    startScannerForCode(codeInput, step1Label);
   });
 
   // scanner location
@@ -279,23 +241,19 @@ document.addEventListener("DOMContentLoaded", () => {
     startScannerForLocation(locationInput);
   });
 
-  btnStopScanLocation.addEventListener("click", () => {
-    stopScannerForLocation();
-  });
-
   // save update
   btnSaveUpdate.addEventListener("click", async () => {
-    if (!isCodeLocked || !currentCode) {
-      alert(translations[currentLang].errorNoCodeLocked);
-      return;
-    }
+    const code = codeInput.value.trim();
     const location = locationInput.value.trim();
-    if (!location) {
+    if (!code || !location) {
       alert(translations[currentLang].errorMissingFields);
       return;
     }
-    const ok = await saveUpdateToSupabase(currentCode, location);
+    const ok = await saveUpdateToSupabase(code, location);
     if (ok) {
+      // lokasi dibuka lagi untuk next input, kode tetap
+      locationInput.readOnly = false;
+      locationInput.classList.remove("locked-input");
       locationInput.value = "";
       await loadSummaryList(tableBody, summaryCount, emptyState);
       alert(translations[currentLang].toastSaved);
@@ -325,28 +283,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // load initial list
   loadSummaryList(tableBody, summaryCount, emptyState);
 
-  // global for history button
+  // expose for history button
   window.openHistoryForCode = async (code) => {
     await loadHistoryForCode(code, historyList, historyCodeLabel, historyCountTag);
     historyBackdrop.classList.add("show");
   };
 });
-
-// ---------- Step helper ----------
-function resetCodeStep(codeInput, locationInput, step1Label) {
-  currentCode = null;
-  isCodeLocked = false;
-  codeInput.readOnly = false;
-  codeInput.classList.remove("locked-input");
-  codeInput.value = "";
-  locationInput.value = "";
-  step1Label.classList.remove("locked");
-  stopScannerForCode();
-  stopScannerForLocation();
-  setScannerStatus("code", "scannerIdle");
-  setScannerStatus("location", "scannerIdle");
-  codeInput.focus();
-}
 
 // ---------- Scanner helpers ----------
 function setScannerStatus(target, key) {
@@ -357,9 +299,13 @@ function setScannerStatus(target, key) {
   el.textContent = dict[key] || "";
 }
 
-// CODE scanner: auto-stop when success
-async function startScannerForCode(codeInput) {
-  if (isScanningCode) return;
+// CODE scanner: auto stop & auto lock
+async function startScannerForCode(codeInput, step1Label) {
+  // kalau masih scanning, matikan dulu (tap scan = restart)
+  if (isScanningCode) {
+    await stopScannerForCode();
+  }
+
   try {
     setScannerStatus("code", "scannerScanning");
 
@@ -384,9 +330,16 @@ async function startScannerForCode(codeInput) {
       config,
       async (decodedText) => {
         codeInput.value = decodedText;
+        // auto lock kode
+        codeInput.readOnly = true;
+        codeInput.classList.add("locked-input");
+        step1Label.classList.add("locked");
+
         setScannerStatus("code", "scannerDetected");
-        // AUTO STOP after one successful scan
+        // stop kamera
         await stopScannerForCode();
+        // fokus ke lokasi
+        document.getElementById("location-input").focus();
       },
       () => {}
     );
@@ -410,9 +363,12 @@ async function stopScannerForCode() {
   setScannerStatus("code", "scannerStopped");
 }
 
-// LOCATION scanner: auto-stop when success
+// LOCATION scanner: auto stop & auto lock
 async function startScannerForLocation(locationInput) {
-  if (isScanningLocation) return;
+  if (isScanningLocation) {
+    await stopScannerForLocation();
+  }
+
   try {
     setScannerStatus("location", "scannerScanning");
 
@@ -437,8 +393,11 @@ async function startScannerForLocation(locationInput) {
       config,
       async (decodedText) => {
         locationInput.value = decodedText;
+        // auto lock lokasi
+        locationInput.readOnly = true;
+        locationInput.classList.add("locked-input");
+
         setScannerStatus("location", "scannerDetected");
-        // AUTO STOP after one successful scan
         await stopScannerForLocation();
       },
       () => {}
@@ -469,7 +428,7 @@ async function saveUpdateToSupabase(code, location) {
     const { error } = await supabaseClient
       .from("goods_updates")
       .insert([{ code, location }]);
-  if (error) {
+    if (error) {
       console.error("Supabase insert error:", error);
       return false;
     }
@@ -610,7 +569,6 @@ async function loadHistoryForCode(
     historyListEl.innerHTML = "";
     historyCodeLabelEl.textContent = code;
 
-    // header
     const header = document.createElement("div");
     header.className = "history-table-header";
     const hCode = document.createElement("div");
