@@ -1,4 +1,4 @@
-import { showHistory } from './history.js';
+
 
 // Render table with History buttons
 export function renderTable(data) {
