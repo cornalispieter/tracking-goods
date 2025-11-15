@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     data = await loadData();
     renderTable(data);
     clearInputs();
-    showToast("Data berhasil disimpan!");
+   showPopup("Data berhasil disimpan!");
   };
 
   // ===========================
