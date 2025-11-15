@@ -73,8 +73,10 @@ header {
   border: none;
   color: var(--text);
   outline: none;
-  font-size: 0.75rem;
+  font-size: 0.9rem; /* sedikit lebih besar, tetap rapi di HP */
 }
+
+
 
 /* MAIN LAYOUT – single column (default) */
 main {
@@ -165,14 +167,15 @@ label span.helper {
 
 input[type="text"] {
   width: 100%;
-  padding: 7px 9px;
+  padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: #020617;
   color: var(--text);
-  font-size: 0.8rem;
+  font-size: 1rem; /* ≈ 16px, biar iOS gak ngezoom */
   outline: none;
 }
+
 
 input::placeholder {
   color: #4b5563;
