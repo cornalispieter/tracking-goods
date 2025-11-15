@@ -15,11 +15,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     clearInputs();
   };
 
-  // Scan umum (tombol besar) → default ke kodebarang
-  document.getElementById('scanBtn').onclick = () => {
-    startScanner('kodebarang');
-  };
-
   // Scan khusus input kodebarang
   const scanKodeBtn = document.getElementById('scanKodeBtn');
   if (scanKodeBtn) {
@@ -32,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     scanLokasiBtn.onclick = () => startScanner('lokasi');
   }
 
-  // FAB (kalau ada) → juga ke kodebarang
+  // FAB scan → default ke kodebarang
   const fabScan = document.getElementById('fab-scan');
   if (fabScan) {
     fabScan.onclick = () => startScanner('kodebarang');
