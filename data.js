@@ -1,53 +1,40 @@
-// data.js — FIXED VERSION
+// data.js — TABLE FIX VERSION
 
 let summaryRows = [];
 
-// Load summary (unique codes)
+// Load unique items
 async function loadSummaryList(tableBody, summaryCount, emptyState) {
-  try {
-    const { data, error } = await supabaseClient
-      .from("goods_updates")
-      .select("code, location, updated_at")
-      .order("updated_at", { ascending: false });
+  const { data, error } = await supabaseClient
+    .from("goods_updates")
+    .select("*")
+    .order("updated_at", { ascending: false });
 
-    if (error) {
-      console.error("Load error:", error);
-      return;
-    }
-
-    const map = new Map();
-
-    data.forEach((row) => {
-      if (!row.code) return;
-      const exist = map.get(row.code);
-
-      if (!exist) map.set(row.code, row);
-      else {
-        if (new Date(row.updated_at) > new Date(exist.updated_at)) {
-          map.set(row.code, row);
-        }
-      }
-    });
-
-    summaryRows = Array.from(map.values());
-
-    summaryRows.sort((a, b) => {
-      return new Date(b.updated_at) - new Date(a.updated_at);
-    });
-
-    renderSummaryList(tableBody, summaryCount, emptyState);
-
-  } catch (err) {
-    console.error("Fatal:", err);
+  if (error) {
+    console.error(error);
+    return;
   }
+
+  // unique per code
+  const map = new Map();
+
+  data.forEach((row) => {
+    const exist = map.get(row.code);
+    if (!exist) map.set(row.code, row);
+    else if (new Date(row.updated_at) > new Date(exist.updated_at))
+      map.set(row.code, row);
+  });
+
+  summaryRows = [...map.values()].sort(
+    (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
+  );
+
+  renderSummaryList(tableBody, summaryCount, emptyState);
 }
 
-// Render list
+// Render table
 function renderSummaryList(tableBody, summaryCount, emptyState) {
   const dict = window.translations[window.currentLang];
-  const search = (document.getElementById("search-input")?.value || "")
-    .toLowerCase()
-    .trim();
+  const search = (document.getElementById("search-input")?.value || "").trim().toLowerCase();
 
   const rows = summaryRows.filter((r) => {
     return (
@@ -75,9 +62,7 @@ function renderSummaryList(tableBody, summaryCount, emptyState) {
           <td>${r.location}</td>
           <td>${ts}</td>
           <td>
-            <button class="btn btn-small" onclick="openHistoryForCode('${r.code}')">
-              ⋯
-            </button>
+            <button class="btn-history" onclick="openHistoryForCode('${r.code}')">⋯</button>
           </td>
         </tr>
       `;
@@ -85,38 +70,26 @@ function renderSummaryList(tableBody, summaryCount, emptyState) {
     .join("");
 }
 
-// Save
+// Save update
 async function saveUpdateToSupabase(code, location) {
-  try {
-    const { error } = await supabaseClient.from("goods_updates").insert([
-      {
-        code: code,
-        location: location,
-        updated_at: new Date().toISOString(),
-      },
-    ]);
+  const { error } = await supabaseClient.from("goods_updates").insert([
+    {
+      code,
+      location,
+      updated_at: new Date().toISOString(),
+    },
+  ]);
 
-    if (error) {
-      console.error(error);
-      return false;
-    }
-
-    return true;
-  } catch (err) {
-    console.error(err);
-    return false;
-  }
+  return !error;
 }
 
-// Load history
+// HISTORY TABLE
 async function loadHistoryForCode(code, historyList, codeLabel, countTag) {
   const dict = window.translations[window.currentLang];
 
-  codeLabel.textContent = code;
-
   const { data, error } = await supabaseClient
     .from("goods_updates")
-    .select("location, updated_at")
+    .select("*")
     .eq("code", code)
     .order("updated_at", { ascending: false });
 
@@ -125,17 +98,28 @@ async function loadHistoryForCode(code, historyList, codeLabel, countTag) {
     return;
   }
 
+  codeLabel.textContent = code;
   countTag.textContent = data.length;
 
-  historyList.innerHTML = data
-    .map((r) => {
-      const ts = new Date(r.updated_at).toLocaleString();
-      return `
-        <div class="history-item">
-          <div><strong>${dict.colLocation}:</strong> ${r.location}</div>
-          <div><strong>${dict.colTime}:</strong> ${ts}</div>
-        </div>
-      `;
-    })
-    .join("");
+  historyList.innerHTML = `
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>${dict.colLocation}</th>
+          <th>${dict.colTime}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data
+          .map((r) => {
+            return `
+            <tr>
+              <td>${r.location}</td>
+              <td>${new Date(r.updated_at).toLocaleString()}</td>
+            </tr>`;
+          })
+          .join("")}
+      </tbody>
+    </table>
+  `;
 }
