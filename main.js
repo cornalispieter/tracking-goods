@@ -70,10 +70,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       renderTable(filtered);
     });
-  }
+  }  // <--- CLOSE IF
 
   // ===========================
   // HISTORY MODAL CLOSE
   // ===========================
   attachHistoryClose();
-});
+
+}); // <--- CLOSE DOMContentLoaded
