@@ -1,51 +1,76 @@
-// data.js — TABLE FIX VERSION
+/* ============================================================
+   data.js — Supabase + Data Rendering
+   ============================================================ */
 
-let summaryRows = [];
+/* Supabase client already created in db.js:
+   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+*/
 
-// Load unique items
-async function loadSummaryList(tableBody, summaryCount, emptyState) {
+let summaryRows = []; // cache untuk list utama
+
+
+/* ============================================================
+   LOAD SUMMARY (Unique per code)
+   ============================================================ */
+async function loadSummaryList() {
+  const tableBody = document.getElementById("table-body");
+  const summaryCount = document.getElementById("summary-count");
+  const emptyState = document.getElementById("empty-state");
+
   const { data, error } = await supabaseClient
     .from("goods_updates")
     .select("*")
     .order("updated_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Error loading:", error);
     return;
   }
 
-  // unique per code
-  const map = new Map();
+  // unique per code → ambil update terbaru
+  const map = new Map(); // key = code
 
   data.forEach((row) => {
-    const exist = map.get(row.code);
-    if (!exist) map.set(row.code, row);
-    else if (new Date(row.updated_at) > new Date(exist.updated_at))
+    if (!map.has(row.code)) {
       map.set(row.code, row);
+    } else {
+      const existing = map.get(row.code);
+      if (new Date(row.updated_at) > new Date(existing.updated_at)) {
+        map.set(row.code, row);
+      }
+    }
   });
 
   summaryRows = [...map.values()].sort(
     (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
   );
 
-  renderSummaryList(tableBody, summaryCount, emptyState);
+  renderSummaryList(summaryRows, tableBody, summaryCount, emptyState);
 }
 
-// Render table
-function renderSummaryList(tableBody, summaryCount, emptyState) {
-  const dict = window.translations[window.currentLang];
-  const search = (document.getElementById("search-input")?.value || "").trim().toLowerCase();
 
-  const rows = summaryRows.filter((r) => {
+/* ============================================================
+   RENDER SUMMARY TABLE
+   ============================================================ */
+function renderSummaryList(rows, tableBody, summaryCount, emptyState) {
+  const dict = translations[currentLang];
+
+  const searchValue = document
+    .getElementById("search-input")
+    .value.toLowerCase();
+
+  // filter by search
+  const filtered = rows.filter((r) => {
     return (
-      r.code.toLowerCase().includes(search) ||
-      r.location.toLowerCase().includes(search)
+      r.code.toLowerCase().includes(searchValue) ||
+      r.location.toLowerCase().includes(searchValue)
     );
   });
 
-  summaryCount.textContent = rows.length;
+  summaryCount.textContent = filtered.length;
 
-  if (rows.length === 0) {
+  // no data
+  if (filtered.length === 0) {
     emptyState.style.display = "block";
     tableBody.innerHTML = "";
     return;
@@ -53,24 +78,29 @@ function renderSummaryList(tableBody, summaryCount, emptyState) {
 
   emptyState.style.display = "none";
 
-  tableBody.innerHTML = rows
+  tableBody.innerHTML = filtered
     .map((r) => {
-      const ts = new Date(r.updated_at).toLocaleString();
+      const timestamp = new Date(r.updated_at).toLocaleString();
       return `
-        <tr>
-          <td>${r.code}</td>
-          <td>${r.location}</td>
-          <td>${ts}</td>
-          <td>
-            <button class="btn-history" onclick="openHistoryForCode('${r.code}')">⋯</button>
-          </td>
-        </tr>
-      `;
+      <tr>
+        <td>${r.code}</td>
+        <td>${r.location}</td>
+        <td>${timestamp}</td>
+        <td>
+          <button class="btn-history" onclick="openHistoryForCode('${r.code}')">
+            ⋯
+          </button>
+        </td>
+      </tr>
+    `;
     })
     .join("");
 }
 
-// Save update
+
+/* ============================================================
+   SAVE UPDATE
+   ============================================================ */
 async function saveUpdateToSupabase(code, location) {
   const { error } = await supabaseClient.from("goods_updates").insert([
     {
@@ -80,12 +110,26 @@ async function saveUpdateToSupabase(code, location) {
     },
   ]);
 
-  return !error;
+  if (error) {
+    console.error("Save failed:", error);
+    return false;
+  }
+
+  return true;
 }
 
-// HISTORY TABLE
-async function loadHistoryForCode(code, historyList, codeLabel, countTag) {
-  const dict = window.translations[window.currentLang];
+
+/* ============================================================
+   LOAD HISTORY (Full list for specific code)
+   ============================================================ */
+async function openHistoryForCode(code) {
+  const modal = document.getElementById("history-modal");
+  const historyList = document.getElementById("history-list");
+  const dict = translations[currentLang];
+  const codeLabel = document.getElementById("history-code-label");
+  const countLabel = document.getElementById("history-count-tag");
+
+  codeLabel.textContent = code;
 
   const { data, error } = await supabaseClient
     .from("goods_updates")
@@ -98,8 +142,7 @@ async function loadHistoryForCode(code, historyList, codeLabel, countTag) {
     return;
   }
 
-  codeLabel.textContent = code;
-  countTag.textContent = data.length;
+  countLabel.textContent = data.length + " " + dict.historyCountLabel;
 
   historyList.innerHTML = `
     <table class="history-table">
@@ -122,4 +165,26 @@ async function loadHistoryForCode(code, historyList, codeLabel, countTag) {
       </tbody>
     </table>
   `;
+
+  modal.classList.add("show");
 }
+
+
+/* ============================================================
+   CLOSE HISTORY MODAL
+   ============================================================ */
+document.getElementById("close-history").addEventListener("click", () => {
+  document.getElementById("history-modal").classList.remove("show");
+});
+
+
+/* ============================================================
+   SEARCH EVENT
+   ============================================================ */
+document.getElementById("search-input").addEventListener("input", () => {
+  const tableBody = document.getElementById("table-body");
+  const summaryCount = document.getElementById("summary-count");
+  const emptyState = document.getElementById("empty-state");
+
+  renderSummaryList(summaryRows, tableBody, summaryCount, emptyState);
+});

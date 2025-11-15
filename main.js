@@ -1,151 +1,174 @@
-// main.js – clean rewritten version
+/* ============================================================
+   main.js — Control full UI logic
+   ============================================================ */
+
+/*
+  Dependencies available:
+  - translations (from i18n.js)
+  - loadSummaryList(), saveUpdateToSupabase() (data.js)
+  - startScannerForCode(), startScannerForLocation() (scanner.js)
+*/
 
 document.addEventListener("DOMContentLoaded", () => {
-  const langSelect = document.getElementById("language-select");
 
+  /* DOM Reference */
   const codeInput = document.getElementById("code-input");
   const locationInput = document.getElementById("location-input");
+
+  const btnScanCode = document.getElementById("start-scan-code");
+  const btnLockCode = document.getElementById("lock-code");
+
+  const btnScanLocation = document.getElementById("start-scan-location");
+  const btnLockLocation = document.getElementById("lock-location");
+
+  const btnSave = document.getElementById("save-update");
+
   const step1Label = document.getElementById("step1-label");
+  const step2Label = document.getElementById("step2-label");
 
-  const btnStartScanCode = document.getElementById("btn-start-scan-code");
-  const btnStartScanLocation = document.getElementById("btn-start-scan-location");
-  const btnSaveUpdate = document.getElementById("btn-save-update");
-  const btnExportCsv = document.getElementById("btn-export-csv");
+  const langSelect = document.getElementById("lang-select");
 
-  const tableBody = document.getElementById("table-body");
-  const summaryCount = document.getElementById("summary-count");
-  const emptyState = document.getElementById("empty-state");
-  const searchInput = document.getElementById("search-input");
+  /* ============================================================
+     INITIALIZATION
+     ============================================================ */
 
-  const historyBackdrop = document.getElementById("history-modal-backdrop");
-  const historyList = document.getElementById("history-list");
-  const historyCodeLabel = document.getElementById("history-code-label");
-  const historyCountTag = document.getElementById("history-count-tag");
-  const btnCloseHistory = document.getElementById("btn-close-history");
+  // Fill language dropdown
+  Object.keys(translations).forEach((lang) => {
+    const opt = document.createElement("option");
+    opt.value = lang;
+    opt.textContent = lang.toUpperCase();
+    langSelect.appendChild(opt);
+  });
+  langSelect.value = window.currentLang;
 
-  // INITIAL LANGUAGE APPLY
-  if (typeof window.applyTranslations === "function") {
-    window.applyTranslations();
-  }
+  applyTranslations();
+  loadSummaryList(); // load initial data
 
-  // CHANGE LANGUAGE
-  if (langSelect) {
-    langSelect.addEventListener("change", () => {
-      window.currentLang = langSelect.value;
-      window.applyTranslations();
-      renderSummaryList(tableBody, summaryCount, emptyState);
-    });
-  }
 
-  // START SCANNER - CODE
-  if (btnStartScanCode) {
-    btnStartScanCode.addEventListener("click", () => {
-      startScannerForCode(codeInput, step1Label);
-    });
-  }
+  /* ============================================================
+     STEP 1 — LOCK CODE
+     ============================================================ */
+  btnLockCode.addEventListener("click", () => {
+    const code = codeInput.value.trim();
+    if (!code) return;
 
-  // START SCANNER - LOCATION
-  if (btnStartScanLocation) {
-    btnStartScanLocation.addEventListener("click", () => {
-      startScannerForLocation(locationInput);
-    });
-  }
+    codeInput.classList.add("locked-input");
+    codeInput.disabled = true;
 
-  // SAVE UPDATE
-  if (btnSaveUpdate) {
-    btnSaveUpdate.addEventListener("click", async () => {
-      const code = codeInput.value.trim();
-      const location = locationInput.value.trim();
-      const dict = window.translations[window.currentLang];
+    // highlight step 1 as done
+    step1Label.classList.add("locked");
 
-      if (!code || !location) {
-        alert(dict.errorMissingFields);
-        return;
-      }
+    // enable step 2
+    locationInput.disabled = false;
+    btnScanLocation.disabled = false;
+    btnLockLocation.disabled = false;
+  });
 
-      const ok = await saveUpdateToSupabase(code, location);
 
-      if (ok) {
-        await loadSummaryList(tableBody, summaryCount, emptyState);
-        alert(dict.toastSaved);
-        resetForm();
-      } else {
-        alert(dict.toastErrorSave);
-      }
-    });
-  }
+  /* ============================================================
+     STEP 2 — LOCK LOCATION
+     ============================================================ */
+  btnLockLocation.addEventListener("click", () => {
+    const loc = locationInput.value.trim();
+    if (!loc) return;
 
-  // SEARCH
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      renderSummaryList(tableBody, summaryCount, emptyState);
-    });
-  }
+    locationInput.classList.add("locked-input");
+    locationInput.disabled = true;
+    step2Label.classList.add("locked");
 
-  // EXPORT CSV
-  if (btnExportCsv) {
-    btnExportCsv.addEventListener("click", () => {
-      if (typeof exportSummaryToCsv === "function") {
-        exportSummaryToCsv();
-      }
-    });
-  }
+    btnSave.disabled = false;
+  });
 
-  // HISTORY MODAL CLOSE (BACKGROUND)
-  if (historyBackdrop) {
-    historyBackdrop.addEventListener("click", (e) => {
-      if (e.target === historyBackdrop) {
-        historyBackdrop.classList.remove("show");
-      }
-    });
-  }
 
-  // HISTORY MODAL CLOSE BUTTON
-  if (btnCloseHistory) {
-    btnCloseHistory.addEventListener("click", () => {
-      historyBackdrop.classList.remove("show");
-    });
-  }
+  /* ============================================================
+     SCANNER BUTTONS
+     ============================================================ */
 
-  // INITIAL FETCH LIST
-  if (tableBody && summaryCount && emptyState) {
-    loadSummaryList(tableBody, summaryCount, emptyState);
-  }
+  btnScanCode.addEventListener("click", () => {
+    startScannerForCode();
+  });
 
-  // GLOBAL FUNCTION FOR "History" BUTTON
-  window.openHistoryForCode = async (code) => {
-    await loadHistoryForCode(code, historyList, historyCodeLabel, historyCountTag);
-    historyBackdrop.classList.add("show");
-  };
+  btnScanLocation.addEventListener("click", () => {
+    startScannerForLocation();
+  });
 
-  // RESET FORM
+
+  /* ============================================================
+     SAVE UPDATE
+     ============================================================ */
+  btnSave.addEventListener("click", async () => {
+    const code = codeInput.value.trim();
+    const loc = locationInput.value.trim();
+
+    if (!code || !loc) return;
+
+    btnSave.disabled = true;
+
+    const ok = await saveUpdateToSupabase(code, loc);
+
+    if (ok) {
+      resetForm();
+      loadSummaryList();
+    } else {
+      alert("Failed to save. Check Supabase.");
+      btnSave.disabled = false;
+    }
+  });
+
+
+  /* ============================================================
+     LANGUAGE CHANGE
+     ============================================================ */
+  langSelect.addEventListener("change", () => {
+    window.currentLang = langSelect.value;
+    applyTranslations();
+    loadSummaryList();
+  });
+
+
+  /* ============================================================
+     RESET FORM AFTER SAVE
+     ============================================================ */
   function resetForm() {
-    const dict = window.translations[window.currentLang];
+    // stop any scanners
+    stopScannerForCode();
+    stopScannerForLocation();
 
-    // Clear inputs
+    // reset input
     codeInput.value = "";
     locationInput.value = "";
 
-    // Unlock fields
-    codeInput.readOnly = false;
-    locationInput.readOnly = false;
+    codeInput.disabled = false;
+    locationInput.disabled = true;
 
     codeInput.classList.remove("locked-input");
     locationInput.classList.remove("locked-input");
+
+    // reset step labels
     step1Label.classList.remove("locked");
+    step2Label.classList.remove("locked");
 
-    // Reset scanner status
-    const statusCode = document.getElementById("scanner-status-code");
-    const statusLoc = document.getElementById("scanner-status-location");
+    // disable step 2 controls
+    btnScanLocation.disabled = true;
+    btnLockLocation.disabled = true;
 
-    if (statusCode) statusCode.textContent = dict.scannerIdle;
-    if (statusLoc) statusLoc.textContent = dict.scannerIdle;
-
-    // Stop active scanners
-    if (typeof stopScannerForCode === "function") stopScannerForCode();
-    if (typeof stopScannerForLocation === "function") stopScannerForLocation();
-
-    // Focus back to code input
-    codeInput.focus();
+    // disable save
+    btnSave.disabled = true;
   }
+
+
+  /* ============================================================
+     APPLY TRANSLATIONS
+     ============================================================ */
+  function applyTranslations() {
+    const dict = translations[currentLang];
+
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      if (dict[key]) {
+        el.textContent = dict[key];
+      }
+    });
+  }
+
 });
