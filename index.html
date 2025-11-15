@@ -1,113 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TrackFlow</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Item Tracking App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f5;
+      }
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
+      header {
+        padding: 1rem 1.5rem;
+        background: #18181b;
+        color: #fafafa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-<body>
+      header h1 {
+        font-size: 1.2rem;
+        margin: 0;
+      }
 
-<div class="app">
+      .lang-switcher button {
+        margin-left: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        border: 1px solid #3f3f46;
+        background: #27272a;
+        color: #fafafa;
+        font-size: 0.75rem;
+        cursor: pointer;
+      }
 
-  <header>
-    <h1>TrackFlow</h1>
-    <select id="lang-select"></select>
-  </header>
+      .lang-switcher button.active {
+        background: #f97316;
+        border-color: #f97316;
+        color: #020617;
+        font-weight: 600;
+      }
 
-  <main>
+      main {
+        padding: 1.5rem;
+        max-width: 960px;
+        margin: 0 auto;
+      }
 
-    <section class="card">
-      <h2><i class="fa-solid fa-qrcode"></i> Scan / Input</h2>
+      .card {
+        background: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      }
 
-      <!-- CODE -->
-      <label>Item Code</label>
-      <input id="code-input" class="input" type="text">
+      .card h2 {
+        margin: 0 0 0.75rem 0;
+        font-size: 1rem;
+      }
 
-      <button id="scan-code-btn" class="btn btn-primary full">
-        <i class="fa-solid fa-barcode"></i> Scan Code
-      </button>
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: flex-end;
+      }
 
-      <div id="scanner-code-box" class="scanner hidden">
-        <div id="qr-reader-code"></div>
+      .field {
+        flex: 1;
+        min-width: 160px;
+      }
+
+      label {
+        display: block;
+        font-size: 0.8rem;
+        margin-bottom: 0.25rem;
+        color: #52525b;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.5rem 0.6rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d4d4d8;
+        font-size: 0.9rem;
+      }
+
+      button.primary {
+        padding: 0.6rem 1rem;
+        border-radius: 0.75rem;
+        border: none;
+        background: #16a34a;
+        color: #f9fafb;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      button.primary:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
+      .hint {
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: #71717a;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+
+      thead {
+        background: #f9fafb;
+      }
+
+      th,
+      td {
+        padding: 0.6rem 0.5rem;
+        border-bottom: 1px solid #e4e4e7;
+        text-align: left;
+      }
+
+      th {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #71717a;
+      }
+
+      tbody tr:hover {
+        background: #f4f4f5;
+      }
+
+      .code-cell {
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .time-cell {
+        font-size: 0.8rem;
+        color: #6b7280;
+      }
+
+      .actions-cell button {
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid #e4e4e7;
+        background: #fafafa;
+        font-size: 0.75rem;
+        cursor: pointer;
+      }
+
+      .actions-cell button:hover {
+        background: #e5e7eb;
+      }
+
+      /* Modal */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+      }
+
+      .modal {
+        background: #ffffff;
+        border-radius: 0.75rem;
+        max-width: 480px;
+        width: 100%;
+        max-height: 80vh;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.4);
+      }
+
+      .modal-header {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e4e4e7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      .modal-body {
+        padding: 0.75rem 1rem;
+        max-height: 60vh;
+        overflow-y: auto;
+        font-size: 0.85rem;
+      }
+
+      .modal-footer {
+        padding: 0.75rem 1rem;
+        border-top: 1px solid #e4e4e7;
+        text-align: right;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.1rem 0.4rem;
+        font-size: 0.7rem;
+        border-radius: 999px;
+        border: 1px solid #e5e7eb;
+        background: #f9fafb;
+        margin-left: 0.25rem;
+      }
+
+      @media (max-width: 640px) {
+        main {
+          padding: 1rem;
+        }
+
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+
+        .form-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1 data-i18n="title">Item Tracking App</h1>
+      <div class="lang-switcher">
+        <button data-lang="en" class="active">EN</button>
+        <button data-lang="id">ID</button>
+        <button data-lang="nl">NL</button>
+        <button data-lang="pl">PL</button>
       </div>
+    </header>
 
-      <!-- LOCATION -->
-      <label>Location</label>
-      <input id="location-input" class="input" type="text">
+    <main>
+      <section class="card">
+        <h2 data-i18n="formTitle">Update item location</h2>
+        <div class="form-row">
+          <div class="field">
+            <label for="kodeProduksi" data-i18n="labelCode">Item code</label>
+            <input
+              id="kodeProduksi"
+              type="text"
+              placeholder="e.g. PRD-00123"
+              autocomplete="off"
+            />
+          </div>
 
-      <button id="scan-location-btn" class="btn btn-primary full">
-        <i class="fa-solid fa-location-dot"></i> Scan Location
-      </button>
+          <div class="field">
+            <label for="lokasi" data-i18n="labelLocation">Location</label>
+            <input
+              id="lokasi"
+              type="text"
+              placeholder="e.g. Rack A3"
+              autocomplete="off"
+            />
+          </div>
 
-      <div id="scanner-location-box" class="scanner hidden">
-        <div id="qr-reader-location"></div>
+          <div>
+            <button id="saveBtn" class="primary" data-i18n="btnSave">
+              Save / Update
+            </button>
+          </div>
+        </div>
+        <p class="hint" data-i18n="hintText">
+          When you save with the same item code, the current row is updated and
+          older records are kept as history.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2 data-i18n="listTitle">Current items</h2>
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="thCode">Code</th>
+              <th data-i18n="thLocation">Location</th>
+              <th data-i18n="thUpdated">Last Updated</th>
+              <th data-i18n="thActions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody">
+            <!-- rows rendered via JS -->
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <!-- History Modal -->
+    <div id="historyBackdrop" class="modal-backdrop">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="historyTitle"></h3>
+          <button id="closeHistoryBtn">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="historyContent"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="closeHistoryBtn2">Close</button>
+        </div>
       </div>
-
-      <button id="save-btn" class="btn btn-success full">
-        <i class="fa-solid fa-plus"></i> Save
-      </button>
-    </section>
-
-    <!-- TABLE -->
-    <section class="card">
-      <div class="list-header">
-        <h2>Tracked Items</h2>
-        <span id="item-count">0</span>
-      </div>
-
-      <input id="search-input" class="input" placeholder="Search..."/>
-
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Code</th>
-            <th>Location</th>
-            <th>Updated</th>
-            <th>History</th>
-          </tr>
-        </thead>
-        <tbody id="data-body"></tbody>
-      </table>
-
-      <div id="empty-state" class="empty-state">No items</div>
-
-      <button id="export-btn" class="btn btn-secondary full">
-        <i class="fa-solid fa-file-csv"></i> Export CSV
-      </button>
-    </section>
-
-  </main>
-</div>
-
-<!-- HISTORY MODAL -->
-<div id="history-modal" class="modal-backdrop hidden">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>History</h3>
-      <small id="history-code"></small>
-      <button id="close-history" class="btn-close">×</button>
     </div>
-    <div id="history-body" class="modal-body"></div>
-    <div class="modal-footer">
-      <span id="history-count" class="tag"></span>
-    </div>
-  </div>
-</div>
 
-<!-- SCRIPTS AT BOTTOM (WAJIB!) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://unpkg.com/html5-qrcode"></script>
-
-<script src="db.js"></script>
-<script src="i18n.js"></script>
-<script src="data.js"></script>
-<script src="scanner.js"></script>
-<script src="main.js"></script>
-
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
