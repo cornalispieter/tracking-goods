@@ -65,3 +65,13 @@ export function startScanner() {
     document.body.removeChild(scannerBox);
   };
 }
+
+// Make showHistory available globally for HTML onclick
+window.showHistory = showHistory;
+
+// Make showHistory available globally
+window.showHistory = showHistory;
+
+
+// Make showHistory available globally
+window.showHistory = showHistory;

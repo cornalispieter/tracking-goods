@@ -1,8 +1,8 @@
 import { loadHistory } from './db.js';
 
 export async function showHistory(kodebarang) {
-  const modal = document.getElementById('historyModal');
-  const container = document.getElementById('historyContent');
+  const modal = document.getElementById("historyModal");
+  const container = document.getElementById("historyContent");
 
   container.innerHTML = `<h3>History for: ${kodebarang}</h3>`;
 
@@ -22,13 +22,14 @@ export async function showHistory(kodebarang) {
         <tbody>
           ${data
             .map(
-              row => `
-            <tr>
-              <td>${row.lokasi}</td>
-              <td>${new Date(row.updated).toLocaleString()}</td>
-            </tr>`
+              (row) => `
+                <tr>
+                  <td>${row.lokasi}</td>
+                  <td>${new Date(row.updated).toLocaleString()}</td>
+                </tr>
+              `
             )
-            .join('')}
+            .join("")}
         </tbody>
       </table>
     `;
@@ -37,9 +38,11 @@ export async function showHistory(kodebarang) {
   modal.style.display = "block";
 }
 
-// Close modal button
 export function attachHistoryClose() {
-  document.getElementById('closeHistory').onclick = () => {
-    document.getElementById('historyModal').style.display = "none";
+  document.getElementById("closeHistory").onclick = () => {
+    document.getElementById("historyModal").style.display = "none";
   };
 }
+
+// 🔥 FIX untuk error showHistory is not defined
+window.showHistory = showHistory;
