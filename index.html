@@ -1,326 +1,263 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
+<html lang="en" data-theme="dark">
+<head>
     <meta charset="UTF-8" />
-    <title>Item Tracking App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tracking Goods App</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-      body {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-        margin: 0;
-        padding: 0;
-        background: #f4f4f5;
-      }
-
-      header {
-        padding: 1rem 1.5rem;
-        background: #18181b;
-        color: #fafafa;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      header h1 {
-        font-size: 1.2rem;
-        margin: 0;
-      }
-
-      .lang-switcher button {
-        margin-left: 0.25rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 999px;
-        border: 1px solid #3f3f46;
-        background: #27272a;
-        color: #fafafa;
-        font-size: 0.75rem;
-        cursor: pointer;
-      }
-
-      .lang-switcher button.active {
-        background: #f97316;
-        border-color: #f97316;
-        color: #020617;
-        font-weight: 600;
-      }
-
-      main {
-        padding: 1.5rem;
-        max-width: 960px;
-        margin: 0 auto;
-      }
-
-      .card {
-        background: #ffffff;
-        border-radius: 0.75rem;
-        padding: 1rem 1.25rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
-      }
-
-      .card h2 {
-        margin: 0 0 0.75rem 0;
-        font-size: 1rem;
-      }
-
-      .form-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        align-items: flex-end;
-      }
-
-      .field {
-        flex: 1;
-        min-width: 160px;
-      }
-
-      label {
-        display: block;
-        font-size: 0.8rem;
-        margin-bottom: 0.25rem;
-        color: #52525b;
-      }
-
-      input {
-        width: 100%;
-        padding: 0.5rem 0.6rem;
-        border-radius: 0.5rem;
-        border: 1px solid #d4d4d8;
-        font-size: 0.9rem;
-      }
-
-      button.primary {
-        padding: 0.6rem 1rem;
-        border-radius: 0.75rem;
-        border: none;
-        background: #16a34a;
-        color: #f9fafb;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 0.9rem;
-      }
-
-      button.primary:disabled {
-        opacity: 0.6;
-        cursor: default;
-      }
-
-      .hint {
-        margin-top: 0.5rem;
-        font-size: 0.75rem;
-        color: #71717a;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.9rem;
-      }
-
-      thead {
-        background: #f9fafb;
-      }
-
-      th,
-      td {
-        padding: 0.6rem 0.5rem;
-        border-bottom: 1px solid #e4e4e7;
-        text-align: left;
-      }
-
-      th {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        color: #71717a;
-      }
-
-      tbody tr:hover {
-        background: #f4f4f5;
-      }
-
-      .code-cell {
-        font-weight: 600;
-        color: #111827;
-      }
-
-      .time-cell {
-        font-size: 0.8rem;
-        color: #6b7280;
-      }
-
-      .actions-cell button {
-        padding: 0.35rem 0.7rem;
-        border-radius: 999px;
-        border: 1px solid #e4e4e7;
-        background: #fafafa;
-        font-size: 0.75rem;
-        cursor: pointer;
-      }
-
-      .actions-cell button:hover {
-        background: #e5e7eb;
-      }
-
-      /* Modal */
-      .modal-backdrop {
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.4);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 50;
-      }
-
-      .modal {
-        background: #ffffff;
-        border-radius: 0.75rem;
-        max-width: 480px;
-        width: 100%;
-        max-height: 80vh;
-        overflow: hidden;
-        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.4);
-      }
-
-      .modal-header {
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid #e4e4e7;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .modal-header h3 {
-        margin: 0;
-        font-size: 0.95rem;
-      }
-
-      .modal-body {
-        padding: 0.75rem 1rem;
-        max-height: 60vh;
-        overflow-y: auto;
-        font-size: 0.85rem;
-      }
-
-      .modal-footer {
-        padding: 0.75rem 1rem;
-        border-top: 1px solid #e4e4e7;
-        text-align: right;
-      }
-
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.1rem 0.4rem;
-        font-size: 0.7rem;
-        border-radius: 999px;
-        border: 1px solid #e5e7eb;
-        background: #f9fafb;
-        margin-left: 0.25rem;
-      }
-
-      @media (max-width: 640px) {
-        main {
-          padding: 1rem;
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0d0d0d;
+            color: #e6e6e6;
         }
-
         header {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 0.5rem;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
         }
-
-        .form-row {
-          flex-direction: column;
-          align-items: stretch;
+        .container {
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
         }
-      }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 6px;
+        }
+        button {
+            padding: 10px 15px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background: #111;
+        }
+        .lang-picker {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .history-btn {
+            background: #444;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
-  </head>
-  <body>
-    <header>
-      <h1 data-i18n="title">Item Tracking App</h1>
-      <div class="lang-switcher">
-        <button data-lang="en" class="active">EN</button>
-        <button data-lang="id">ID</button>
-        <button data-lang="nl">NL</button>
-        <button data-lang="pl">PL</button>
-      </div>
-    </header>
+</head>
+<body>
+<header>
+    <span id="titleText">Tracking Goods</span>
+</header>
 
-    <main>
-      <section class="card">
-        <h2 data-i18n="formTitle">Update item location</h2>
-        <div class="form-row">
-          <div class="field">
-            <label for="kodeProduksi" data-i18n="labelCode">Item code</label>
-            <input
-              id="kodeProduksi"
-              type="text"
-              placeholder="e.g. PRD-00123"
-              autocomplete="off"
-            />
-          </div>
+<select id="languageSelect" class="lang-picker">
+    <option value="en">English</option>
+    <option value="nl">Nederlands</option>
+</select>
 
-          <div class="field">
-            <label for="lokasi" data-i18n="labelLocation">Location</label>
-            <input
-              id="lokasi"
-              type="text"
-              placeholder="e.g. Rack A3"
-              autocomplete="off"
-            />
-          </div>
+<div class="container">
+    <h2 id="sectionInput">Input</h2>
 
-          <div>
-            <button id="saveBtn" class="primary" data-i18n="btnSave">
-              Save / Update
-            </button>
-          </div>
-        </div>
-        <p class="hint" data-i18n="hintText">
-          When you save with the same item code, the current row is updated and
-          older records are kept as history.
-        </p>
-      </section>
+    <input id="kodeInput" placeholder="Item Code" />
+    <input id="lokasiInput" placeholder="Location" />
+    <button id="saveBtn"><i class="fa fa-save"></i> Save</button>
 
-      <section class="card">
-        <h2 data-i18n="listTitle">Current items</h2>
-        <table>
-          <thead>
-            <tr>
-              <th data-i18n="thCode">Code</th>
-              <th data-i18n="thLocation">Location</th>
-              <th data-i18n="thUpdated">Last Updated</th>
-              <th data-i18n="thActions">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="recordsBody">
-            <!-- rows rendered via JS -->
-          </tbody>
-        </table>
-      </section>
-    </main>
+    <h2 id="sectionSearch">Search</h2>
+    <input id="searchInput" placeholder="Search..." />
 
-    <!-- History Modal -->
-    <div id="historyBackdrop" class="modal-backdrop">
-      <div class="modal">
-        <div class="modal-header">
-          <h3 id="historyTitle"></h3>
-          <button id="closeHistoryBtn">✕</button>
-        </div>
-        <div class="modal-body">
-          <div id="historyContent"></div>
-        </div>
-        <div class="modal-footer">
-          <button id="closeHistoryBtn2">Close</button>
-        </div>
-      </div>
+    <div>
+        <button id="exportCSV"><i class="fa fa-file-csv"></i> Export CSV</button>
     </div>
 
-    <script src="script.js"></script>
-  </body>
+    <h2 id="sectionData">Data</h2>
+    <table>
+        <thead>
+            <tr>
+                <th id="thKode">Item Code</th>
+                <th id="thLokasi">Location</th>
+                <th id="thWaktu">Updated</th>
+                <th>History</th>
+            </tr>
+        </thead>
+        <tbody id="dataBody"></tbody>
+    </table>
+
+    <h2 id="sectionHistory">History</h2>
+    <table>
+        <thead>
+            <tr>
+                <th id="thHKode">Item Code</th>
+                <th id="thHLokasi">Location</th>
+                <th id="thHWaktu">Updated</th>
+            </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+    </table>
+</div>
+
+<script>
+// === SUPABASE SETUP ===
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// === MULTI LANGUAGE ===
+const lang = {
+    en: {
+        title: "Tracking Goods",
+        input: "Input",
+        search: "Search",
+        data: "Data Overview",
+        history: "History",
+        item: "Item Code",
+        loc: "Location",
+        updated: "Updated",
+        save: "Save",
+    },
+    nl: {
+        title: "Goederen Tracking",
+        input: "Invoer",
+        search: "Zoeken",
+        data: "Gegevensoverzicht",
+        history: "Historiek",
+        item: "Artikelcode",
+        loc: "Locatie",
+        updated: "Bijgewerkt",
+        save: "Opslaan",
+    }
+};
+
+const applyLanguage = () => {
+    const l = lang[document.getElementById("languageSelect").value];
+    document.getElementById("titleText").innerText = l.title;
+    document.getElementById("sectionInput").innerText = l.input;
+    document.getElementById("sectionSearch").innerText = l.search;
+    document.getElementById("sectionData").innerText = l.data;
+    document.getElementById("sectionHistory").innerText = l.history;
+    document.getElementById("thKode").innerText = l.item;
+    document.getElementById("thLokasi").innerText = l.loc;
+    document.getElementById("thWaktu").innerText = l.updated;
+    document.getElementById("thHKode").innerText = l.item;
+    document.getElementById("thHLokasi").innerText = l.loc;
+    document.getElementById("thHWaktu").innerText = l.updated;
+};
+
+// === LOAD DATA ===
+async function loadData() {
+    const { data } = await supabase.from("tracking").select("*");
+
+    const unique = {};
+    data.forEach(r => {
+        if (!unique[r.kodebarang]) unique[r.kodebarang] = r;
+    });
+
+    const tbody = document.getElementById("dataBody");
+    tbody.innerHTML = "";
+
+    Object.values(unique).forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${row.kodebarang}</td>
+            <td>${row.lokasi}</td>
+            <td>${new Date(row.updated_at).toLocaleString()}</td>
+            <td><button class="history-btn" onclick="loadHistory('${row.kodebarang}')"><i class='fa fa-clock'></i></button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// === SAVE ===
+document.getElementById("saveBtn").onclick = async () => {
+    let kode = document.getElementById("kodeInput").value.trim();
+    let lokasi = document.getElementById("lokasiInput").value.trim();
+
+    if (!kode || !lokasi) return;
+
+    await supabase.from("tracking").insert({ kodebarang: kode, lokasi: lokasi });
+
+    document.getElementById("kodeInput").value = "";
+    document.getElementById("lokasiInput").value = "";
+
+    loadData();
+};
+
+// === SEARCH ===
+document.getElementById("searchInput").addEventListener("input", () => {
+    const term = document.getElementById("searchInput").value.toLowerCase();
+    document.querySelectorAll("#dataBody tr").forEach(tr => {
+        tr.style.display = tr.innerText.toLowerCase().includes(term) ? "" : "none";
+    });
+});
+
+// === HISTORY ===
+async function loadHistory(kode) {
+    const { data } = await supabase
+        .from("tracking")
+        .select("*")
+        .eq("kodebarang", kode)
+        .order("updated_at", { ascending: false });
+
+    const tbody = document.getElementById("historyBody");
+    tbody.innerHTML = "";
+
+    data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${row.kodebarang}</td>
+            <td>${row.lokasi}</td>
+            <td>${new Date(row.updated_at).toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// === EXPORT CSV ===
+document.getElementById("exportCSV").onclick = () => {
+    let rows = [];
+    document.querySelectorAll("#dataBody tr").forEach(tr => {
+        const cols = [...tr.children].map(td => td.innerText);
+        rows.push(cols.join(","));
+    });
+
+    const blob = new Blob([rows.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "tracking_data.csv";
+    a.click();
+};
+
+// INITIAL LOAD
+applyLanguage();
+loadData();
+
+document.getElementById("languageSelect").onchange = applyLanguage;
+</script>
+</body>
 </html>
