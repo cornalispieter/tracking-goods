@@ -1,8 +1,3 @@
-import { loadData, saveRecord } from './db.js';
-import { renderTable, clearInputs } from './ui.js';
-import { startScanner } from './scan.js';
-
-// Load data when page loads
 document.addEventListener('DOMContentLoaded', async () => {
   const data = await loadData();
   renderTable(data);
@@ -20,14 +15,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     clearInputs();
   };
 
-  // Old Scan Button (optional)
+  // Scan umum (tombol besar) → default ke kodebarang
   document.getElementById('scanBtn').onclick = () => {
-    startScanner();
+    startScanner('kodebarang');
   };
 
-  // FAB Scan Button (new)
-  const fabScan = document.getElementById("fab-scan");
+  // Scan khusus input kodebarang
+  const scanKodeBtn = document.getElementById('scanKodeBtn');
+  if (scanKodeBtn) {
+    scanKodeBtn.onclick = () => startScanner('kodebarang');
+  }
+
+  // Scan khusus input lokasi
+  const scanLokasiBtn = document.getElementById('scanLokasiBtn');
+  if (scanLokasiBtn) {
+    scanLokasiBtn.onclick = () => startScanner('lokasi');
+  }
+
+  // FAB (kalau ada) → juga ke kodebarang
+  const fabScan = document.getElementById('fab-scan');
   if (fabScan) {
-    fabScan.onclick = () => startScanner();
+    fabScan.onclick = () => startScanner('kodebarang');
   }
 });

@@ -1,10 +1,11 @@
 // Barcode/QR Scanner using ZXing
-// Pastikan tambahkan CDN ZXing di index.html jika belum:
-// <script src="https://unpkg.com/@zxing/browser@latest"></script>
+// Pastikan tambahkan CDN ZXing di index.html:
+// <script src="https://unpkg.com/@zxing/library@latest"></script>
 
-export function startScanner() {
+export function startScanner(targetFieldId = 'kodebarang') {
   const codeInput = document.getElementById('kodebarang');
   const locationInput = document.getElementById('lokasi');
+  const targetInput = document.getElementById(targetFieldId);
 
   const preview = document.createElement('video');
   preview.setAttribute('playsinline', true);
@@ -40,29 +41,32 @@ export function startScanner() {
   // ZXing reader
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
-  // Start scanning using back camera
+  // Start scanning using camera
   codeReader
     .decodeFromVideoDevice(null, preview, (result, err) => {
       if (result) {
-        codeInput.value = result.text; // Auto-fill kodebarang
+        const text = result.text;
 
-        // Auto-fill lokasi jika berupa QR berformat lokasi|kode
-        if (result.text.includes("|")) {
-          const [kode, lokasi] = result.text.split("|");
+        // Kalau format "kode|lokasi" → isi dua-duanya
+        if (text.includes('|')) {
+          const [kode, lokasi] = text.split('|');
           codeInput.value = kode;
           locationInput.value = lokasi;
+        } else {
+          // Kalau tidak, isi hanya target input
+          if (targetInput) {
+            targetInput.value = text;
+          }
         }
 
-        // Stop scanner
         codeReader.reset();
         document.body.removeChild(scannerBox);
       }
     })
-    .catch(e => console.error(e));
+    .catch((e) => console.error(e));
 
   closeBtn.onclick = () => {
     codeReader.reset();
     document.body.removeChild(scannerBox);
   };
 }
-

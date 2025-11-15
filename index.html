@@ -12,11 +12,19 @@
   <h2>📦 Tracking Goods</h2>
   </header>
   <div id="form-section">
+  <div class="field-group">
     <input type="text" id="kodebarang" placeholder="Item Code" />
-    <input type="text" id="lokasi" placeholder="Location" />
-    <button id="saveBtn">💾 Save</button>
-    <button id="scanBtn">📷 Scan</button>
+    <button type="button" id="scanKodeBtn" class="btn-icon">📷</button>
   </div>
+
+  <div class="field-group">
+    <input type="text" id="lokasi" placeholder="Location" />
+    <button type="button" id="scanLokasiBtn" class="btn-icon">📷</button>
+  </div>
+
+  <button id="saveBtn" class="btn-primary">💾 Save</button>
+  <button id="scanBtn" class="btn-scan">📷 Scan</button>
+</div>
 
   <table id="data-table">
     <thead>
