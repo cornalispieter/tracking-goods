@@ -136,5 +136,76 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fokus balik ke kode barang
     codeInputEl.focus();
+    // Export current summaryRows to CSV (Excel / Google Sheets friendly)
+function exportSummaryToCsv() {
+  try {
+    if (!summaryRows || summaryRows.length === 0) {
+      alert(window.translations[window.currentLang].toastExportNoData);
+      return;
+    }
+
+    const dict = window.translations[window.currentLang];
+
+    const header = [
+      '"' + (dict.colCode || "Code") + '"',
+      '"' + (dict.colLocation || "Location") + '"',
+      '"' + (dict.colTime || "Updated") + '"'
+    ];
+
+    const rows = summaryRows.map((row) => {
+      const code = String(row.code || "").replace(/"/g, '""');
+      const loc = String(row.location || "").replace(/"/g, '""');
+      const ts = row.updated_at
+        ? new Date(row.updated_at).toLocaleString()
+        : "";
+
+      return `"${code}","${loc}","${ts.replace(/"/g, '""')}"`;
+    });
+
+    const csvContent = [header.join(","), ...rows].join("\n");
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;"
+    });
+    const url = URL.createObjectURL(blob);
+
+    const now = new Date();
+    const pad = (n) => (n < 10 ? "0" + n : String(n));
+    const filename =
+      "goods-tracking-" +
+      now.getFullYear() +
+      pad(now.getMonth() + 1) +
+      pad(now.getDate()) +
+      "-" +
+      pad(now.getHours()) +
+      pad(now.getMinutes()) +
+      ".csv";
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Error exporting CSV:", err);
+    alert("Failed to export CSV.");
   }
+}
+
+  }
+  const btnExportCsv = document.getElementById("btn-export-csv");
+
+...
+
+// export CSV
+if (btnExportCsv) {
+  btnExportCsv.addEventListener("click", () => {
+    if (typeof exportSummaryToCsv === "function") {
+      exportSummaryToCsv();
+    }
+  });
+}
+
 });
