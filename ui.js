@@ -62,4 +62,21 @@ export function exportToCSV(data) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  export function showPopup(message = "Data berhasil disimpan!") {
+  const popup = document.getElementById("popup");
+  const text = document.getElementById("popup-message");
+  const okBtn = document.getElementById("popup-ok");
+
+  text.textContent = message;
+  popup.style.display = "flex";
+
+  okBtn.onclick = () => {
+    popup.style.display = "none";
+  };
+
+  // Auto close setelah 2 detik (opsional)
+  setTimeout(() => {
+    popup.style.display = "none";
+  }, 2000);
+
 }
