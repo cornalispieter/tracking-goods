@@ -36,4 +36,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (fabScan) {
     fabScan.onclick = () => startScanner('kodebarang');
   }
+
+  // === Realtime Search ===
+const searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("input", () => {
+  const keyword = searchInput.value.toLowerCase();
+
+  const filtered = data.filter(item =>
+    item.kodebarang.toLowerCase().includes(keyword) ||
+    item.lokasi.toLowerCase().includes(keyword) ||
+    new Date(item.updated).toLocaleString().toLowerCase().includes(keyword)
+  );
+
+  renderTable(filtered);
 });

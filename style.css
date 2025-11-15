@@ -281,6 +281,30 @@ tr:hover {
 .btn-icon:active {
   transform: scale(0.95);
 }
+.search-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+#searchInput {
+  width: 100%;
+  max-width: 350px;
+  padding: 12px 14px;
+  background: #1b1b1b;
+  border: 1px solid #333;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: 0.2s ease;
+}
+
+#searchInput:focus {
+  outline: none;
+  border-color: #4c6ef5;
+  box-shadow: 0 0 6px rgba(76,110,245,0.4);
+}
 
 
 }
