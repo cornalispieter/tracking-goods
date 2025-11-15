@@ -1,9 +1,10 @@
 /* ============================================================
-   data.js — Supabase + Rendering
+   data.js — UPDATED WITH EXPORT CSV + NO LOCK
    ============================================================ */
 
 let summaryRows = [];
 
+/* Load summary list */
 async function loadSummaryList() {
   const tableBody = document.getElementById("table-body");
   const summaryCount = document.getElementById("summary-count");
@@ -14,16 +15,12 @@ async function loadSummaryList() {
     .select("*")
     .order("updated_at", { ascending: false });
 
-  if (error) {
-    console.error("Supabase load error:", error);
-    return;
-  }
+  if (error) return console.error(error);
 
   const map = new Map();
   data.forEach((row) => {
-    if (!map.has(row.code)) {
-      map.set(row.code, row);
-    } else if (new Date(row.updated_at) > new Date(map.get(row.code).updated_at)) {
+    if (!map.has(row.code)) map.set(row.code, row);
+    else if (new Date(row.updated_at) > new Date(map.get(row.code).updated_at)) {
       map.set(row.code, row);
     }
   });
@@ -32,16 +29,18 @@ async function loadSummaryList() {
   renderSummaryList();
 }
 
+/* Render table */
 function renderSummaryList() {
   const tableBody = document.getElementById("table-body");
   const summaryCount = document.getElementById("summary-count");
   const emptyState = document.getElementById("empty-state");
 
-  const search = document.getElementById("search-input").value.toLowerCase();
+  const searchValue = document.getElementById("search-input").value.toLowerCase();
 
-  const filtered = summaryRows.filter((r) =>
-    r.code.toLowerCase().includes(search) ||
-    r.location.toLowerCase().includes(search)
+  const filtered = summaryRows.filter(
+    (r) =>
+      r.code.toLowerCase().includes(searchValue) ||
+      r.location.toLowerCase().includes(searchValue)
   );
 
   summaryCount.textContent = filtered.length;
@@ -68,22 +67,19 @@ function renderSummaryList() {
     .join("");
 }
 
+/* Save */
 async function saveUpdateToSupabase(code, location) {
   const { error } = await window.supabaseClient.from("goods_updates").insert([
-    {
-      code,
-      location,
-      updated_at: new Date().toISOString(),
-    },
+    { code, location, updated_at: new Date().toISOString() },
   ]);
 
   return !error;
 }
 
+/* History modal */
 async function openHistoryForCode(code) {
   const modal = document.getElementById("history-modal");
   const historyList = document.getElementById("history-list");
-  const dict = translations[currentLang];
 
   const { data, error } = await window.supabaseClient
     .from("goods_updates")
@@ -94,15 +90,14 @@ async function openHistoryForCode(code) {
   if (error) return;
 
   document.getElementById("history-code-label").textContent = code;
-  document.getElementById("history-count-tag").textContent =
-    data.length + " " + dict.historyCountLabel;
+  document.getElementById("history-count-tag").textContent = data.length + " logs";
 
   historyList.innerHTML = `
     <table class="history-table">
       <thead>
         <tr>
-          <th>${dict.colLocation}</th>
-          <th>${dict.colTime}</th>
+          <th>Location</th>
+          <th>Updated</th>
         </tr>
       </thead>
       <tbody>
@@ -126,3 +121,28 @@ document.getElementById("close-history").onclick = () =>
   document.getElementById("history-modal").classList.remove("show");
 
 document.getElementById("search-input").oninput = renderSummaryList;
+
+/* EXPORT CSV */
+function exportToCSV(rows) {
+  if (!rows || rows.length === 0) {
+    alert("No data to export.");
+    return;
+  }
+
+  const header = ["code", "location", "updated_at"];
+  const csvRows = [header.join(",")];
+
+  rows.forEach((r) => {
+    csvRows.push(`${r.code},${r.location},${r.updated_at}`);
+  });
+
+  const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "tracked_items.csv";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}

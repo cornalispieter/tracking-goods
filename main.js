@@ -1,5 +1,5 @@
 /* ============================================================
-   main.js — UI Logic
+   main.js — UPDATED (NO LOCK SYSTEM + EXPORT)
    ============================================================ */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -7,15 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const locationInput = document.getElementById("location-input");
 
   const btnScanCode = document.getElementById("start-scan-code");
-  const btnLockCode = document.getElementById("lock-code");
-
   const btnScanLocation = document.getElementById("start-scan-location");
-  const btnLockLocation = document.getElementById("lock-location");
 
   const btnSave = document.getElementById("save-update");
-
-  const step1Label = document.getElementById("step1-label");
-  const step2Label = document.getElementById("step2-label");
+  const btnExport = document.getElementById("export-csv");
 
   const langSelect = document.getElementById("lang-select");
 
@@ -32,55 +27,58 @@ document.addEventListener("DOMContentLoaded", () => {
   applyTranslations();
   loadSummaryList();
 
-  btnLockCode.onclick = () => {
-    if (!codeInput.value.trim()) return;
 
-    codeInput.disabled = true;
-    codeInput.classList.add("locked-input");
-    step1Label.classList.add("locked");
-
-    locationInput.disabled = false;
-    btnScanLocation.disabled = false;
-    btnLockLocation.disabled = false;
-  };
-
-  btnLockLocation.onclick = () => {
-    if (!locationInput.value.trim()) return;
-
-    locationInput.disabled = true;
-    locationInput.classList.add("locked-input");
-    step2Label.classList.add("locked");
-
-    btnSave.disabled = false;
-  };
-
+  /* ============================
+       SCAN CODE
+     ============================ */
   btnScanCode.onclick = startScannerForCode;
+
+  /* ============================
+       SCAN LOCATION
+     ============================ */
   btnScanLocation.onclick = startScannerForLocation;
 
+  /* ============================
+       SAVE ENTRY
+     ============================ */
   btnSave.onclick = async () => {
     const code = codeInput.value.trim();
     const loc = locationInput.value.trim();
 
-    if (!code || !loc) return;
+    if (!code || !loc) return alert("Both fields required.");
 
     btnSave.disabled = true;
 
     const ok = await saveUpdateToSupabase(code, loc);
+
     if (ok) {
       resetForm();
       loadSummaryList();
     } else {
-      alert("Save failed");
+      alert("Save failed.");
       btnSave.disabled = false;
     }
   };
 
+  /* ============================
+       EXPORT CSV
+     ============================ */
+  btnExport.onclick = () => {
+    exportToCSV(summaryRows);
+  };
+
+  /* ============================
+       LANGUAGE SWITCH
+     ============================ */
   langSelect.onchange = () => {
     currentLang = langSelect.value;
     applyTranslations();
     loadSummaryList();
   };
 
+  /* ============================
+       RESET FORM
+     ============================ */
   function resetForm() {
     stopScannerForCode();
     stopScannerForLocation();
@@ -88,20 +86,12 @@ document.addEventListener("DOMContentLoaded", () => {
     codeInput.value = "";
     locationInput.value = "";
 
-    codeInput.disabled = false;
-    locationInput.disabled = true;
-
-    codeInput.classList.remove("locked-input");
-    locationInput.classList.remove("locked-input");
-
-    step1Label.classList.remove("locked");
-    step2Label.classList.remove("locked");
-
-    btnScanLocation.disabled = true;
-    btnLockLocation.disabled = true;
-    btnSave.disabled = true;
+    btnSave.disabled = false;
   }
 
+  /* ============================
+       TRANSLATIONS
+     ============================ */
   function applyTranslations() {
     const dict = translations[currentLang];
     document.querySelectorAll("[data-i18n]").forEach((el) => {
