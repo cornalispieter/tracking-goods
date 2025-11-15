@@ -77,11 +77,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }  // <--- CLOSE IF
 
-  // ===========================
-  // HISTORY MODAL CLOSE
-  // ===========================
-  attachHistoryClose();
-
+ // ==================================================
+  // POPUP MESSAGE
+  // ==================================================
   function showPopup(message = "Saved successfully!") {
     const popup = document.createElement("div");
     popup.className = "popup-message";
@@ -97,6 +95,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         popup.classList.remove("show");
         setTimeout(() => popup.remove(), 300);
     }, 1500);
+  } // <--- FIXED: fungsi ditutup benar
+
 
   const exportCsvBtn = document.getElementById('exportCsvBtn');
 if (exportCsvBtn) {
