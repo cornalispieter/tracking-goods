@@ -569,8 +569,6 @@ input.locked-input {
   color: white;
 }
 
-}
-
 /* Very wide screens – keep app centered, not terlalu lebar */
 @media (min-width: 1440px) {
   .app {
