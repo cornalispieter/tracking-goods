@@ -1,360 +1,326 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <title>App Tracking Barang (Supabase)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Scanner -->
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <!-- Supabase JS v2 -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
-  <style>
-    :root {
-      --bg: #0f172a;          /* dark blue/grey */
-      --bg-soft: #111827;
-      --card: #1f2937;
-      --accent: #22c55e;
-      --accent-soft: rgba(34, 197, 94, 0.15);
-      --text: #e5e7eb;
-      --text-muted: #9ca3af;
-      --border: #374151;
-      --danger: #f97373;
-      --radius: 12px;
-      --shadow-soft: 0 10px 25px rgba(0,0,0,0.35);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, sans-serif;
-    }
-
-    body {
-      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-    }
-
-    main {
-      width: 100%;
-      max-width: 480px;
-      padding: 1.25rem 1rem 2.5rem;
-    }
-
-    header {
-      margin-bottom: 1.25rem;
-    }
-
-    h1 {
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-
-    header p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    section {
-      background: rgba(15, 23, 42, 0.92);
-      border-radius: var(--radius);
-      border: 1px solid rgba(55, 65, 81, 0.7);
-      padding: 0.9rem 0.9rem 1rem;
-      margin-bottom: 0.9rem;
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: blur(10px);
-    }
-
-    section h2 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 0.6rem;
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    section h2::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-
-    label {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 0.35rem;
-    }
-
-    input {
-      width: 100%;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      padding: 0.55rem 0.75rem;
-      font-size: 0.9rem;
-      background: #020617;
-      color: var(--text);
-      outline: none;
-      transition: border 0.15s, box-shadow 0.15s, background 0.15s;
-    }
-
-    input::placeholder {
-      color: #6b7280;
-    }
-
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.6);
-      background: #020617;
-    }
-
-    .field-group {
-      margin-bottom: 0.7rem;
-    }
-
-    .btn-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-bottom: 0.7rem;
-    }
-
-    button {
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #020617;
-      color: var(--text);
-      padding: 0.45rem 0.9rem;
-      font-size: 0.85rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.35rem;
-      transition: background 0.15s, transform 0.05s, border 0.15s;
-      flex: 1 1 40%;
-    }
-
-    button:active {
-      transform: scale(0.97);
-    }
-
-    button.primary {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      border-color: #22c55e;
-      color: #022c22;
-      font-weight: 500;
-      flex: 1 1 100%;
-      margin-top: 0.2rem;
-    }
-
-    button.secondary {
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    button.danger {
-      border-color: rgba(248, 113, 113, 0.7);
-      color: #fecaca;
-    }
-
-    button:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    #reader {
-      width: 100%;
-      max-width: 360px;
-      margin: 0 auto 0.7rem;
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: #020617;
-    }
-
-    #message {
-      font-size: 0.8rem;
-      margin-top: 0.4rem;
-      min-height: 1em;
-    }
-
-    /* Search section */
-    .search-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-
-    .search-row input {
-      flex: 1 1 100%;
-    }
-
-    .search-row button {
-      flex: 1 1 calc(50% - 0.2rem);
-    }
-
-    /* List items */
-    #itemsContainer {
-      max-height: 55vh;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .item-card {
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), #020617);
-      border-radius: 10px;
-      border: 1px solid rgba(55, 65, 81, 0.85);
-      padding: 0.6rem 0.7rem;
-      margin-bottom: 0.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-    }
-
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .item-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-    }
-
-    .item-value {
-      font-size: 0.9rem;
-      font-weight: 500;
-      word-break: break-all;
-    }
-
-    .item-value.code {
-      color: #bbf7d0;
-    }
-
-    .item-value.location {
-      color: #e5e7eb;
-    }
-
-    .item-value.time {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      text-align: right;
-    }
-
-    .item-divider {
-      border-top: 1px dashed rgba(55, 65, 81, 0.9);
-      margin: 0.25rem 0;
-    }
-
-    .empty-state {
-      text-align: center;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      padding: 0.7rem 0.3rem;
-    }
-
-    /* Scrollbar halus di mobile */
-    #itemsContainer::-webkit-scrollbar {
-      width: 4px;
-    }
-    #itemsContainer::-webkit-scrollbar-thumb {
-      background: #4b5563;
-      border-radius: 999px;
-    }
-
-    @media (min-width: 480px) {
-      main {
-        padding-top: 1.75rem;
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Item Tracking App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f5;
       }
-    }
-  </style>
-</head>
-<body>
-  <main>
+
+      header {
+        padding: 1rem 1.5rem;
+        background: #18181b;
+        color: #fafafa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      header h1 {
+        font-size: 1.2rem;
+        margin: 0;
+      }
+
+      .lang-switcher button {
+        margin-left: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        border: 1px solid #3f3f46;
+        background: #27272a;
+        color: #fafafa;
+        font-size: 0.75rem;
+        cursor: pointer;
+      }
+
+      .lang-switcher button.active {
+        background: #f97316;
+        border-color: #f97316;
+        color: #020617;
+        font-weight: 600;
+      }
+
+      main {
+        padding: 1.5rem;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+
+      .card {
+        background: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      }
+
+      .card h2 {
+        margin: 0 0 0.75rem 0;
+        font-size: 1rem;
+      }
+
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: flex-end;
+      }
+
+      .field {
+        flex: 1;
+        min-width: 160px;
+      }
+
+      label {
+        display: block;
+        font-size: 0.8rem;
+        margin-bottom: 0.25rem;
+        color: #52525b;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.5rem 0.6rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d4d4d8;
+        font-size: 0.9rem;
+      }
+
+      button.primary {
+        padding: 0.6rem 1rem;
+        border-radius: 0.75rem;
+        border: none;
+        background: #16a34a;
+        color: #f9fafb;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      button.primary:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
+      .hint {
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: #71717a;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+
+      thead {
+        background: #f9fafb;
+      }
+
+      th,
+      td {
+        padding: 0.6rem 0.5rem;
+        border-bottom: 1px solid #e4e4e7;
+        text-align: left;
+      }
+
+      th {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #71717a;
+      }
+
+      tbody tr:hover {
+        background: #f4f4f5;
+      }
+
+      .code-cell {
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .time-cell {
+        font-size: 0.8rem;
+        color: #6b7280;
+      }
+
+      .actions-cell button {
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid #e4e4e7;
+        background: #fafafa;
+        font-size: 0.75rem;
+        cursor: pointer;
+      }
+
+      .actions-cell button:hover {
+        background: #e5e7eb;
+      }
+
+      /* Modal */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+      }
+
+      .modal {
+        background: #ffffff;
+        border-radius: 0.75rem;
+        max-width: 480px;
+        width: 100%;
+        max-height: 80vh;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.4);
+      }
+
+      .modal-header {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e4e4e7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      .modal-body {
+        padding: 0.75rem 1rem;
+        max-height: 60vh;
+        overflow-y: auto;
+        font-size: 0.85rem;
+      }
+
+      .modal-footer {
+        padding: 0.75rem 1rem;
+        border-top: 1px solid #e4e4e7;
+        text-align: right;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.1rem 0.4rem;
+        font-size: 0.7rem;
+        border-radius: 999px;
+        border: 1px solid #e5e7eb;
+        background: #f9fafb;
+        margin-left: 0.25rem;
+      }
+
+      @media (max-width: 640px) {
+        main {
+          padding: 1rem;
+        }
+
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+
+        .form-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
+    </style>
+  </head>
+  <body>
     <header>
-      <h1>Tracking Barang</h1>
-      <p>Scan barcode / QR atau input manual. Data disimpan di Supabase.</p>
+      <h1 data-i18n="title">Item Tracking App</h1>
+      <div class="lang-switcher">
+        <button data-lang="en" class="active">EN</button>
+        <button data-lang="id">ID</button>
+        <button data-lang="nl">NL</button>
+        <button data-lang="pl">PL</button>
+      </div>
     </header>
 
-    <!-- FORM INPUT -->
-    <section>
-      <h2>Input Data</h2>
+    <main>
+      <section class="card">
+        <h2 data-i18n="formTitle">Update item location</h2>
+        <div class="form-row">
+          <div class="field">
+            <label for="kodeProduksi" data-i18n="labelCode">Item code</label>
+            <input
+              id="kodeProduksi"
+              type="text"
+              placeholder="e.g. PRD-00123"
+              autocomplete="off"
+            />
+          </div>
 
-      <div class="field-group">
-        <label for="itemCode">Kode Barang</label>
-        <input
-          id="itemCode"
-          type="text"
-          placeholder="Contoh: PRD-001 / hasil scan"
-        />
+          <div class="field">
+            <label for="lokasi" data-i18n="labelLocation">Location</label>
+            <input
+              id="lokasi"
+              type="text"
+              placeholder="e.g. Rack A3"
+              autocomplete="off"
+            />
+          </div>
+
+          <div>
+            <button id="saveBtn" class="primary" data-i18n="btnSave">
+              Save / Update
+            </button>
+          </div>
+        </div>
+        <p class="hint" data-i18n="hintText">
+          When you save with the same item code, the current row is updated and
+          older records are kept as history.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2 data-i18n="listTitle">Current items</h2>
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="thCode">Code</th>
+              <th data-i18n="thLocation">Location</th>
+              <th data-i18n="thUpdated">Last Updated</th>
+              <th data-i18n="thActions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody">
+            <!-- rows rendered via JS -->
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <!-- History Modal -->
+    <div id="historyBackdrop" class="modal-backdrop">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="historyTitle"></h3>
+          <button id="closeHistoryBtn">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="historyContent"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="closeHistoryBtn2">Close</button>
+        </div>
       </div>
+    </div>
 
-      <div class="field-group">
-        <label for="location">Lokasi</label>
-        <input
-          id="location"
-          type="text"
-          placeholder="Contoh: Rak A1 / Lokasi scan"
-        />
-      </div>
-
-      <div class="btn-row">
-        <button id="scanCodeBtn" class="secondary">
-          📦 Scan Kode
-        </button>
-        <button id="scanLocationBtn" class="secondary">
-          📍 Scan Lokasi
-        </button>
-        <button id="stopScanBtn" class="secondary danger" disabled>
-          ✋ Stop Scan
-        </button>
-      </div>
-
-      <div id="reader" style="display:none;"></div>
-
-      <button id="saveBtn" class="primary">
-        💾 Simpan ke Database
-      </button>
-
-      <p id="message"></p>
-    </section>
-
-    <!-- SEARCH -->
-    <section>
-      <h2>Cari Barang</h2>
-      <div class="search-row">
-        <input
-          id="searchCode"
-          type="text"
-          placeholder="Cari berdasarkan kode barang (mis: PRD-001)"
-        />
-        <button id="searchBtn" class="secondary">🔍 Cari</button>
-        <button id="refreshBtn" class="secondary">♻️ Terbaru</button>
-      </div>
-    </section>
-
-    <!-- LIST DATA -->
-    <section>
-      <h2>Data Tersimpan</h2>
-      <div id="itemsContainer"></div>
-    </section>
-
-    <script src="./script.js"></script>
-  </main>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
