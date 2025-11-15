@@ -6,14 +6,16 @@
   <title>Tracking Goods App</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <h2>Tracking Goods App</h2>
 
+<body>
+  <header class="app-header">
+  <h2>📦 Tracking Goods</h2>
+  </header>
   <div id="form-section">
     <input type="text" id="kodebarang" placeholder="Item Code" />
     <input type="text" id="lokasi" placeholder="Location" />
-    <button id="saveBtn">Save</button>
-    <button id="scanBtn">Scan</button>
+    <button id="saveBtn">💾 Save</button>
+    <button id="scanBtn">📷 Scan</button>
   </div>
 
   <table id="data-table">
@@ -43,5 +45,6 @@
   import { attachHistoryClose } from "./history.js";
   attachHistoryClose();
 </script>
+<button id="fab-scan" class="fab">📷</button>
 </body>
 </html>

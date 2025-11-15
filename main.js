@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const data = await loadData();
   renderTable(data);
 
-  // Button events
+  // Save Button
   document.getElementById('saveBtn').onclick = async () => {
     const kodebarang = document.getElementById('kodebarang').value.trim();
     const lokasi = document.getElementById('lokasi').value.trim();
@@ -20,7 +20,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     clearInputs();
   };
 
+  // Old Scan Button (optional)
   document.getElementById('scanBtn').onclick = () => {
     startScanner();
   };
+
+  // FAB Scan Button (new)
+  const fabScan = document.getElementById("fab-scan");
+  if (fabScan) {
+    fabScan.onclick = () => startScanner();
+  }
 });
