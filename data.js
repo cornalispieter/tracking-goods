@@ -1,38 +1,27 @@
-// data.js
-
-let summaryRows = [];
-
-// save 1 update ke Supabase
-async function saveUpdateToSupabase(code, location) {
+// Export current items to CSV (Excel / Google Sheets friendly)
+// versi baru: langsung baca dari Supabase, tidak tergantung summaryRows di UI
+async function exportSummaryToCsv() {
   try {
-    const { error } = await supabaseClient
-      .from("goods_updates")
-      .insert([{ code, location }]);
-    if (error) {
-      console.error("Supabase insert error:", error);
-      return false;
-    }
-    return true;
-  } catch (err) {
-    console.error("Unexpected error saving update:", err);
-    return false;
-  }
-}
+    const dict = window.translations[window.currentLang];
 
-// load list unik per code
-async function loadSummaryList(tableBody, summaryCountEl, emptyStateEl) {
-  try {
+    // Ambil semua data dari Supabase
     const { data, error } = await supabaseClient
       .from("goods_updates")
-      .select("*")
+      .select("code, location, updated_at")
       .order("updated_at", { ascending: false });
 
     if (error) {
-      console.error("Supabase select error:", error);
-      alert(window.translations[window.currentLang].toastErrorLoad);
+      console.error("Supabase export select error:", error);
+      alert(dict.toastErrorLoad || "Failed to load data for export.");
       return;
     }
 
+    if (!data || data.length === 0) {
+      alert(dict.toastExportNoData);
+      return;
+    }
+
+    // Group per code, ambil update terbaru
     const byCode = new Map();
     (data || []).forEach((row) => {
       if (!row.code) return;
@@ -46,156 +35,68 @@ async function loadSummaryList(tableBody, summaryCountEl, emptyStateEl) {
       }
     });
 
-    summaryRows = Array.from(byCode.values()).sort((a, b) => {
+    const summaryArray = Array.from(byCode.values()).sort((a, b) => {
       return (
         new Date(b.updated_at).getTime() -
         new Date(a.updated_at).getTime()
       );
     });
 
-    renderSummaryList(tableBody, summaryCountEl, emptyStateEl);
-  } catch (err) {
-    console.error("Unexpected error loading list:", err);
-    alert(window.translations[window.currentLang].toastErrorLoad);
-  }
-}
-
-// render list di table
-function renderSummaryList(tableBody, summaryCountEl, emptyStateEl) {
-  if (!tableBody || !summaryCountEl || !emptyStateEl) return;
-
-  const dict = window.translations[window.currentLang];
-  const searchInput = document.getElementById("search-input");
-  const term = (searchInput?.value || "").trim().toLowerCase();
-
-  let filtered = summaryRows;
-  if (term) {
-    filtered = summaryRows.filter((row) => {
-      const code = (row.code || "").toLowerCase();
-      const loc = (row.location || "").toLowerCase();
-      return code.includes(term) || loc.includes(term);
-    });
-  }
-
-  tableBody.innerHTML = "";
-
-  if (filtered.length === 0) {
-    emptyStateEl.style.display = "block";
-    const span = emptyStateEl.querySelector("[data-i18n='emptyState']");
-    if (span) {
-      span.textContent = term ? dict.noResultsSearch : dict.emptyState;
-    }
-  } else {
-    emptyStateEl.style.display = "none";
-  }
-
-  filtered.forEach((row) => {
-    const tr = document.createElement("div");
-    tr.className = "table-row";
-
-    const codeCell = document.createElement("div");
-    codeCell.className = "badge-code";
-    codeCell.textContent = row.code;
-
-    const locCell = document.createElement("div");
-    locCell.className = "badge-location";
-    locCell.textContent = row.location || "-";
-
-    const timeCell = document.createElement("div");
-    timeCell.className = "badge-time";
-    const ts = row.updated_at
-      ? new Date(row.updated_at).toLocaleString()
-      : "";
-    timeCell.textContent = ts;
-
-    const actionCell = document.createElement("div");
-    const historyBtn = document.createElement("button");
-    historyBtn.className = "btn-history";
-    historyBtn.textContent = "⋯";
-    historyBtn.title = "View history";
-    historyBtn.addEventListener("click", () => {
-      window.openHistoryForCode(row.code);
-    });
-    actionCell.appendChild(historyBtn);
-
-    tr.appendChild(codeCell);
-    tr.appendChild(locCell);
-    tr.appendChild(timeCell);
-    tr.appendChild(actionCell);
-
-    tableBody.appendChild(tr);
-  });
-
-  summaryCountEl.textContent = filtered.length.toString();
-}
-
-// load history per code
-async function loadHistoryForCode(
-  code,
-  historyListEl,
-  historyCodeLabelEl,
-  historyCountTagEl
-) {
-  try {
-    const { data, error } = await supabaseClient
-      .from("goods_updates")
-      .select("*")
-      .eq("code", code)
-      .order("updated_at", { ascending: false });
-
-    if (error) {
-      console.error("Supabase history error:", error);
-      alert(window.translations[window.currentLang].toastErrorHistory);
+    if (!summaryArray.length) {
+      alert(dict.toastExportNoData);
       return;
     }
 
-    const dict = window.translations[window.currentLang];
-    historyListEl.innerHTML = "";
-    historyCodeLabelEl.textContent = code;
+    // Header CSV pakai translate aktif
+    const header = [
+      '"' + (dict.colCode || "Code") + '"',
+      '"' + (dict.colLocation || "Location") + '"',
+      '"' + (dict.colTime || "Updated") + '"'
+    ];
 
-    const header = document.createElement("div");
-    header.className = "history-table-header";
-    const hCode = document.createElement("div");
-    hCode.textContent = dict.colCode;
-    const hLoc = document.createElement("div");
-    hLoc.textContent = dict.colLocation;
-    const hTime = document.createElement("div");
-    hTime.textContent = dict.colTime;
-    header.appendChild(hCode);
-    header.appendChild(hLoc);
-    header.appendChild(hTime);
-    historyListEl.appendChild(header);
-
-    (data || []).forEach((row) => {
-      const r = document.createElement("div");
-      r.className = "history-row";
-
-      const cCode = document.createElement("div");
-      cCode.className = "history-code";
-      cCode.textContent = row.code;
-
-      const cLoc = document.createElement("div");
-      cLoc.className = "history-location";
-      cLoc.textContent = row.location || "-";
-
-      const cTime = document.createElement("div");
-      cTime.className = "history-time";
+    const rows = summaryArray.map((row) => {
+      const code = String(row.code || "").replace(/"/g, '""');
+      const loc = String(row.location || "").replace(/"/g, '""');
       const ts = row.updated_at
         ? new Date(row.updated_at).toLocaleString()
         : "";
-      cTime.textContent = ts;
 
-      r.appendChild(cCode);
-      r.appendChild(cLoc);
-      r.appendChild(cTime);
-      historyListEl.appendChild(r);
+      return [
+        '"' + code + '"',
+        '"' + loc + '"',
+        '"' + ts.replace(/"/g, '""') + '"'
+      ].join(",");
     });
 
-    historyCountTagEl.textContent = `${data?.length || 0} ${
-      dict.historyCountLabel
-    }`;
+    const csvContent = [header.join(","), ...rows].join("\n");
+
+    // Tambah UTF-8 BOM biar Excel baca dengan benar
+    const blob = new Blob(["\ufeff" + csvContent], {
+      type: "text/csv;charset=utf-8;"
+    });
+    const url = URL.createObjectURL(blob);
+
+    const now = new Date();
+    const pad = (n) => (n < 10 ? "0" + n : String(n));
+    const filename =
+      "goods-tracking-" +
+      now.getFullYear() +
+      pad(now.getMonth() + 1) +
+      pad(now.getDate()) +
+      "-" +
+      pad(now.getHours()) +
+      pad(now.getMinutes()) +
+      ".csv";
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   } catch (err) {
-    console.error("Unexpected error loading history:", err);
-    alert(window.translations[window.currentLang].toastErrorHistory);
+    console.error("Error exporting CSV:", err);
+    alert("Failed to export CSV.");
   }
 }
