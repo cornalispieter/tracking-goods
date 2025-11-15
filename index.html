@@ -5,183 +5,176 @@
   <title>Tracking Goods</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Dark style -->
   <style>
     :root {
       --bg: #020617;
       --bg-card: #020617;
-      --border-subtle: #1e293b;
+      --border: #1f2933;
       --accent: #22c55e;
-      --accent-soft: rgba(34, 197, 94, 0.1);
-      --accent-strong: rgba(34, 197, 94, 0.25);
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --radius-lg: 18px;
+      --accent-soft: rgba(34, 197, 94, 0.12);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     body {
-      background: radial-gradient(circle at top, #0b1120, #020617 60%);
-      color: var(--text-main);
+      background: #020617;
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 16px;
+      padding: 12px;
     }
 
     .app {
       width: 100%;
       max-width: 480px;
-      background: linear-gradient(145deg, #020617, #020617);
-      border-radius: 24px;
-      padding: 16px 16px 20px;
-      border: 1px solid var(--border-subtle);
-      box-shadow:
-        0 24px 80px rgba(15, 23, 42, 0.9),
-        0 0 0 1px rgba(15, 23, 42, 0.8);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: #020617;
+      padding: 12px;
     }
 
     header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .title-block {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    h1 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      display: flex;
       align-items: center;
+      margin-bottom: 12px;
       gap: 8px;
     }
 
-    h1 span.logo-pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      padding: 4px 10px;
-      border: 1px solid var(--accent-soft);
-      background: radial-gradient(circle at top, #22c55e22, transparent 60%);
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #bbf7d0;
+    .title-block h1 {
+      font-size: 1rem;
+      font-weight: 600;
     }
 
-    header p {
+    .title-block p {
       font-size: 0.75rem;
-      color: var(--text-muted);
+      color: var(--muted);
+      margin-top: 2px;
     }
 
     .lang-select {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 10px;
+      padding: 4px 8px;
       border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      background: radial-gradient(circle at top, #0b1120, #020617);
+      border: 1px solid var(--border);
       font-size: 0.75rem;
     }
 
     .lang-select label {
-      color: var(--text-muted);
+      color: var(--muted);
     }
 
     .lang-select select {
       background: transparent;
       border: none;
-      color: var(--text-main);
-      font-size: 0.8rem;
+      color: var(--text);
       outline: none;
+      font-size: 0.75rem;
     }
 
     main {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
     }
 
     .card {
-      background: radial-gradient(circle at top left, #0b1120, #020617 65%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-subtle);
-      padding: 12px 12px 14px;
+      background: #020617;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 10px;
     }
 
     .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       margin-bottom: 8px;
     }
 
-    .card-title {
-      font-size: 0.85rem;
+    .card-header-title {
+      font-size: 0.9rem;
       font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .card-header-subtitle {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .step-block {
+      border-radius: 10px;
+      border: 1px solid #1b2634;
+      padding: 8px;
+      margin-top: 6px;
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
-    .card-title span.dot {
-      width: 7px;
-      height: 7px;
+    .step-label span.step-number {
+      width: 18px;
+      height: 18px;
       border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+      border: 1px solid var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--accent);
+      background: rgba(15, 23, 42, 0.8);
     }
 
-    .card-subtitle {
-      font-size: 0.7rem;
-      color: var(--text-muted);
+    .step-label.locked {
+      color: #a5f3fc;
+    }
+
+    .step-label.locked .step-number {
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     .field-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-top: 8px;
+      gap: 4px;
       margin-bottom: 6px;
     }
 
     label {
-      font-size: 0.7rem;
-      color: var(--text-muted);
+      font-size: 0.75rem;
+      color: var(--muted);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     label span.helper {
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       color: var(--accent);
     }
 
     input[type="text"] {
       width: 100%;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border-subtle);
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
       background: #020617;
-      color: var(--text-main);
+      color: var(--text);
       font-size: 0.8rem;
       outline: none;
     }
@@ -190,254 +183,176 @@
       color: #4b5563;
     }
 
+    input.locked-input {
+      border-color: var(--accent);
+    }
+
     .button-row {
       display: flex;
-      gap: 8px;
-      margin-top: 6px;
       flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 6px;
     }
 
     .btn {
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: none;
+      font-size: 0.75rem;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: none;
-      font-size: 0.78rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s;
+      gap: 4px;
       white-space: nowrap;
     }
 
     .btn-primary {
-      background: radial-gradient(circle at top, #22c55e, #16a34a);
+      background: var(--accent);
       color: #022c22;
-      box-shadow:
-        0 0 20px rgba(34, 197, 94, 0.35),
-        0 0 0 1px rgba(21, 128, 61, 0.7);
-    }
-
-    .btn-primary:active {
-      transform: scale(0.97);
     }
 
     .btn-secondary {
       background: #020617;
-      color: var(--text-muted);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .btn-secondary:active {
-      transform: scale(0.97);
+      border: 1px solid var(--border);
+      color: var(--muted);
     }
 
     .btn-ghost {
       background: transparent;
-      color: var(--text-muted);
-      border: 1px dashed var(--border-subtle);
-    }
-
-    .btn-icon {
-      font-size: 0.9rem;
+      border: 1px dashed var(--border);
+      color: var(--muted);
     }
 
     .scanner-box {
-      border-radius: 14px;
-      border: 1px dashed var(--border-subtle);
-      padding: 8px;
-      margin-top: 8px;
-      background: radial-gradient(circle at top, #020617, #020617 70%);
+      border-radius: 8px;
+      border: 1px dashed #1f2937;
+      padding: 6px;
+      background: #020617;
     }
 
     #qr-reader-code,
     #qr-reader-location {
       width: 100%;
-      min-height: 150px;
+      min-height: 120px;
     }
 
     .scanner-status {
-      font-size: 0.7rem;
       margin-top: 4px;
-      color: var(--text-muted);
+      font-size: 0.7rem;
+      color: var(--muted);
       display: flex;
       justify-content: space-between;
     }
 
     .scanner-status span.value {
-      color: #bbf7d0;
+      color: #a5f3fc;
     }
 
-    .step-block {
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      padding: 8px 10px;
-      margin-top: 6px;
-    }
-
-    .step-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .step-label-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 999px;
-      border: 1px solid var(--accent-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.65rem;
-      color: #bbf7d0;
-      background: radial-gradient(circle at top, #22c55e22, transparent 60%);
-    }
-
-    .step-label.locked {
-      color: #bbf7d0;
-    }
-
-    .step-label.locked .step-label-dot {
-      background: radial-gradient(circle at top, #22c55e66, transparent 60%);
-      border-color: var(--accent);
-    }
-
-    .locked-input {
-      border-color: var(--accent);
-      background: #020617;
-    }
-
-    .list-header-row {
+    .list-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 8px;
+      align-items: baseline;
+      margin-bottom: 6px;
     }
 
-    .list-header-row small {
-      font-size: 0.68rem;
-      color: var(--text-muted);
+    .list-header-title {
+      font-size: 0.85rem;
+      font-weight: 600;
     }
 
-    .pill-bar {
-      display: inline-flex;
-      padding: 3px 8px;
+    .list-header-subtitle {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .count-pill {
+      font-size: 0.7rem;
       border-radius: 999px;
-      background: var(--accent-soft);
-      border: 1px solid var(--accent-strong);
-      font-size: 0.68rem;
-      color: #bbf7d0;
-      gap: 4px;
-      align-items: center;
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      color: var(--muted);
     }
 
-    .pill-bar-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 999px;
-      background: var(--accent);
+    .field-search {
+      margin-bottom: 6px;
     }
 
     .table {
       width: 100%;
-      border-radius: 14px;
-      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      border: 1px solid var(--border);
       overflow: hidden;
-      background: #020617;
     }
 
     .table-header,
     .table-row {
       display: grid;
-      grid-template-columns: 2.1fr 1.5fr 1.5fr 0.9fr;
+      grid-template-columns: 1.7fr 1.3fr 1.4fr 0.9fr;
       gap: 4px;
-      padding: 6px 8px;
+      padding: 5px 7px;
       align-items: center;
     }
 
     .table-header {
-      background: radial-gradient(circle at top left, #0b1120, #020617);
+      background: #020b16;
       font-size: 0.7rem;
-      color: var(--text-muted);
+      color: var(--muted);
       border-bottom: 1px solid #020617;
     }
 
-    .table-row:nth-child(even) {
-      background: #020617;
+    .table-row {
+      font-size: 0.75rem;
     }
 
     .table-row:nth-child(odd) {
       background: #020617;
     }
 
-    .table-cell {
-      font-size: 0.72rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .table-row:nth-child(even) {
+      background: #02091a;
     }
 
     .badge-code {
-      font-size: 0.77rem;
       font-weight: 500;
-      color: #e5e7eb;
     }
 
     .badge-location {
-      font-size: 0.72rem;
       color: #a5b4fc;
     }
 
     .badge-time {
       font-size: 0.68rem;
-      color: var(--text-muted);
+      color: var(--muted);
     }
 
     .btn-history {
       font-size: 0.7rem;
-      padding: 6px 8px;
+      padding: 4px 6px;
       border-radius: 999px;
-      border: 1px solid var(--border-subtle);
+      border: 1px solid var(--border);
       background: #020617;
-      color: var(--text-main);
+      color: var(--text);
       cursor: pointer;
     }
 
-    .btn-history:hover {
-      border-color: var(--accent);
-    }
-
     .empty-state {
-      padding: 10px;
       font-size: 0.75rem;
-      color: var(--text-muted);
+      color: var(--muted);
       text-align: center;
+      padding: 8px;
     }
 
     .footer-hint {
-      margin-top: 8px;
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: var(--muted);
     }
 
     .footer-hint strong {
       color: var(--accent);
-      font-weight: 500;
     }
 
-    /* Modal for history */
+    /* Modal history */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -445,8 +360,8 @@
       display: none;
       align-items: center;
       justify-content: center;
+      padding: 12px;
       z-index: 50;
-      padding: 16px;
     }
 
     .modal-backdrop.show {
@@ -457,11 +372,10 @@
       width: 100%;
       max-width: 420px;
       max-height: 80vh;
-      background: linear-gradient(145deg, #020617, #020617);
-      border-radius: 20px;
-      border: 1px solid var(--border-subtle);
-      padding: 12px 14px 14px;
-      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #020617;
+      padding: 10px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -471,58 +385,52 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      font-size: 0.8rem;
     }
 
-    .modal-title {
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-
-    .modal-title small {
+    .modal-header small {
       font-size: 0.7rem;
-      color: var(--text-muted);
+      color: var(--muted);
     }
 
     .btn-close {
-      background: #020617;
       border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      width: 26px;
-      height: 26px;
+      border: 1px solid var(--border);
+      background: #020617;
+      width: 24px;
+      height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-muted);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
+      color: var(--muted);
       cursor: pointer;
     }
 
     .modal-body {
-      margin-top: 6px;
-      padding: 6px;
-      border-radius: 12px;
-      background: #020617;
-      border: 1px solid #020617;
+      border-radius: 8px;
+      border: 1px solid #111827;
+      padding: 4px;
       overflow-y: auto;
+      flex: 1;
     }
 
     .history-table-header,
     .history-row {
       display: grid;
-      grid-template-columns: 1.4fr 1.6fr 1.4fr;
+      grid-template-columns: 1.3fr 1.5fr 1.4fr;
       gap: 4px;
-      padding: 5px 6px;
+      padding: 4px 5px;
       align-items: center;
+      font-size: 0.72rem;
     }
 
     .history-table-header {
-      border-bottom: 1px solid #020617;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      background: radial-gradient(circle at top left, #020617, #020617);
       position: sticky;
       top: 0;
+      background: #020617;
+      border-bottom: 1px solid #111827;
+      color: var(--muted);
       z-index: 1;
     }
 
@@ -531,51 +439,46 @@
     }
 
     .history-row:nth-child(even) {
-      background: #020617;
+      background: #02091a;
     }
 
     .history-code {
-      font-size: 0.75rem;
-      color: #e5e7eb;
+      font-weight: 500;
     }
 
     .history-location {
-      font-size: 0.75rem;
       color: #a5b4fc;
     }
 
     .history-time {
       font-size: 0.7rem;
-      color: var(--text-muted);
+      color: var(--muted);
     }
 
     .modal-footer {
       margin-top: 4px;
-      font-size: 0.68rem;
-      color: var(--text-muted);
+      font-size: 0.7rem;
+      color: var(--muted);
       display: flex;
       justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .tag {
-      padding: 3px 8px;
       border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      font-size: 0.68rem;
-      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
     }
 
     @media (max-width: 380px) {
       .table-header,
       .table-row {
-        grid-template-columns: 1.8fr 1.4fr 1.6fr 0.9fr;
+        grid-template-columns: 1.5fr 1.4fr 1.4fr 0.8fr;
       }
 
       .history-table-header,
       .history-row {
-        grid-template-columns: 1.3fr 1.5fr 1.5fr;
+        grid-template-columns: 1.2fr 1.4fr 1.5fr;
       }
     }
   </style>
@@ -593,9 +496,7 @@
   <div class="app">
     <header>
       <div class="title-block">
-        <h1>
-          <span class="logo-pill">TrackFlow</span>
-        </h1>
+        <h1>TrackFlow</h1>
         <p data-i18n="subtitle">
           Simple goods tracking with camera & history.
         </p>
@@ -612,33 +513,26 @@
     </header>
 
     <main>
-      <!-- Input: Step 1 & 2 -->
+      <!-- Form -->
       <section class="card">
         <div class="card-header">
-          <div>
-            <div class="card-title">
-              <span class="dot"></span>
-              <span data-i18n="inputSectionTitle">New update</span>
-            </div>
-            <div class="card-subtitle" data-i18n="inputSectionSubtitle">
-              Step 1: item code. Step 2: location.
-            </div>
+          <div class="card-header-title" data-i18n="inputSectionTitle">New update</div>
+          <div class="card-header-subtitle" data-i18n="inputSectionSubtitle">
+            Step 1: item code. Step 2: location.
           </div>
         </div>
 
-        <!-- STEP 1: Kode barang (manual atau scan) -->
+        <!-- STEP 1 -->
         <div class="step-block">
           <div class="step-label" id="step1-label">
-            <span class="step-label-dot">1</span>
+            <span class="step-number">1</span>
             <span data-i18n="step1Label">Step 1 · Item code</span>
           </div>
 
-          <div class="field-group" style="margin-top: 4px;">
+          <div class="field-group">
             <label for="code-input">
               <span data-i18n="labelCode">Item code</span>
-              <span class="helper" data-i18n="labelCodeHelper">
-                Type or scan code
-              </span>
+              <span class="helper" data-i18n="labelCodeHelper">Type or scan code</span>
             </label>
             <input
               type="text"
@@ -649,16 +543,13 @@
 
           <div class="button-row">
             <button class="btn btn-primary" id="btn-start-scan-code">
-              <span class="btn-icon">📷</span>
-              <span data-i18n="btnStartScanner">Scan code</span>
+              📷 <span data-i18n="btnStartScanner">Scan</span>
             </button>
             <button class="btn btn-secondary" id="btn-stop-scan-code">
-              <span class="btn-icon">⏹</span>
-              <span data-i18n="btnStopScanner">Stop</span>
+              ⏹ <span data-i18n="btnStopScanner">Stop</span>
             </button>
             <button class="btn btn-secondary" id="btn-lock-code">
-              <span class="btn-icon">✅</span>
-              <span data-i18n="btnLockCode">Lock code & next</span>
+              ✅ <span data-i18n="btnLockCode">Lock code & next</span>
             </button>
           </div>
 
@@ -673,14 +564,14 @@
           </div>
         </div>
 
-        <!-- STEP 2: Lokasi + Save (dengan scanner sendiri) -->
+        <!-- STEP 2 -->
         <div class="step-block">
           <div class="step-label" id="step2-label">
-            <span class="step-label-dot">2</span>
+            <span class="step-number">2</span>
             <span data-i18n="step2Label">Step 2 · Location</span>
           </div>
 
-          <div class="field-group" style="margin-top: 4px;">
+          <div class="field-group">
             <label for="location-input">
               <span data-i18n="labelLocation">Location</span>
               <span class="helper" data-i18n="labelLocationHelper">
@@ -696,20 +587,16 @@
 
           <div class="button-row">
             <button class="btn btn-primary" id="btn-start-scan-location">
-              <span class="btn-icon">📷</span>
-              <span data-i18n="btnStartScanner">Scan location</span>
+              📷 <span data-i18n="btnStartScanner">Scan</span>
             </button>
             <button class="btn btn-secondary" id="btn-stop-scan-location">
-              <span class="btn-icon">⏹</span>
-              <span data-i18n="btnStopScanner">Stop</span>
+              ⏹ <span data-i18n="btnStopScanner">Stop</span>
             </button>
             <button class="btn btn-secondary" id="btn-save-update">
-              <span class="btn-icon">💾</span>
-              <span data-i18n="btnSaveUpdate">Save update</span>
+              💾 <span data-i18n="btnSaveUpdate">Save update</span>
             </button>
             <button class="btn btn-ghost" id="btn-reset-code">
-              <span class="btn-icon">🔁</span>
-              <span data-i18n="btnChangeCode">Change code</span>
+              🔁 <span data-i18n="btnChangeCode">Change code</span>
             </button>
           </div>
 
@@ -725,27 +612,21 @@
         </div>
       </section>
 
-      <!-- List view -->
+      <!-- List -->
       <section class="card">
-        <div class="list-header-row">
+        <div class="list-header">
           <div>
-            <div class="card-title">
-              <span class="dot"></span>
-              <span data-i18n="listTitle">Tracked items</span>
-            </div>
-            <small data-i18n="listSubtitle">
+            <div class="list-header-title" data-i18n="listTitle">Tracked items</div>
+            <div class="list-header-subtitle" data-i18n="listSubtitle">
               One row per unique item code. Latest update shown.
-            </small>
+            </div>
           </div>
-          <div class="pill-bar">
-            <span class="pill-bar-dot"></span>
-            <span id="summary-count">0</span>
-            <span data-i18n="itemsLabel">items</span>
+          <div class="count-pill">
+            <span id="summary-count">0</span> <span data-i18n="itemsLabel">items</span>
           </div>
         </div>
 
-        <!-- Search bar -->
-        <div class="field-group" style="margin-top: 4px; margin-bottom: 8px;">
+        <div class="field-group field-search">
           <label for="search-input">
             <span data-i18n="searchLabel">Search</span>
           </label>
@@ -758,10 +639,10 @@
 
         <div class="table" id="items-table">
           <div class="table-header">
-            <div class="table-cell" data-i18n="colCode">Code</div>
-            <div class="table-cell" data-i18n="colLocation">Location</div>
-            <div class="table-cell" data-i18n="colTime">Updated</div>
-            <div class="table-cell" data-i18n="colActions">History</div>
+            <div data-i18n="colCode">Code</div>
+            <div data-i18n="colLocation">Location</div>
+            <div data-i18n="colTime">Updated</div>
+            <div data-i18n="colActions">History</div>
           </div>
           <div id="table-body"></div>
         </div>
@@ -776,6 +657,7 @@
           <span data-i18n="footerHint1">
             Each update is stored as history in Supabase.
           </span>
+          <br />
           <span data-i18n="footerHint2">
             List is <strong>unique per code</strong>, history shows all locations.
           </span>
@@ -784,13 +666,12 @@
     </main>
   </div>
 
-  <!-- Modal: history -->
+  <!-- History modal -->
   <div class="modal-backdrop" id="history-modal-backdrop">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title">
-          <span data-i18n="historyTitle">History</span>
-          <br />
+        <div>
+          <div data-i18n="historyTitle">History</div>
           <small id="history-code-label">CODE-123</small>
         </div>
         <button class="btn-close" id="btn-close-history">✕</button>
