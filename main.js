@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     data = await loadData();
     renderTable(data);
     clearInputs();
-   showPopup("Data berhasil disimpan!");
+   showPopup("Data Saved");
   };
 
   // ===========================
@@ -82,9 +82,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ===========================
   attachHistoryClose();
 
+  function showPopup(message = "Saved successfully!") {
+    const popup = document.createElement("div");
+    popup.className = "popup-message";
+    popup.innerText = message;
+
+    document.body.appendChild(popup);
+
+    setTimeout(() => {
+        popup.classList.add("show");
+    }, 10);
+
+    setTimeout(() => {
+        popup.classList.remove("show");
+        setTimeout(() => popup.remove(), 300);
+    }, 1500);
+
   const exportCsvBtn = document.getElementById('exportCsvBtn');
 if (exportCsvBtn) {
   exportCsvBtn.onclick = () => exportToCSV(data);
 }
+
 
 }); // <--- CLOSE DOMContentLoaded
