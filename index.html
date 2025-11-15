@@ -6,84 +6,61 @@
   <title>TrackFlow</title>
 
   <link rel="stylesheet" href="style.css" />
-
-  <!-- ICONS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- QR SCANNER -->
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
+
 <div class="app">
 
   <header>
-    <div class="title-block">
-      <h1>TrackFlow</h1>
-      <p data-i18n="subtitle">Goods Tracking System</p>
-    </div>
-
-    <div class="lang-select">
-      <label data-i18n="languageLabel">Lang</label>
-      <select id="lang-select"></select>
-    </div>
+    <h1>TrackFlow</h1>
+    <select id="lang-select"></select>
   </header>
 
   <main>
 
-    <!-- UPDATE FORM -->
     <section class="card">
-      <div class="card-title"><i class="fa-solid fa-qrcode"></i> Scan / Input Data</div>
+      <h2><i class="fa-solid fa-qrcode"></i> Scan / Input</h2>
 
-      <!-- STEP 1 -->
-      <div class="step-block">
-        <label class="step-label"><span>1</span> Item Code</label>
+      <!-- CODE -->
+      <label>Item Code</label>
+      <input id="code-input" class="input" type="text">
 
-        <input id="code-input" type="text" class="input" placeholder="Enter or scan item code">
+      <button id="scan-code-btn" class="btn btn-primary full">
+        <i class="fa-solid fa-barcode"></i> Scan Code
+      </button>
 
-        <button class="btn btn-primary" id="scan-code-btn">
-          <i class="fa-solid fa-barcode"></i> Scan Code
-        </button>
-
-        <div id="scanner-code-box" class="scanner hidden">
-          <div id="qr-reader-code"></div>
-        </div>
+      <div id="scanner-code-box" class="scanner hidden">
+        <div id="qr-reader-code"></div>
       </div>
 
-      <!-- STEP 2 -->
-      <div class="step-block">
-        <label class="step-label"><span>2</span> Location</label>
+      <!-- LOCATION -->
+      <label>Location</label>
+      <input id="location-input" class="input" type="text">
 
-        <input id="location-input" type="text" class="input" placeholder="Enter or scan location">
+      <button id="scan-location-btn" class="btn btn-primary full">
+        <i class="fa-solid fa-location-dot"></i> Scan Location
+      </button>
 
-        <button class="btn btn-primary" id="scan-location-btn">
-          <i class="fa-solid fa-location-dot"></i> Scan Location
-        </button>
-
-        <div id="scanner-location-box" class="scanner hidden">
-          <div id="qr-reader-location"></div>
-        </div>
+      <div id="scanner-location-box" class="scanner hidden">
+        <div id="qr-reader-location"></div>
       </div>
 
-      <button class="btn btn-success full" id="save-btn">
-        <i class="fa-solid fa-plus"></i> Save Update
+      <button id="save-btn" class="btn btn-success full">
+        <i class="fa-solid fa-plus"></i> Save
       </button>
     </section>
 
-    <!-- TRACKED ITEMS -->
+    <!-- TABLE -->
     <section class="card">
       <div class="list-header">
-        <div>
-          <div class="list-title">Tracked Items</div>
-          <div class="list-subtitle">Latest update of every code</div>
-        </div>
-        <div class="count-pill"><span id="item-count">0</span> items</div>
+        <h2>Tracked Items</h2>
+        <span id="item-count">0</span>
       </div>
 
-      <input id="search-input" type="text" class="input" placeholder="Search...">
+      <input id="search-input" class="input" placeholder="Search..."/>
 
       <table class="data-table">
         <thead>
@@ -97,37 +74,34 @@
         <tbody id="data-body"></tbody>
       </table>
 
-      <div class="empty-state" id="empty-state">No data yet</div>
+      <div id="empty-state" class="empty-state">No items</div>
 
-      <div class="export-box">
-        <button id="export-btn" class="btn btn-secondary full">
-          <i class="fa-solid fa-file-csv"></i> Export CSV
-        </button>
-      </div>
+      <button id="export-btn" class="btn btn-secondary full">
+        <i class="fa-solid fa-file-csv"></i> Export CSV
+      </button>
     </section>
 
   </main>
 </div>
 
 <!-- HISTORY MODAL -->
-<div class="modal-backdrop hidden" id="history-modal">
+<div id="history-modal" class="modal-backdrop hidden">
   <div class="modal">
     <div class="modal-header">
-      <div>
-        <div class="modal-title"><i class="fa-solid fa-clock-rotate-left"></i> History</div>
-        <small id="history-code"></small>
-      </div>
-      <button class="btn-close" id="close-history">×</button>
+      <h3>History</h3>
+      <small id="history-code"></small>
+      <button id="close-history" class="btn-close">×</button>
     </div>
-
-    <div class="modal-body" id="history-body"></div>
-
+    <div id="history-body" class="modal-body"></div>
     <div class="modal-footer">
-      <span class="tag">Latest first</span>
-      <span class="tag" id="history-count">0 logs</span>
+      <span id="history-count" class="tag"></span>
     </div>
   </div>
 </div>
+
+<!-- SCRIPTS AT BOTTOM (WAJIB!) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 
 <script src="db.js"></script>
 <script src="i18n.js"></script>
