@@ -1,9 +1,8 @@
-// data.js — NEW CLEAN VERSION
+// data.js — FIXED VERSION
 
-// This will contain processed summary rows (unique codes)
 let summaryRows = [];
 
-// LOAD ALL ITEMS → then render
+// Load summary (unique codes)
 async function loadSummaryList(tableBody, summaryCount, emptyState) {
   try {
     const { data, error } = await supabaseClient
@@ -12,28 +11,26 @@ async function loadSummaryList(tableBody, summaryCount, emptyState) {
       .order("updated_at", { ascending: false });
 
     if (error) {
-      console.error("Supabase load error:", error);
+      console.error("Load error:", error);
       return;
     }
 
-    // Group by "code", keep latest
     const map = new Map();
+
     data.forEach((row) => {
       if (!row.code) return;
+      const exist = map.get(row.code);
 
-      const existing = map.get(row.code);
-      if (!existing) {
-        map.set(row.code, row);
-      } else {
-        const a = new Date(existing.updated_at).getTime();
-        const b = new Date(row.updated_at).getTime();
-        if (b > a) map.set(row.code, row);
+      if (!exist) map.set(row.code, row);
+      else {
+        if (new Date(row.updated_at) > new Date(exist.updated_at)) {
+          map.set(row.code, row);
+        }
       }
     });
 
     summaryRows = Array.from(map.values());
 
-    // Sort by updated time (latest top)
     summaryRows.sort((a, b) => {
       return new Date(b.updated_at) - new Date(a.updated_at);
     });
@@ -41,32 +38,26 @@ async function loadSummaryList(tableBody, summaryCount, emptyState) {
     renderSummaryList(tableBody, summaryCount, emptyState);
 
   } catch (err) {
-    console.error("loadSummaryList fatal:", err);
+    console.error("Fatal:", err);
   }
 }
 
-
-// RENDER SUMMARY LIST
+// Render list
 function renderSummaryList(tableBody, summaryCount, emptyState) {
-  const keyword = (document.getElementById("search-input")?.value || "")
-    .trim()
-    .toLowerCase();
-
   const dict = window.translations[window.currentLang];
+  const search = (document.getElementById("search-input")?.value || "")
+    .toLowerCase()
+    .trim();
 
-  // Filter rows
   const rows = summaryRows.filter((r) => {
-    if (!keyword) return true;
     return (
-      r.code.toLowerCase().includes(keyword) ||
-      r.location.toLowerCase().includes(keyword)
+      r.code.toLowerCase().includes(search) ||
+      r.location.toLowerCase().includes(search)
     );
   });
 
-  // Update count
   summaryCount.textContent = rows.length;
 
-  // Empty state
   if (rows.length === 0) {
     emptyState.style.display = "block";
     tableBody.innerHTML = "";
@@ -75,11 +66,9 @@ function renderSummaryList(tableBody, summaryCount, emptyState) {
 
   emptyState.style.display = "none";
 
-  // Render table rows
   tableBody.innerHTML = rows
     .map((r) => {
       const ts = new Date(r.updated_at).toLocaleString();
-
       return `
         <tr>
           <td>${r.code}</td>
@@ -87,7 +76,7 @@ function renderSummaryList(tableBody, summaryCount, emptyState) {
           <td>${ts}</td>
           <td>
             <button class="btn btn-small" onclick="openHistoryForCode('${r.code}')">
-              ${dict.btnViewHistory}
+              ⋯
             </button>
           </td>
         </tr>
@@ -96,35 +85,30 @@ function renderSummaryList(tableBody, summaryCount, emptyState) {
     .join("");
 }
 
-
-
-// SAVE UPDATE TO SUPABASE  
+// Save
 async function saveUpdateToSupabase(code, location) {
   try {
     const { error } = await supabaseClient.from("goods_updates").insert([
       {
         code: code,
         location: location,
-        updated_at: new Date().toISOString()
-      }
+        updated_at: new Date().toISOString(),
+      },
     ]);
 
     if (error) {
-      console.error("Save error:", error);
+      console.error(error);
       return false;
     }
 
     return true;
-
   } catch (err) {
-    console.error("Save fatal:", err);
+    console.error(err);
     return false;
   }
 }
 
-
-
-// LOAD FULL HISTORY FOR ONE CODE
+// Load history
 async function loadHistoryForCode(code, historyList, codeLabel, countTag) {
   const dict = window.translations[window.currentLang];
 
@@ -154,71 +138,4 @@ async function loadHistoryForCode(code, historyList, codeLabel, countTag) {
       `;
     })
     .join("");
-}
-
-
-
-// EXPORT SUMMARY TO CSV
-async function exportSummaryToCsv() {
-  try {
-    const dict = window.translations[window.currentLang];
-
-    const { data, error } = await supabaseClient
-      .from("goods_updates")
-      .select("code, location, updated_at")
-      .order("updated_at", { ascending: false });
-
-    if (error) {
-      alert(dict.toastErrorLoad);
-      return;
-    }
-
-    if (!data || data.length === 0) {
-      alert(dict.toastExportNoData);
-      return;
-    }
-
-    // Group per code
-    const byCode = new Map();
-    data.forEach((row) => {
-      const existing = byCode.get(row.code);
-      if (!existing) byCode.set(row.code, row);
-    });
-
-    const summary = Array.from(byCode.values());
-
-    const header = [
-      '"' + dict.colCode + '"',
-      '"' + dict.colLocation + '"',
-      '"' + dict.colTime + '"'
-    ];
-
-    const rows = summary.map((r) => {
-      return [
-        `"${r.code}"`,
-        `"${r.location}"`,
-        `"${new Date(r.updated_at).toLocaleString()}"`
-      ].join(",");
-    });
-
-    const csv = [header.join(","), ...rows].join("\n");
-
-    const blob = new Blob(["\ufeff" + csv], {
-      type: "text/csv;charset=utf-8;"
-    });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "goods-tracking.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
-
-  } catch (err) {
-    console.error("CSV export fatal:", err);
-    alert("Failed to export CSV.");
-  }
 }
