@@ -1,394 +1,104 @@
-/* ============================================================
-   GLOBAL THEME (DARK MODE)
-   ============================================================ */
-:root {
-  --bg: #020617;
-  --bg-card: #0f172a;
-  --bg-soft: #0b1220;
-
-  --border: #1e293b;
-  --border-light: #334155;
-
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-
-  --accent: #22c55e;
-  --accent-dark: #14532d;
-  --accent-soft: rgba(34, 197, 94, 0.25);
-
-  --radius: 12px;
-  --radius-lg: 18px;
-
-  --input-font: 1rem; /* prevent iOS zoom */
-}
-
-/* RESET */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, sans-serif;
-  display: flex;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 14px;
+  margin: 0;
+  background: #0f0f0f;
+  color: #ddd;
+  font-family: Arial;
 }
 
-/* ============================================================
-   APP WRAPPER
-   ============================================================ */
 .app {
-  width: 100%;
   max-width: 480px;
-  background: var(--bg);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  padding: 16px;
+  margin: auto;
+  padding: 15px;
 }
 
-/* ============================================================
-   HEADER
-   ============================================================ */
 header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
-.title-block h1 {
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-
-.title-block p {
-  font-size: 0.82rem;
-  color: var(--muted);
-  margin-top: 2px;
-}
-
-/* Language menu */
-.lang-select {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: var(--bg-card);
-}
-
-.lang-select select {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--text);
-  font-size: 0.9rem;
-}
-
-/* ============================================================
-   CARD
-   ============================================================ */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 16px;
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px #0005;
 }
 
-.card-header-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-
-.card-header-subtitle {
-  margin-top: 4px;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-/* ============================================================
-   STEPS
-   ============================================================ */
-.step-block {
-  margin-top: 14px;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  padding: 12px;
-}
-
-.step-label {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.step-number {
-  width: 20px;
-  height: 20px;
-  border-radius: 999px;
-  border: 1px solid var(--accent-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent);
-  font-size: 0.75rem;
-}
-
-.step-label.locked {
-  color: var(--accent);
-}
-
-.step-label.locked .step-number {
-  border-color: var(--accent);
-}
-
-/* ============================================================
-   INPUTS
-   ============================================================ */
-.field-group {
+.card-title {
+  font-size: 18px;
   margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
 }
 
-label {
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-  color: var(--muted);
-}
-
-input[type="text"] {
+.input {
   width: 100%;
-  padding: 10px 12px;
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  font-size: var(--input-font);
-  outline: none;
-}
-
-input.locked-input {
-  border-color: var(--accent);
-}
-
-/* ============================================================
-   BUTTONS
-   ============================================================ */
-.button-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  padding: 10px;
+  margin: 8px 0 12px;
+  border-radius: 8px;
+  border: none;
+  background: #2a2a2a;
+  color: #fff;
 }
 
 .btn {
   padding: 10px 14px;
-  border-radius: var(--radius);
   border: none;
+  border-radius: 8px;
+  margin-top: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 14px;
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: var(--accent-dark);
-  font-weight: 600;
+  background: #007bff;
+  color: white;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
 }
 
 .btn-secondary {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--muted);
+  background: #444;
+  color: white;
 }
 
 .full {
   width: 100%;
 }
 
-/* History button inside table */
-.btn-history {
-  padding: 6px 10px;
-  background: var(--bg-soft);
-  color: var(--text);
-  border: 1px solid var(--border-light);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-/* ============================================================
-   SCANNER BOXES
-   ============================================================ */
-.scanner-box {
-  margin-top: 10px;
-  border: 1px dashed var(--border-light);
-  padding: 10px;
-  border-radius: var(--radius);
-  background: var(--bg-soft);
-}
-
-.hidden {
-  display: none;
-}
-
-#qr-reader-code,
-#qr-reader-location {
-  width: 100%;
-  min-height: 160px;
-}
-
-/* ============================================================
-   TRACKED ITEMS > TABLE
-   ============================================================ */
-
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
-  overflow: hidden;
+  margin-top: 12px;
 }
 
 .data-table th {
-  background: #1e293b;
+  background: #333;
   padding: 10px;
-  color: var(--muted);
-  font-size: 0.85rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
 }
 
 .data-table td {
   padding: 10px;
-  font-size: 0.9rem;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid #333;
 }
 
-.data-table tr:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-/* Empty */
-.empty-state {
-  text-align: center;
+.scanner {
   margin-top: 10px;
-  color: var(--muted);
-  font-size: 0.9rem;
 }
 
-/* ============================================================
-   HISTORY MODAL
-   ============================================================ */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 14px;
+.hidden {
+  display: none !important;
 }
 
-.modal-backdrop.show {
-  display: flex;
+.btn-history {
+  background: #555;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: white;
 }
 
-.modal {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px;
-  width: 100%;
-  max-width: 420px;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.btn-close {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.modal-body {
-  margin-top: 10px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-/* History table */
-.history-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.history-table th {
-  background: #1e293b;
-  padding: 10px;
-  color: var(--muted);
-  font-size: 0.85rem;
-  text-align: left;
-}
-
-.history-table td {
-  padding: 10px;
-  font-size: 0.9rem;
-  border-bottom: 1px solid #1e293b;
-}
-
-.modal-footer {
-  margin-top: 12px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.tag {
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-
-/* Tablet */
-@media (min-width: 640px) {
-  .app {
-    max-width: 660px;
-    padding: 20px;
-  }
-}
-
-/* Desktop – split 2 columns */
-@media (min-width: 1024px) {
-  .app {
-    max-width: 1024px;
-  }
-
-  main {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-  }
+.export-box {
+  margin-top: 15px;
 }

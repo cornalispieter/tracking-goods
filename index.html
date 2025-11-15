@@ -7,25 +7,23 @@
 
   <link rel="stylesheet" href="style.css" />
 
+  <!-- ICONS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- QR Scanner -->
+  <!-- QR SCANNER -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
-<!-- SCRIPTS ORDER BENAR -->
-<script src="db.js"></script>
-<script src="i18n.js"></script>
-<script src="data.js"></script>
-<script src="scanner.js"></script>
-<script src="main.js"></script>
+
 <body>
 <div class="app">
 
   <header>
     <div class="title-block">
       <h1>TrackFlow</h1>
-      <p data-i18n="subtitle">Simple goods tracking</p>
+      <p data-i18n="subtitle">Goods Tracking System</p>
     </div>
 
     <div class="lang-select">
@@ -38,90 +36,73 @@
 
     <!-- UPDATE FORM -->
     <section class="card">
-      <div class="card-header-title" data-i18n="inputSectionTitle">New update</div>
-      <div class="card-header-subtitle" data-i18n="inputSectionSubtitle">
-        Step 1: scan code · Step 2: scan location
-      </div>
+      <div class="card-title"><i class="fa-solid fa-qrcode"></i> Scan / Input Data</div>
 
       <!-- STEP 1 -->
       <div class="step-block">
-        <div class="step-label" id="step1-label">
-          <span class="step-number">1</span>
-          <span data-i18n="step1Label">Item code</span>
-        </div>
+        <label class="step-label"><span>1</span> Item Code</label>
 
-        <div class="field-group">
-          <label data-i18n="labelCode">Item code</label>
-          <input id="code-input" type="text" placeholder="Enter item code" />
-        </div>
+        <input id="code-input" type="text" class="input" placeholder="Enter or scan item code">
 
-        <button class="btn btn-primary full" id="start-scan-code" data-i18n="btnScan">Scan Code</button>
+        <button class="btn btn-primary" id="scan-code-btn">
+          <i class="fa-solid fa-barcode"></i> Scan Code
+        </button>
 
-        <div id="scanner-code-box" class="scanner-box hidden">
+        <div id="scanner-code-box" class="scanner hidden">
           <div id="qr-reader-code"></div>
         </div>
       </div>
 
       <!-- STEP 2 -->
       <div class="step-block">
-        <div class="step-label" id="step2-label">
-          <span class="step-number">2</span>
-          <span data-i18n="step2Label">Location</span>
-        </div>
+        <label class="step-label"><span>2</span> Location</label>
 
-        <div class="field-group">
-          <label data-i18n="labelLocation">Location</label>
-          <input id="location-input" type="text" placeholder="Enter location" />
-        </div>
+        <input id="location-input" type="text" class="input" placeholder="Enter or scan location">
 
-        <button class="btn btn-primary full" id="start-scan-location" data-i18n="btnScan">Scan Location</button>
+        <button class="btn btn-primary" id="scan-location-btn">
+          <i class="fa-solid fa-location-dot"></i> Scan Location
+        </button>
 
-        <div id="scanner-location-box" class="scanner-box hidden">
+        <div id="scanner-location-box" class="scanner hidden">
           <div id="qr-reader-location"></div>
         </div>
-
-        <button class="btn btn-primary full" id="save-update" data-i18n="btnSaveUpdate">Save</button>
       </div>
 
+      <button class="btn btn-success full" id="save-btn">
+        <i class="fa-solid fa-plus"></i> Save Update
+      </button>
     </section>
 
-    <!-- TRACKED ITEMS LIST -->
+    <!-- TRACKED ITEMS -->
     <section class="card">
       <div class="list-header">
         <div>
-          <div class="list-header-title" data-i18n="listTitle">Tracked items</div>
-          <div class="list-header-subtitle" data-i18n="listSubtitle">Latest update</div>
+          <div class="list-title">Tracked Items</div>
+          <div class="list-subtitle">Latest update of every code</div>
         </div>
-        <div class="count-pill">
-          <span id="summary-count">0</span>
-          <span data-i18n="itemsLabel">items</span>
-        </div>
+        <div class="count-pill"><span id="item-count">0</span> items</div>
       </div>
 
-      <div class="field-group">
-        <label data-i18n="searchLabel">Search</label>
-        <input id="search-input" type="text" placeholder="Search…" />
-      </div>
+      <input id="search-input" type="text" class="input" placeholder="Search...">
 
       <table class="data-table">
         <thead>
           <tr>
-            <th data-i18n="colCode">Code</th>
-            <th data-i18n="colLocation">Location</th>
-            <th data-i18n="colTime">Updated</th>
-            <th data-i18n="colActions">History</th>
+            <th>Code</th>
+            <th>Location</th>
+            <th>Updated</th>
+            <th>History</th>
           </tr>
         </thead>
-        <tbody id="table-body"></tbody>
+        <tbody id="data-body"></tbody>
       </table>
 
-      <div class="empty-state" id="empty-state">
-        <span data-i18n="emptyState">No items.</span>
-      </div>
+      <div class="empty-state" id="empty-state">No data yet</div>
 
-      <!-- EXPORT BUTTON -->
       <div class="export-box">
-        <button class="btn btn-primary full" id="export-csv">Export CSV</button>
+        <button id="export-btn" class="btn btn-secondary full">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
       </div>
     </section>
 
@@ -129,26 +110,30 @@
 </div>
 
 <!-- HISTORY MODAL -->
-<div class="modal-backdrop" id="history-modal">
+<div class="modal-backdrop hidden" id="history-modal">
   <div class="modal">
     <div class="modal-header">
       <div>
-        <div data-i18n="historyTitle">History</div>
-        <small id="history-code-label">CODE</small>
+        <div class="modal-title"><i class="fa-solid fa-clock-rotate-left"></i> History</div>
+        <small id="history-code"></small>
       </div>
-      <button class="btn-close" id="close-history">✕</button>
+      <button class="btn-close" id="close-history">×</button>
     </div>
-    <div class="modal-body" id="history-list"></div>
+
+    <div class="modal-body" id="history-body"></div>
 
     <div class="modal-footer">
-      <span class="tag" data-i18n="historyHint">Latest first</span>
-      <span class="tag" id="history-count-tag">0 logs</span>
+      <span class="tag">Latest first</span>
+      <span class="tag" id="history-count">0 logs</span>
     </div>
   </div>
 </div>
 
-
+<script src="db.js"></script>
+<script src="i18n.js"></script>
+<script src="data.js"></script>
+<script src="scanner.js"></script>
+<script src="main.js"></script>
 
 </body>
 </html>
-data-table

@@ -1,102 +1,24 @@
-/* ============================================================
-   main.js — UPDATED (NO LOCK SYSTEM + EXPORT)
-   ============================================================ */
-
 document.addEventListener("DOMContentLoaded", () => {
-  const codeInput = document.getElementById("code-input");
-  const locationInput = document.getElementById("location-input");
 
-  const btnScanCode = document.getElementById("start-scan-code");
-  const btnScanLocation = document.getElementById("start-scan-location");
+  loadData();
 
-  const btnSave = document.getElementById("save-update");
-  const btnExport = document.getElementById("export-csv");
+  document.getElementById("scan-code-btn").onclick = startCodeScan;
+  document.getElementById("scan-location-btn").onclick = startLocationScan;
 
-  const langSelect = document.getElementById("lang-select");
+  document.getElementById("save-btn").onclick = async () => {
+    const code = document.getElementById("code-input").value.trim();
+    const loc = document.getElementById("location-input").value.trim();
 
-  // Load languages
-  Object.keys(translations).forEach((lang) => {
-    const opt = document.createElement("option");
-    opt.value = lang;
-    opt.textContent = lang.toUpperCase();
-    langSelect.appendChild(opt);
-  });
+    if (!code || !loc) return alert("Please fill both fields");
 
-  langSelect.value = currentLang;
+    await saveData(code, loc);
 
-  applyTranslations();
-  loadSummaryList();
-
-
-  /* ============================
-       SCAN CODE
-     ============================ */
-  btnScanCode.onclick = startScannerForCode;
-
-  /* ============================
-       SCAN LOCATION
-     ============================ */
-  btnScanLocation.onclick = startScannerForLocation;
-
-  /* ============================
-       SAVE ENTRY
-     ============================ */
-  btnSave.onclick = async () => {
-    const code = codeInput.value.trim();
-    const loc = locationInput.value.trim();
-
-    if (!code || !loc) return alert("Both fields required.");
-
-    btnSave.disabled = true;
-
-    const ok = await saveUpdateToSupabase(code, loc);
-
-    if (ok) {
-      resetForm();
-      loadSummaryList();
-    } else {
-      alert("Save failed.");
-      btnSave.disabled = false;
-    }
+    document.getElementById("code-input").value = "";
+    document.getElementById("location-input").value = "";
   };
 
-  /* ============================
-       EXPORT CSV
-     ============================ */
-  btnExport.onclick = () => {
-    exportToCSV(summaryRows);
-  };
+  document.getElementById("search-input").oninput = renderTable;
 
-  /* ============================
-       LANGUAGE SWITCH
-     ============================ */
-  langSelect.onchange = () => {
-    currentLang = langSelect.value;
-    applyTranslations();
-    loadSummaryList();
-  };
+  document.getElementById("export-btn").onclick = exportCSV;
 
-  /* ============================
-       RESET FORM
-     ============================ */
-  function resetForm() {
-    stopScannerForCode();
-    stopScannerForLocation();
-
-    codeInput.value = "";
-    locationInput.value = "";
-
-    btnSave.disabled = false;
-  }
-
-  /* ============================
-       TRANSLATIONS
-     ============================ */
-  function applyTranslations() {
-    const dict = translations[currentLang];
-    document.querySelectorAll("[data-i18n]").forEach((el) => {
-      const key = el.getAttribute("data-i18n");
-      if (dict[key]) el.textContent = dict[key];
-    });
-  }
 });
