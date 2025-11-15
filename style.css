@@ -321,6 +321,21 @@ tr:hover {
   transform: translateY(-2px);
   background: linear-gradient(135deg, #ffb300, #b67200);
 }
+#toast {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2b8a3e;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
+}
 
 
 }

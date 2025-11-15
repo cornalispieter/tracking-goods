@@ -3,6 +3,8 @@ import { renderTable, clearInputs } from './ui.js';
 import { startScanner } from './scan.js';
 import { attachHistoryClose } from './history.js';
 import { exportToCSV } from './ui.js';
+import { renderTable, clearInputs, showToast } from './ui.js';
+
 
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -29,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     data = await loadData();
     renderTable(data);
     clearInputs();
+    showToast("Data berhasil disimpan!");
   };
 
   // ===========================
