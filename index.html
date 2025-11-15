@@ -252,9 +252,10 @@
       background: radial-gradient(circle at top, #020617, #020617 70%);
     }
 
-    #qr-reader {
+    #qr-reader-code,
+    #qr-reader-location {
       width: 100%;
-      min-height: 180px;
+      min-height: 150px;
     }
 
     .scanner-status {
@@ -647,11 +648,11 @@
           </div>
 
           <div class="button-row">
-            <button class="btn btn-primary" id="btn-start-scan">
+            <button class="btn btn-primary" id="btn-start-scan-code">
               <span class="btn-icon">📷</span>
               <span data-i18n="btnStartScanner">Scan code</span>
             </button>
-            <button class="btn btn-secondary" id="btn-stop-scan">
+            <button class="btn btn-secondary" id="btn-stop-scan-code">
               <span class="btn-icon">⏹</span>
               <span data-i18n="btnStopScanner">Stop</span>
             </button>
@@ -662,17 +663,17 @@
           </div>
 
           <div class="scanner-box">
-            <div id="qr-reader"></div>
+            <div id="qr-reader-code"></div>
             <div class="scanner-status">
               <span data-i18n="scannerStatusLabel">Status:</span>
-              <span class="value" id="scanner-status-text">
+              <span class="value" id="scanner-status-code">
                 <span data-i18n="scannerIdle">Idle</span>
               </span>
             </div>
           </div>
         </div>
 
-        <!-- STEP 2: Lokasi + Save -->
+        <!-- STEP 2: Lokasi + Save (dengan scanner sendiri) -->
         <div class="step-block">
           <div class="step-label" id="step2-label">
             <span class="step-label-dot">2</span>
@@ -689,12 +690,20 @@
             <input
               type="text"
               id="location-input"
-              placeholder="Enter location"
+              placeholder="Enter or scan location"
             />
           </div>
 
           <div class="button-row">
-            <button class="btn btn-primary" id="btn-save-update">
+            <button class="btn btn-primary" id="btn-start-scan-location">
+              <span class="btn-icon">📷</span>
+              <span data-i18n="btnStartScanner">Scan location</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-stop-scan-location">
+              <span class="btn-icon">⏹</span>
+              <span data-i18n="btnStopScanner">Stop</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-save-update">
               <span class="btn-icon">💾</span>
               <span data-i18n="btnSaveUpdate">Save update</span>
             </button>
@@ -702,6 +711,16 @@
               <span class="btn-icon">🔁</span>
               <span data-i18n="btnChangeCode">Change code</span>
             </button>
+          </div>
+
+          <div class="scanner-box">
+            <div id="qr-reader-location"></div>
+            <div class="scanner-status">
+              <span data-i18n="scannerStatusLabel">Status:</span>
+              <span class="value" id="scanner-status-location">
+                <span data-i18n="scannerIdle">Idle</span>
+              </span>
+            </div>
           </div>
         </div>
       </section>

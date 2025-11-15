@@ -11,7 +11,7 @@ const translations = {
     labelCodeHelper: "Type or scan code",
     labelLocation: "Location",
     labelLocationHelper: 'Example: “Warehouse A”',
-    btnStartScanner: "Scan code",
+    btnStartScanner: "Scan",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Save update",
     btnLockCode: "Lock code & next",
@@ -54,7 +54,7 @@ const translations = {
     labelCodeHelper: "Typ of scan code",
     labelLocation: "Locatie",
     labelLocationHelper: 'Bijv: “Magazijn A”',
-    btnStartScanner: "Code scannen",
+    btnStartScanner: "Scannen",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Opslaan",
     btnLockCode: "Code vastzetten",
@@ -98,7 +98,7 @@ const translations = {
     labelCodeHelper: "Ketik atau scan kode",
     labelLocation: "Lokasi",
     labelLocationHelper: 'Contoh: “Gudang A”',
-    btnStartScanner: "Scan kode",
+    btnStartScanner: "Scan",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Simpan update",
     btnLockCode: "Kunci kode & lanjut",
@@ -142,7 +142,7 @@ const translations = {
     labelCodeHelper: "Wpisz lub zeskanuj kod",
     labelLocation: "Lokalizacja",
     labelLocationHelper: 'Np. “Magazyn A”',
-    btnStartScanner: "Skanuj kod",
+    btnStartScanner: "Skanuj",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Zapisz",
     btnLockCode: "Zablokuj kod",
@@ -188,9 +188,11 @@ const translations = {
 let currentLang = "en";
 let summaryRows = []; // cache list unik per kode
 
-// Scanner state
-let html5QrCode = null;
-let isScanning = false;
+// Scanner state: terpisah untuk code & location
+let html5QrCodeCode = null;
+let html5QrCodeLocation = null;
+let isScanningCode = false;
+let isScanningLocation = false;
 
 // Step state
 let currentCode = null;
@@ -215,8 +217,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const step1Label = document.getElementById("step1-label");
   const step2Label = document.getElementById("step2-label");
 
-  const btnStartScan = document.getElementById("btn-start-scan");
-  const btnStopScan = document.getElementById("btn-stop-scan");
+  const btnStartScanCode = document.getElementById("btn-start-scan-code");
+  const btnStopScanCode = document.getElementById("btn-stop-scan-code");
+  const btnStartScanLocation =
+    document.getElementById("btn-start-scan-location");
+  const btnStopScanLocation =
+    document.getElementById("btn-stop-scan-location");
+
   const btnLockCode = document.getElementById("btn-lock-code");
   const btnResetCode = document.getElementById("btn-reset-code");
   const btnSaveUpdate = document.getElementById("btn-save-update");
@@ -257,22 +264,33 @@ document.addEventListener("DOMContentLoaded", () => {
     codeInput.readOnly = true;
     codeInput.classList.add("locked-input");
     step1Label.classList.add("locked");
+    // berhentiin scanner code biar hemat
+    stopScannerForCode();
     // fokus ke lokasi
     locationInput.focus();
   });
 
-  // Change code / reset
+  // Ganti kode (reset step)
   btnResetCode.addEventListener("click", () => {
     resetCodeStep(codeInput, locationInput, step1Label);
   });
 
-  // Scanner buttons
-  btnStartScan.addEventListener("click", () => {
-    startScanner(codeInput);
+  // Scanner CODE
+  btnStartScanCode.addEventListener("click", () => {
+    startScannerForCode(codeInput);
   });
 
-  btnStopScan.addEventListener("click", () => {
-    stopScanner();
+  btnStopScanCode.addEventListener("click", () => {
+    stopScannerForCode();
+  });
+
+  // Scanner LOCATION
+  btnStartScanLocation.addEventListener("click", () => {
+    startScannerForLocation(locationInput);
+  });
+
+  btnStopScanLocation.addEventListener("click", () => {
+    stopScannerForLocation();
   });
 
   // Save update (step 2)
@@ -338,26 +356,33 @@ function resetCodeStep(codeInput, locationInput, step1Label) {
   codeInput.value = "";
   locationInput.value = "";
   step1Label.classList.remove("locked");
-  stopScanner();
+  stopScannerForCode();
+  stopScannerForLocation();
+  setScannerStatus("code", "scannerIdle");
+  setScannerStatus("location", "scannerIdle");
   codeInput.focus();
 }
 
-// ---------- Scanner helper ----------
-function setScannerStatus(key) {
-  const el = document.getElementById("scanner-status-text");
+// ---------- Scanner helpers ----------
+function setScannerStatus(target, key) {
   const dict = translations[currentLang];
+  const elId =
+    target === "location"
+      ? "scanner-status-location"
+      : "scanner-status-code";
+  const el = document.getElementById(elId);
   if (!el || !dict) return;
   el.textContent = dict[key] || "";
 }
 
-async function startScanner(codeInput) {
-  if (isScanning) return;
+async function startScannerForCode(codeInput) {
+  if (isScanningCode) return;
   try {
-    setScannerStatus("scannerScanning");
+    setScannerStatus("code", "scannerScanning");
 
     const cameras = await Html5Qrcode.getCameras();
     if (!cameras || cameras.length === 0) {
-      setScannerStatus("scannerIdle");
+      setScannerStatus("code", "scannerIdle");
       alert("No camera found.");
       return;
     }
@@ -367,38 +392,87 @@ async function startScanner(codeInput) {
     );
     const cameraId = backCam ? backCam.id : cameras[0].id;
 
-    html5QrCode = new Html5Qrcode("qr-reader");
+    html5QrCodeCode = new Html5Qrcode("qr-reader-code");
     const config = { fps: 10, qrbox: { width: 230, height: 230 } };
-    isScanning = true;
+    isScanningCode = true;
 
-    await html5QrCode.start(
+    await html5QrCodeCode.start(
       cameraId,
       config,
       (decodedText) => {
         codeInput.value = decodedText;
-        setScannerStatus("scannerDetected");
-        // Scanner tetap jalan sampai user stop atau lock code
+        setScannerStatus("code", "scannerDetected");
       },
       () => {}
     );
   } catch (err) {
-    console.error("Error starting scanner:", err);
-    setScannerStatus("scannerIdle");
-    alert("Cannot start camera scanner.");
+    console.error("Error starting code scanner:", err);
+    setScannerStatus("code", "scannerIdle");
+    alert("Cannot start camera scanner (code).");
   }
 }
 
-async function stopScanner() {
-  if (html5QrCode && isScanning) {
+async function stopScannerForCode() {
+  if (html5QrCodeCode && isScanningCode) {
     try {
-      await html5QrCode.stop();
-      html5QrCode.clear();
+      await html5QrCodeCode.stop();
+      html5QrCodeCode.clear();
     } catch (err) {
-      console.warn("Error stopping scanner:", err);
+      console.warn("Error stopping code scanner:", err);
     }
   }
-  isScanning = false;
-  setScannerStatus("scannerStopped");
+  isScanningCode = false;
+  setScannerStatus("code", "scannerStopped");
+}
+
+async function startScannerForLocation(locationInput) {
+  if (isScanningLocation) return;
+  try {
+    setScannerStatus("location", "scannerScanning");
+
+    const cameras = await Html5Qrcode.getCameras();
+    if (!cameras || cameras.length === 0) {
+      setScannerStatus("location", "scannerIdle");
+      alert("No camera found.");
+      return;
+    }
+
+    const backCam = cameras.find((cam) =>
+      /back|rear|environment/i.test(cam.label || "")
+    );
+    const cameraId = backCam ? backCam.id : cameras[0].id;
+
+    html5QrCodeLocation = new Html5Qrcode("qr-reader-location");
+    const config = { fps: 10, qrbox: { width: 230, height: 230 } };
+    isScanningLocation = true;
+
+    await html5QrCodeLocation.start(
+      cameraId,
+      config,
+      (decodedText) => {
+        locationInput.value = decodedText;
+        setScannerStatus("location", "scannerDetected");
+      },
+      () => {}
+    );
+  } catch (err) {
+    console.error("Error starting location scanner:", err);
+    setScannerStatus("location", "scannerIdle");
+    alert("Cannot start camera scanner (location).");
+  }
+}
+
+async function stopScannerForLocation() {
+  if (html5QrCodeLocation && isScanningLocation) {
+    try {
+      await html5QrCodeLocation.stop();
+      html5QrCodeLocation.clear();
+    } catch (err) {
+      console.warn("Error stopping location scanner:", err);
+    }
+  }
+  isScanningLocation = false;
+  setScannerStatus("location", "scannerStopped");
 }
 
 // ---------- Supabase helper ----------
@@ -549,7 +623,6 @@ async function loadHistoryForCode(
     historyListEl.innerHTML = "";
     historyCodeLabelEl.textContent = code;
 
-    // Header
     const header = document.createElement("div");
     header.className = "history-table-header";
     const hCode = document.createElement("div");
@@ -563,7 +636,6 @@ async function loadHistoryForCode(
     header.appendChild(hTime);
     historyListEl.appendChild(header);
 
-    // Rows
     (data || []).forEach((row) => {
       const r = document.createElement("div");
       r.className = "history-row";
