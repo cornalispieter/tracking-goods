@@ -3,7 +3,7 @@ import { renderTable, clearInputs } from './ui.js';
 import { startScanner } from './scan.js';
 import { attachHistoryClose } from './history.js';
 import { exportToCSV } from './ui.js';
-import { renderTable, clearInputs, showToast } from './ui.js';
+
 
 
 
