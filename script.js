@@ -12,7 +12,7 @@ const translations = {
     labelCode: "Item code",
     labelCodeHelper: "Fills from camera",
     labelLocation: "Location",
-    labelLocationHelper: 'Example: "Warehouse A"',
+    labelLocationHelper: 'Example: “Warehouse A”',
     btnStartScanner: "Start scanner",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Save update",
@@ -41,8 +41,7 @@ const translations = {
     toastErrorHistory: "Failed to load history."
   },
   nl: {
-    subtitle:
-      "Eenvoudige goederen-tracking met camera en historie.",
+    subtitle: "Eenvoudige goederen-tracking met camera en historie.",
     languageLabel: "Taal",
     inputSectionTitle: "Nieuwe update",
     inputSectionSubtitle:
@@ -52,7 +51,7 @@ const translations = {
     labelCode: "Artikelcode",
     labelCodeHelper: "Wordt ingevuld via camera",
     labelLocation: "Locatie",
-    labelLocationHelper: 'Bijv: "Magazijn A"',
+    labelLocationHelper: 'Bijv: “Magazijn A”',
     btnStartScanner: "Scanner starten",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Opslaan",
@@ -69,28 +68,20 @@ const translations = {
     colLocation: "Locatie",
     colTime: "Bijgewerkt",
     colActions: "Historie",
-    emptyState:
-      "Nog geen items. Voeg een update toe om deze lijst te vullen.",
-    footerHint1:
-      "Elke update wordt als historie opgeslagen in Supabase.",
-    footerHint2:
-      "Lijst is uniek per code, historie toont alle locaties.",
+    emptyState: "Nog geen items. Voeg een update toe om deze lijst te vullen.",
+    footerHint1: "Elke update wordt als historie opgeslagen in Supabase.",
+    footerHint2: "Lijst is uniek per code, historie toont alle locaties.",
     historyTitle: "Historie",
     historyHint: "Nieuwste bovenaan. Elke regel = één update.",
     historyCountLabel: "logs",
-    errorMissingFields:
-      "Vul eerst de artikelcode en locatie in.",
+    errorMissingFields: "Vul eerst de artikelcode en locatie in.",
     toastSaved: "Update opgeslagen.",
-    toastErrorSave:
-      "Opslaan van update is mislukt.",
-    toastErrorLoad:
-      "Items laden is mislukt.",
-    toastErrorHistory:
-      "Historie laden is mislukt."
+    toastErrorSave: "Opslaan van update is mislukt.",
+    toastErrorLoad: "Items laden is mislukt.",
+    toastErrorHistory: "Historie laden is mislukt."
   },
   id: {
-    subtitle:
-      "Tracking barang sederhana dengan kamera & riwayat lokasi.",
+    subtitle: "Tracking barang sederhana dengan kamera & riwayat lokasi.",
     languageLabel: "Bahasa",
     inputSectionTitle: "Update baru",
     inputSectionSubtitle:
@@ -100,7 +91,7 @@ const translations = {
     labelCode: "Kode barang",
     labelCodeHelper: "Terisi dari hasil kamera",
     labelLocation: "Lokasi",
-    labelLocationHelper: 'Contoh: "Gudang A"',
+    labelLocationHelper: 'Contoh: “Gudang A”',
     btnStartScanner: "Mulai scanner",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Simpan update",
@@ -117,28 +108,21 @@ const translations = {
     colLocation: "Lokasi",
     colTime: "Diupdate",
     colActions: "History",
-    emptyState:
-      "Belum ada data. Tambahkan update untuk melihat daftar.",
-    footerHint1:
-      "Setiap update disimpan sebagai history di Supabase.",
-    footerHint2:
-      "List hanya satu baris per kode, history berisi semua lokasi.",
+    emptyState: "Belum ada data. Tambahkan update untuk melihat daftar.",
+    footerHint1: "Setiap update disimpan sebagai history di Supabase.",
+    footerHint2: "List hanya satu baris per kode, history berisi semua lokasi.",
     historyTitle: "History",
     historyHint:
       "Terbaru di paling atas. Setiap baris = satu update.",
     historyCountLabel: "log",
-    errorMissingFields:
-      "Isi dulu kode barang dan lokasi.",
+    errorMissingFields: "Isi dulu kode barang dan lokasi.",
     toastSaved: "Update tersimpan.",
     toastErrorSave: "Gagal menyimpan update.",
-    toastErrorLoad:
-      "Gagal memuat daftar barang.",
-    toastErrorHistory:
-      "Gagal memuat history."
+    toastErrorLoad: "Gagal memuat daftar barang.",
+    toastErrorHistory: "Gagal memuat history."
   },
   pl: {
-    subtitle:
-      "Prosty system śledzenia towarów z kamerą i historią.",
+    subtitle: "Prosty system śledzenia towarów z kamerą i historią.",
     languageLabel: "Język",
     inputSectionTitle: "Nowa aktualizacja",
     inputSectionSubtitle:
@@ -148,7 +132,7 @@ const translations = {
     labelCode: "Kod towaru",
     labelCodeHelper: "Uzupełniany z kamery",
     labelLocation: "Lokalizacja",
-    labelLocationHelper: 'Np. "Magazyn A"',
+    labelLocationHelper: 'Np. “Magazyn A”',
     btnStartScanner: "Start skanera",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Zapisz",
@@ -165,8 +149,7 @@ const translations = {
     colLocation: "Lokalizacja",
     colTime: "Zaktualizowano",
     colActions: "Historia",
-    emptyState:
-      "Brak danych. Dodaj aktualizację, aby zobaczyć listę.",
+    emptyState: "Brak danych. Dodaj aktualizację, aby zobaczyć listę.",
     footerHint1:
       "Każda aktualizacja jest zapisywana jako historia w Supabase.",
     footerHint2:
@@ -191,14 +174,12 @@ let currentLang = "en";
 
 function applyTranslations() {
   const dict = translations[currentLang] || translations.en;
-  document
-    .querySelectorAll("[data-i18n]")
-    .forEach((el) => {
-      const key = el.getAttribute("data-i18n");
-      if (dict[key]) {
-        el.textContent = dict[key];
-      }
-    });
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) {
+      el.textContent = dict[key];
+    }
+  });
 }
 
 // ---------- Scanner state ----------
@@ -222,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnStopScan = document.getElementById("btn-stop-scan");
   const btnSaveScan = document.getElementById("btn-save-scan");
   const btnSaveManual = document.getElementById("btn-save-manual");
-  const scannerStatusText = document.getElementById("scanner-status-text");
 
   const tableBody = document.getElementById("table-body");
   const summaryCount = document.getElementById("summary-count");
@@ -236,12 +216,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const historyCodeLabel = document.getElementById(
     "history-code-label"
   );
-  const historyCountTag = document.getElementById(
-    "history-count-tag"
-  );
-  const btnCloseHistory = document.getElementById(
-    "btn-close-history"
-  );
+  const historyCountTag = document.getElementById("history-count-tag");
+  const btnCloseHistory = document.getElementById("btn-close-history");
 
   // Language init
   applyTranslations();
@@ -250,12 +226,20 @@ document.addEventListener("DOMContentLoaded", () => {
     applyTranslations();
   });
 
-  // Tabs
+  // Default: Scan mode aktif → kode barang hanya dari kamera
+  scannedCodeInput.readOnly = true;
+  scannedCodeInput.placeholder = "Scan item code with camera";
+
+  // Tabs: pilih dulu mau scan atau manual
   tabScan.addEventListener("click", () => {
     tabScan.classList.add("active");
     tabManual.classList.remove("active");
     scanMode.style.display = "";
     manualMode.style.display = "none";
+
+    // Dalam mode Scan, kode barang hanya bisa diisi kamera
+    scannedCodeInput.readOnly = true;
+    scannedCodeInput.placeholder = "Scan item code with camera";
   });
 
   tabManual.addEventListener("click", () => {
@@ -263,15 +247,18 @@ document.addEventListener("DOMContentLoaded", () => {
     tabScan.classList.remove("active");
     scanMode.style.display = "none";
     manualMode.style.display = "";
+
+    // Mode Manual pakai field manual-code/manual-location,
+    // field scanned-code tetap readOnly (karena hidden di mode ini).
   });
 
   // Scanner buttons
   btnStartScan.addEventListener("click", () => {
-    startScanner(scannerStatusText, scannedCodeInput);
+    startScanner(scannedCodeInput);
   });
 
   btnStopScan.addEventListener("click", () => {
-    stopScanner(scannerStatusText);
+    stopScanner();
   });
 
   // Save from scan mode
@@ -284,7 +271,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const ok = await saveUpdateToSupabase(code, location);
     if (ok) {
-      scannedCodeInput.value = "";
       scanLocationInput.value = "";
       await loadSummaryList(tableBody, summaryCount, emptyState);
       alert(translations[currentLang].toastSaved);
@@ -345,7 +331,7 @@ function setScannerStatus(textKey) {
   el.textContent = dict[textKey] || "";
 }
 
-async function startScanner(statusElement, codeInput) {
+async function startScanner(codeInput) {
   if (isScanning) return;
 
   try {
@@ -358,7 +344,12 @@ async function startScanner(statusElement, codeInput) {
       return;
     }
 
-    const cameraId = cameras[0].id;
+    // 🔥 Pilih kamera belakang kalau tersedia
+    const backCam = cameras.find((cam) =>
+      /back|rear|environment/i.test(cam.label || "")
+    );
+    const cameraId = backCam ? backCam.id : cameras[0].id;
+
     const config = { fps: 10, qrbox: { width: 230, height: 230 } };
 
     html5QrCode = new Html5Qrcode("qr-reader");
@@ -368,7 +359,7 @@ async function startScanner(statusElement, codeInput) {
       cameraId,
       config,
       (decodedText) => {
-        // When code detected
+        // When code detected → isi field kode
         codeInput.value = decodedText;
         setScannerStatus("scannerDetected");
 
@@ -403,7 +394,7 @@ async function stopScanner() {
 
 async function saveUpdateToSupabase(code, location) {
   try {
-    const { data, error } = await supabaseClient
+    const { error } = await supabaseClient
       .from("goods_updates")
       .insert([{ code, location }]);
 
