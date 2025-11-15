@@ -539,14 +539,6 @@ input.locked-input {
   .badge-time {
     font-size: 0.7rem;
   }
-}
-
-/* Very wide screens – keep app centered, not terlalu lebar */
-@media (min-width: 1440px) {
-  .app {
-    max-width: 1100px;
-  }
-
   /* TABLE GENERAL */
 .data-table, .history-table {
   width: 100%;
@@ -576,5 +568,14 @@ input.locked-input {
   background: #1e293b;
   color: white;
 }
+
+}
+
+/* Very wide screens – keep app centered, not terlalu lebar */
+@media (min-width: 1440px) {
+  .app {
+    max-width: 1100px;
+  }
+
 
 }
