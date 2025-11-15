@@ -62,7 +62,9 @@
   </div>
 </div>
 
-<script src="https://unpkg.com/@zxing/library@latest"></script>
+<!-- ZXING CAMERA SCANNER -->
+<script src="https://unpkg.com/@zxing/library@0.18.6"></script>
+<!-- SUPABASE CLIENT -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 <script>
@@ -84,13 +86,10 @@ function setLang(lang){ currentLang = lang; const t=textMap[lang];
 setLang("EN");
 
 // ===================== SUPABASE INIT =====================
-const SUPABASE_URL = "https://ifynrranqixyoxombfck.supabase.com";
+// GANTI URL INI DENGAN YANG BENAR DARI DASHBOARD SUPABASE
+const SUPABASE_URL = "https://ifynrranqixyoxombfck.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmeW5ycmFucWl4eW94b21iZmNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNjgwNzIsImV4cCI6MjA3ODc0NDA3Mn0.UqDQd0rrE4vsYjjj5hHNKsBU3c62lgvNjYp4uUEu2GY";
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// TABLE SCHEMA:
-// goods_summary: id, kode, lokasi, updated_at
-// goods_history: id, kode, lokasi, time
 
 // ===================== SAVE RECORD =====================
 async function saveRecord(){
@@ -105,12 +104,15 @@ async function saveRecord(){
 
 // ===================== LOAD SUMMARY =====================
 async function loadData(){
-  let {data} = await db.from("goods_summary").select("*").order("updated_at",{ascending:false});
-  renderTable(data);
+  let {data, error} = await db.from("goods_summary").select("*").order("updated_at",{ascending:false});
+  if(error){ console.error(error); return; }
+  renderTable(data || []);
 }
 
 function renderTable(rows){
   dataList.innerHTML="";
+  if(!rows.length){ dataList.innerHTML = "<tr><td colspan='4'>No data</td></tr>"; return; }
+
   rows.forEach(r=>{
     const tr=document.createElement("tr");
     tr.innerHTML=`<td>${r.kode}</td><td>${r.lokasi}</td><td>${new Date(r.updated_at).toLocaleString()}</td>
@@ -122,10 +124,10 @@ function renderTable(rows){
 // ===================== SEARCH REALTIME =====================
 async function searchData(){
   const q = searchBox.value.toLowerCase();
-  if(!q){loadData();return;}
+  if(!q){ loadData(); return; }
 
   let {data} = await db.from("goods_summary").select("*");
-  data = data.filter(d => d.kode.toLowerCase().includes(q) || d.lokasi.toLowerCase().includes(q));
+  data = data?.filter(d => d.kode.toLowerCase().includes(q) || d.lokasi.toLowerCase().includes(q)) || [];
   renderTable(data);
 }
 
@@ -134,14 +136,14 @@ async function openHistory(kode){
   historyModal.style.display="flex";
   historyTitle.textContent = `History: ${kode}`;
   let {data} = await db.from("goods_history").select("*").eq("kode",kode).order("time",{ascending:false});
-  historyBody.innerHTML = data.map(r=>`<tr><td>${r.lokasi}</td><td>${new Date(r.time).toLocaleString()}</td></tr>`).join("");
+  historyBody.innerHTML = (data||[]).map(r=>`<tr><td>${r.lokasi}</td><td>${new Date(r.time).toLocaleString()}</td></tr>`).join("");
 }
 function closeHistory(){ historyModal.style.display="none"; }
 
 // ===================== EXPORT CSV =====================
 async function exportCSV(){
   let {data} = await db.from("goods_summary").select("*");
-  let csv = "kode,lokasi,updated_at\n" + data.map(r=>`${r.kode},${r.lokasi},${r.updated_at}`).join("\n");
+  let csv = "kode,lokasi,updated_at\n" + (data||[]).map(r=>`${r.kode},${r.lokasi},${r.updated_at}`).join("\n");
   const blob = new Blob([csv],{type:"text/csv"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -151,24 +153,15 @@ async function exportCSV(){
 // ===================== CAMERA SCAN =====================
 let codeReader = new ZXing.BrowserMultiFormatReader();
 async function startScanner(target){
-  const devices = await codeReader.listVideoInputDevices();
-  const backCam = devices[devices.length-1].deviceId;
-  codeReader.decodeOnceFromVideoDevice(backCam, "video-preview")
-    .then(result=>{
-      if(target==="kode") kodeInput.value=result.text;
-      if(target==="lokasi") lokasiInput.value=result.text;
-      codeReader.reset();
-    });
-  createPreview();
-}
-function createPreview(){
-  if(document.getElementById("video-preview")) return;
-  const v=document.createElement("video");
-  v.id="video-preview"; v.style.width="100%";
-  document.body.appendChild(v);
-}
+  try{
+    const devices = await codeReader.listVideoInputDevices();
+    if(!devices || devices.length===0){ alert("No camera found or permission denied."); return; }
 
-loadData();
-</script>
-</body>
-</html>
+    let backCam = devices.find(d=>d.label.toLowerCase().includes("back")) || devices[0];
+
+    createPreview();
+
+    codeReader.decodeOnceFromVideoDevice(backCam.deviceId, "video-preview")
+      .then(result=>{
+        if(target==="kode") kodeInput.value=result.text;
+        if(target==="lokasi") lokasiInput
