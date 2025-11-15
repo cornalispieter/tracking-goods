@@ -5,217 +5,755 @@
   <title>Tracking Goods</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Simple styling -->
+  <!-- Dark style simple -->
   <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    :root {
+      --bg: #020617;
+      --bg-card: #020617;
+      --bg-elevated: #020617;
+      --border-subtle: #1e293b;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.1);
+      --accent-strong: rgba(34, 197, 94, 0.25);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.15);
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 1rem;
-      background: #f5f5f5;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #0b1120, #020617 60%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      background: linear-gradient(145deg, #020617, #020617);
+      border-radius: 24px;
+      padding: 16px 16px 20px;
+      border: 1px solid var(--border-subtle);
+      box-shadow:
+        0 24px 80px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 0.8);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     h1 {
-      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 span.logo-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid var(--accent-soft);
+      background: radial-gradient(circle at top, #22c55e22, transparent 60%);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #bbf7d0;
+    }
+
+    header p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .lang-select {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top, #0b1120, #020617);
+      font-size: 0.75rem;
+    }
+
+    .lang-select label {
+      color: var(--text-muted);
+    }
+
+    .lang-select select {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
 
     .card {
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      background: radial-gradient(circle at top left, #0b1120, #020617 65%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 12px 12px 14px;
     }
 
-    .form-row {
+    .card-header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-title span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+    }
+
+    .card-subtitle {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .pill-bar {
+      display: inline-flex;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-strong);
+      font-size: 0.68rem;
+      color: #bbf7d0;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .pill-bar-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .tabs {
+      display: inline-flex;
+      padding: 2px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid var(--border-subtle);
+      gap: 4px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      text-align: center;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+    }
+
+    .tab.active {
+      background: radial-gradient(circle at top, #22c55e33, #16a34a11);
+      color: #bbf7d0;
+    }
+
+    .tab:hover {
+      cursor: pointer;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      margin-bottom: 6px;
     }
 
     label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      display: block;
-      margin-bottom: 0.25rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    label span.helper {
+      font-size: 0.65rem;
+      color: var(--accent);
     }
 
     input[type="text"] {
-      padding: 0.5rem;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      min-width: 180px;
-    }
-
-    button {
-      padding: 0.5rem 0.75rem;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    button.primary {
-      background: #2563eb;
-      color: white;
-    }
-
-    button.secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-
-    button.danger {
-      background: #dc2626;
-      color: white;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: default;
-    }
-
-    table {
       width: 100%;
-      border-collapse: collapse;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: #020617;
+      color: var(--text-main);
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    input::placeholder {
+      color: #4b5563;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at top, #22c55e, #16a34a);
+      color: #022c22;
+      box-shadow:
+        0 0 20px rgba(34, 197, 94, 0.35),
+        0 0 0 1px rgba(21, 128, 61, 0.7);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.97);
+      box-shadow:
+        0 0 8px rgba(34, 197, 94, 0.35),
+        0 0 0 1px rgba(21, 128, 61, 0.9);
+    }
+
+    .btn-secondary {
+      background: #020617;
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.97);
+    }
+
+    .btn-icon {
       font-size: 0.9rem;
     }
 
-    th, td {
-      padding: 0.5rem;
-      border-bottom: 1px solid #e5e7eb;
-      text-align: left;
+    .button-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
     }
 
-    th {
-      background: #f3f4f6;
+    .scanner-box {
+      border-radius: 14px;
+      border: 1px dashed var(--border-subtle);
+      padding: 8px;
+      margin-top: 8px;
+      background: radial-gradient(circle at top, #020617, #020617 70%);
+    }
+
+    #qr-reader {
+      width: 100%;
+      min-height: 180px;
+    }
+
+    .scanner-status {
+      font-size: 0.7rem;
+      margin-top: 4px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .scanner-status span.value {
+      color: #bbf7d0;
+    }
+
+    .list-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 8px;
+    }
+
+    .list-header-row small {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .table {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      background: #020617;
+    }
+
+    .table-header,
+    .table-row {
+      display: grid;
+      grid-template-columns: 2.1fr 1.5fr 1.5fr 0.9fr;
+      gap: 4px;
+      padding: 6px 8px;
+      align-items: center;
+    }
+
+    .table-header {
+      background: radial-gradient(circle at top left, #0b1120, #020617);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid #020617;
+    }
+
+    .table-row:nth-child(even) {
+      background: #020617;
+    }
+
+    .table-row:nth-child(odd) {
+      background: #020617;
+    }
+
+    .table-cell {
+      font-size: 0.72rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .badge-code {
+      font-size: 0.77rem;
+      font-weight: 500;
+      color: #e5e7eb;
+    }
+
+    .badge-location {
+      font-size: 0.72rem;
+      color: #a5b4fc;
+    }
+
+    .badge-time {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .btn-history {
+      font-size: 0.7rem;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: #020617;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .btn-history:hover {
+      border-color: var(--accent);
+    }
+
+    .empty-state {
+      padding: 10px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .footer-hint {
+      margin-top: 8px;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .footer-hint strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Modal for history */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 16px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 420px;
+      max-height: 80vh;
+      background: linear-gradient(145deg, #020617, #020617);
+      border-radius: 20px;
+      border: 1px solid var(--border-subtle);
+      padding: 12px 14px 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-title {
+      font-size: 0.85rem;
       font-weight: 600;
     }
 
-    #status {
-      font-size: 0.85rem;
-      color: #4b5563;
-      margin-top: 0.25rem;
+    .modal-title small {
+      font-size: 0.7rem;
+      color: var(--text-muted);
     }
 
-    #scanner-container {
-      margin-top: 0.5rem;
-      display: none;
-    }
-
-    #reader {
-      width: 100%;
-      max-width: 360px;
-      margin-top: 0.5rem;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #000;
-    }
-
-    /* History dialog */
-    dialog {
-      border: none;
-      border-radius: 8px;
-      padding: 1rem 1.25rem;
-      max-width: 420px;
-      width: 90%;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    }
-
-    dialog::backdrop {
-      background: rgba(0,0,0,0.4);
-    }
-
-    #history-list {
-      max-height: 260px;
-      overflow-y: auto;
-      padding-left: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    #history-list li {
-      margin-bottom: 0.25rem;
-      font-size: 0.9rem;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 0.1rem 0.4rem;
+    .btn-close {
+      background: #020617;
       border-radius: 999px;
-      font-size: 0.75rem;
-      background: #e5e7eb;
+      border: 1px solid var(--border-subtle);
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      margin-top: 6px;
+      padding: 6px;
+      border-radius: 12px;
+      background: #020617;
+      border: 1px solid #020617;
+      overflow-y: auto;
+      gap: 6px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .history-item {
+      padding: 8px 9px;
+      border-radius: 10px;
+      background: radial-gradient(circle at top left, #020617, #020617);
+      border: 1px solid #020617;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .history-location {
+      font-size: 0.78rem;
+      color: #a5b4fc;
+    }
+
+    .history-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .history-seq {
+      font-size: 0.65rem;
+      color: var(--accent);
+    }
+
+    .modal-footer {
+      margin-top: 4px;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    /* Small screens tweaks */
+    @media (max-width: 380px) {
+      .table-header,
+      .table-row {
+        grid-template-columns: 1.8fr 1.4fr 1.6fr 0.9fr;
+      }
     }
   </style>
 
-  <!-- html5-qrcode (scanner) -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+  <!-- Supabase JS (v1 UMD) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1.35.7/dist/umd/supabase.min.js" defer></script>
+
+  <!-- html5-qrcode for camera scanner (QR) -->
+  <script src="https://unpkg.com/html5-qrcode" defer></script>
+
+  <!-- Our scripts -->
+  <script src="db.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <h1>Tracking Goods</h1>
-  <p>Scan or enter production code and location, then save to track movements.</p>
+  <div class="app">
+    <header>
+      <div class="title-block">
+        <h1>
+          <span class="logo-pill">TrackFlow</span>
+        </h1>
+        <p data-i18n="subtitle">
+          Simple goods tracking with camera & history.
+        </p>
+      </div>
+      <div class="lang-select">
+        <label for="language-select" data-i18n="languageLabel">Lang</label>
+        <select id="language-select">
+          <option value="en">EN</option>
+          <option value="nl">NL</option>
+          <option value="id">ID</option>
+          <option value="pl">PL</option>
+        </select>
+      </div>
+    </header>
 
-  <!-- Input + scanner -->
-  <div class="card">
-    <form id="scan-form">
-      <div class="form-row">
-        <div>
-          <label for="code">Production Code</label>
-          <input type="text" id="code" autocomplete="off" required />
+    <main>
+      <!-- Input + Scanner -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <span class="dot"></span>
+              <span data-i18n="inputSectionTitle">New update</span>
+            </div>
+            <div class="card-subtitle" data-i18n="inputSectionSubtitle">
+              Use camera or manual input to store location.
+            </div>
+          </div>
+          <div class="tabs">
+            <button class="tab active" id="tab-scan" data-i18n="tabScan">
+              Scan
+            </button>
+            <button class="tab" id="tab-manual" data-i18n="tabManual">
+              Manual
+            </button>
+          </div>
         </div>
-        <div>
-          <label for="location">Location</label>
-          <input type="text" id="location" autocomplete="off" required />
+
+        <!-- Scanner mode -->
+        <div id="scan-mode">
+          <div class="field-group">
+            <label for="scanned-code">
+              <span data-i18n="labelCode">Item code</span>
+              <span class="helper" data-i18n="labelCodeHelper">
+                Fills from camera
+              </span>
+            </label>
+            <input
+              type="text"
+              id="scanned-code"
+              placeholder="Scan or type item code"
+            />
+          </div>
+
+          <div class="field-group">
+            <label for="scan-location">
+              <span data-i18n="labelLocation">Location</span>
+              <span class="helper" data-i18n="labelLocationHelper">
+                Example: “Warehouse A”
+              </span>
+            </label>
+            <input
+              type="text"
+              id="scan-location"
+              placeholder="Enter location"
+            />
+          </div>
+
+          <div class="button-row">
+            <button class="btn btn-primary" id="btn-start-scan">
+              <span class="btn-icon">📷</span>
+              <span data-i18n="btnStartScanner">Start scanner</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-stop-scan">
+              <span class="btn-icon">⏹</span>
+              <span data-i18n="btnStopScanner">Stop</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-save-scan">
+              <span class="btn-icon">💾</span>
+              <span data-i18n="btnSaveUpdate">Save update</span>
+            </button>
+          </div>
+
+          <div class="scanner-box">
+            <div id="qr-reader"></div>
+            <div class="scanner-status">
+              <span data-i18n="scannerStatusLabel">Status:</span>
+              <span class="value" id="scanner-status-text">
+                <span data-i18n="scannerIdle">Idle</span>
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="form-row">
-        <button type="submit" class="primary" id="save-btn">Save Movement</button>
-        <button type="button" class="secondary" id="start-scan-btn">Start Scanner</button>
-        <button type="button" class="secondary" id="stop-scan-btn" disabled>Stop Scanner</button>
-      </div>
+        <!-- Manual mode -->
+        <div id="manual-mode" style="display: none;">
+          <div class="field-group">
+            <label for="manual-code">
+              <span data-i18n="labelCode">Item code</span>
+            </label>
+            <input
+              type="text"
+              id="manual-code"
+              placeholder="Enter item code"
+            />
+          </div>
+          <div class="field-group">
+            <label for="manual-location">
+              <span data-i18n="labelLocation">Location</span>
+            </label>
+            <input
+              type="text"
+              id="manual-location"
+              placeholder="Enter location"
+            />
+          </div>
+          <div class="button-row">
+            <button class="btn btn-primary" id="btn-save-manual">
+              <span class="btn-icon">💾</span>
+              <span data-i18n="btnSaveUpdate">Save update</span>
+            </button>
+          </div>
+        </div>
+      </section>
 
-      <div id="status"></div>
+      <!-- List view -->
+      <section class="card">
+        <div class="list-header-row">
+          <div>
+            <div class="card-title">
+              <span class="dot"></span>
+              <span data-i18n="listTitle">Tracked items</span>
+            </div>
+            <small data-i18n="listSubtitle">
+              One row per unique item code. Latest update shown.
+            </small>
+          </div>
+          <div class="pill-bar">
+            <span class="pill-bar-dot"></span>
+            <span id="summary-count">0</span>
+            <span data-i18n="itemsLabel">items</span>
+          </div>
+        </div>
 
-      <div id="scanner-container">
-        <label>Camera Scanner</label>
-        <div id="reader"></div>
-      </div>
-    </form>
+        <div class="table" id="items-table">
+          <div class="table-header">
+            <div class="table-cell" data-i18n="colCode">Code</div>
+            <div class="table-cell" data-i18n="colLocation">Location</div>
+            <div class="table-cell" data-i18n="colTime">Updated</div>
+            <div class="table-cell" data-i18n="colActions">History</div>
+          </div>
+          <div id="table-body"></div>
+        </div>
+
+        <div class="empty-state" id="empty-state">
+          <span data-i18n="emptyState">
+            No items yet. Add an update to see it here.
+          </span>
+        </div>
+
+        <div class="footer-hint">
+          <span data-i18n="footerHint1">
+            Each update is stored as history in Supabase.
+          </span>
+          <span data-i18n="footerHint2">
+            List is <strong>unique per code</strong>, history shows all locations.
+          </span>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <!-- List latest records -->
-  <div class="card">
-    <h2>Latest Location by Production Code</h2>
-    <p style="font-size:0.85rem;color:#6b7280;">
-      Each production code is shown once with its latest location.  
-      Click <span class="badge">History</span> to view full movement history.
-    </p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Production Code</th>
-          <th>Location</th>
-          <th>Last Updated</th>
-          <th>History</th>
-        </tr>
-      </thead>
-      <tbody id="records-body">
-        <!-- Filled by script.js -->
-      </tbody>
-    </table>
-  </div>
-
-  <!-- History dialog -->
-  <dialog id="history-dialog">
-    <h3 id="history-title">History</h3>
-    <ul id="history-list"></ul>
-    <div style="margin-top:0.75rem;text-align:right;">
-      <button type="button" class="secondary" id="close-history-btn">Close</button>
+  <!-- Modal: history -->
+  <div class="modal-backdrop" id="history-modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span data-i18n="historyTitle">History</span>
+          <br />
+          <small id="history-code-label">CODE-123</small>
+        </div>
+        <button class="btn-close" id="btn-close-history">✕</button>
+      </div>
+      <div class="modal-body" id="history-list"></div>
+      <div class="modal-footer">
+        <span class="tag" data-i18n="historyHint">
+          Latest first. Each row = one update.
+        </span>
+        <span class="tag" id="history-count-tag">0 logs</span>
+      </div>
     </div>
-  </dialog>
-
-  <!-- Main JS (module) -->
-  <script type="module" src="./script.js"></script>
+  </div>
 </body>
 </html>

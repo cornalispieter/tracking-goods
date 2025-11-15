@@ -1,247 +1,566 @@
 // script.js
-import {
-  saveMovement,
-  fetchLatestMovements,
-  fetchHistoryByCode,
-} from "./db.js";
 
+// ---------- I18N (EN, NL, ID, PL) ----------
+const translations = {
+  en: {
+    subtitle: "Simple goods tracking with camera & history.",
+    languageLabel: "Lang",
+    inputSectionTitle: "New update",
+    inputSectionSubtitle: "Use camera or manual input to store location.",
+    tabScan: "Scan",
+    tabManual: "Manual",
+    labelCode: "Item code",
+    labelCodeHelper: "Fills from camera",
+    labelLocation: "Location",
+    labelLocationHelper: 'Example: "Warehouse A"',
+    btnStartScanner: "Start scanner",
+    btnStopScanner: "Stop",
+    btnSaveUpdate: "Save update",
+    scannerStatusLabel: "Status:",
+    scannerIdle: "Idle",
+    scannerScanning: "Scanning…",
+    scannerDetected: "Code detected",
+    scannerStopped: "Scanner stopped",
+    listTitle: "Tracked items",
+    listSubtitle: "One row per unique item code. Latest update shown.",
+    itemsLabel: "items",
+    colCode: "Code",
+    colLocation: "Location",
+    colTime: "Updated",
+    colActions: "History",
+    emptyState: "No items yet. Add an update to see it here.",
+    footerHint1: "Each update is stored as history in Supabase.",
+    footerHint2: "List is unique per code, history shows all locations.",
+    historyTitle: "History",
+    historyHint: "Latest first. Each row = one update.",
+    historyCountLabel: "logs",
+    errorMissingFields: "Please fill item code and location first.",
+    toastSaved: "Update saved.",
+    toastErrorSave: "Failed to save update.",
+    toastErrorLoad: "Failed to load items.",
+    toastErrorHistory: "Failed to load history."
+  },
+  nl: {
+    subtitle:
+      "Eenvoudige goederen-tracking met camera en historie.",
+    languageLabel: "Taal",
+    inputSectionTitle: "Nieuwe update",
+    inputSectionSubtitle:
+      "Gebruik de camera of typ handmatig om de locatie op te slaan.",
+    tabScan: "Scan",
+    tabManual: "Handmatig",
+    labelCode: "Artikelcode",
+    labelCodeHelper: "Wordt ingevuld via camera",
+    labelLocation: "Locatie",
+    labelLocationHelper: 'Bijv: "Magazijn A"',
+    btnStartScanner: "Scanner starten",
+    btnStopScanner: "Stop",
+    btnSaveUpdate: "Opslaan",
+    scannerStatusLabel: "Status:",
+    scannerIdle: "Inactief",
+    scannerScanning: "Scannen…",
+    scannerDetected: "Code gevonden",
+    scannerStopped: "Scanner gestopt",
+    listTitle: "Geregistreerde items",
+    listSubtitle:
+      "Eén regel per unieke artikelcode. Laatste update wordt getoond.",
+    itemsLabel: "items",
+    colCode: "Code",
+    colLocation: "Locatie",
+    colTime: "Bijgewerkt",
+    colActions: "Historie",
+    emptyState:
+      "Nog geen items. Voeg een update toe om deze lijst te vullen.",
+    footerHint1:
+      "Elke update wordt als historie opgeslagen in Supabase.",
+    footerHint2:
+      "Lijst is uniek per code, historie toont alle locaties.",
+    historyTitle: "Historie",
+    historyHint: "Nieuwste bovenaan. Elke regel = één update.",
+    historyCountLabel: "logs",
+    errorMissingFields:
+      "Vul eerst de artikelcode en locatie in.",
+    toastSaved: "Update opgeslagen.",
+    toastErrorSave:
+      "Opslaan van update is mislukt.",
+    toastErrorLoad:
+      "Items laden is mislukt.",
+    toastErrorHistory:
+      "Historie laden is mislukt."
+  },
+  id: {
+    subtitle:
+      "Tracking barang sederhana dengan kamera & riwayat lokasi.",
+    languageLabel: "Bahasa",
+    inputSectionTitle: "Update baru",
+    inputSectionSubtitle:
+      "Gunakan kamera atau input manual untuk menyimpan lokasi.",
+    tabScan: "Scan",
+    tabManual: "Manual",
+    labelCode: "Kode barang",
+    labelCodeHelper: "Terisi dari hasil kamera",
+    labelLocation: "Lokasi",
+    labelLocationHelper: 'Contoh: "Gudang A"',
+    btnStartScanner: "Mulai scanner",
+    btnStopScanner: "Stop",
+    btnSaveUpdate: "Simpan update",
+    scannerStatusLabel: "Status:",
+    scannerIdle: "Diam",
+    scannerScanning: "Scanning…",
+    scannerDetected: "Kode terdeteksi",
+    scannerStopped: "Scanner berhenti",
+    listTitle: "Daftar barang",
+    listSubtitle:
+      "Satu baris per kode barang unik. Menampilkan update terbaru.",
+    itemsLabel: "barang",
+    colCode: "Kode",
+    colLocation: "Lokasi",
+    colTime: "Diupdate",
+    colActions: "History",
+    emptyState:
+      "Belum ada data. Tambahkan update untuk melihat daftar.",
+    footerHint1:
+      "Setiap update disimpan sebagai history di Supabase.",
+    footerHint2:
+      "List hanya satu baris per kode, history berisi semua lokasi.",
+    historyTitle: "History",
+    historyHint:
+      "Terbaru di paling atas. Setiap baris = satu update.",
+    historyCountLabel: "log",
+    errorMissingFields:
+      "Isi dulu kode barang dan lokasi.",
+    toastSaved: "Update tersimpan.",
+    toastErrorSave: "Gagal menyimpan update.",
+    toastErrorLoad:
+      "Gagal memuat daftar barang.",
+    toastErrorHistory:
+      "Gagal memuat history."
+  },
+  pl: {
+    subtitle:
+      "Prosty system śledzenia towarów z kamerą i historią.",
+    languageLabel: "Język",
+    inputSectionTitle: "Nowa aktualizacja",
+    inputSectionSubtitle:
+      "Użyj kamery lub wprowadź dane ręcznie, aby zapisać lokalizację.",
+    tabScan: "Skanuj",
+    tabManual: "Ręcznie",
+    labelCode: "Kod towaru",
+    labelCodeHelper: "Uzupełniany z kamery",
+    labelLocation: "Lokalizacja",
+    labelLocationHelper: 'Np. "Magazyn A"',
+    btnStartScanner: "Start skanera",
+    btnStopScanner: "Stop",
+    btnSaveUpdate: "Zapisz",
+    scannerStatusLabel: "Status:",
+    scannerIdle: "Bezczynny",
+    scannerScanning: "Skanowanie…",
+    scannerDetected: "Kod wykryty",
+    scannerStopped: "Skaner zatrzymany",
+    listTitle: "Śledzone pozycje",
+    listSubtitle:
+      "Jeden wiersz na unikalny kod towaru. Pokazana ostatnia aktualizacja.",
+    itemsLabel: "pozycji",
+    colCode: "Kod",
+    colLocation: "Lokalizacja",
+    colTime: "Zaktualizowano",
+    colActions: "Historia",
+    emptyState:
+      "Brak danych. Dodaj aktualizację, aby zobaczyć listę.",
+    footerHint1:
+      "Każda aktualizacja jest zapisywana jako historia w Supabase.",
+    footerHint2:
+      "Lista jest unikalna per kod, historia pokazuje wszystkie lokalizacje.",
+    historyTitle: "Historia",
+    historyHint:
+      "Najnowsze na górze. Każdy wiersz = jedna aktualizacja.",
+    historyCountLabel: "logów",
+    errorMissingFields:
+      "Najpierw wprowadź kod towaru i lokalizację.",
+    toastSaved: "Zapisano aktualizację.",
+    toastErrorSave:
+      "Nie udało się zapisać aktualizacji.",
+    toastErrorLoad:
+      "Nie udało się załadować listy.",
+    toastErrorHistory:
+      "Nie udało się załadować historii."
+  }
+};
+
+let currentLang = "en";
+
+function applyTranslations() {
+  const dict = translations[currentLang] || translations.en;
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      if (dict[key]) {
+        el.textContent = dict[key];
+      }
+    });
+}
+
+// ---------- Scanner state ----------
 let html5QrCode = null;
 let isScanning = false;
 
+// ---------- DOM ready ----------
 document.addEventListener("DOMContentLoaded", () => {
-  const codeInput = document.getElementById("code");
-  const locationInput = document.getElementById("location");
-  const form = document.getElementById("scan-form");
-  const saveBtn = document.getElementById("save-btn");
-  const startScanBtn = document.getElementById("start-scan-btn");
-  const stopScanBtn = document.getElementById("stop-scan-btn");
-  const statusEl = document.getElementById("status");
-  const scannerContainer = document.getElementById("scanner-container");
-  const historyDialog = document.getElementById("history-dialog");
-  const historyTitle = document.getElementById("history-title");
+  const langSelect = document.getElementById("language-select");
+  const tabScan = document.getElementById("tab-scan");
+  const tabManual = document.getElementById("tab-manual");
+  const scanMode = document.getElementById("scan-mode");
+  const manualMode = document.getElementById("manual-mode");
+
+  const scannedCodeInput = document.getElementById("scanned-code");
+  const scanLocationInput = document.getElementById("scan-location");
+  const manualCodeInput = document.getElementById("manual-code");
+  const manualLocationInput = document.getElementById("manual-location");
+
+  const btnStartScan = document.getElementById("btn-start-scan");
+  const btnStopScan = document.getElementById("btn-stop-scan");
+  const btnSaveScan = document.getElementById("btn-save-scan");
+  const btnSaveManual = document.getElementById("btn-save-manual");
+  const scannerStatusText = document.getElementById("scanner-status-text");
+
+  const tableBody = document.getElementById("table-body");
+  const summaryCount = document.getElementById("summary-count");
+  const emptyState = document.getElementById("empty-state");
+
+  // Modal elements
+  const historyBackdrop = document.getElementById(
+    "history-modal-backdrop"
+  );
   const historyList = document.getElementById("history-list");
-  const closeHistoryBtn = document.getElementById("close-history-btn");
+  const historyCodeLabel = document.getElementById(
+    "history-code-label"
+  );
+  const historyCountTag = document.getElementById(
+    "history-count-tag"
+  );
+  const btnCloseHistory = document.getElementById(
+    "btn-close-history"
+  );
 
-  // Load initial data
-  loadLatest();
+  // Language init
+  applyTranslations();
+  langSelect.addEventListener("change", () => {
+    currentLang = langSelect.value;
+    applyTranslations();
+  });
 
-  // Handle save movement
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  // Tabs
+  tabScan.addEventListener("click", () => {
+    tabScan.classList.add("active");
+    tabManual.classList.remove("active");
+    scanMode.style.display = "";
+    manualMode.style.display = "none";
+  });
 
-    const code = codeInput.value.trim();
-    const location = locationInput.value.trim();
+  tabManual.addEventListener("click", () => {
+    tabManual.classList.add("active");
+    tabScan.classList.remove("active");
+    scanMode.style.display = "none";
+    manualMode.style.display = "";
+  });
 
+  // Scanner buttons
+  btnStartScan.addEventListener("click", () => {
+    startScanner(scannerStatusText, scannedCodeInput);
+  });
+
+  btnStopScan.addEventListener("click", () => {
+    stopScanner(scannerStatusText);
+  });
+
+  // Save from scan mode
+  btnSaveScan.addEventListener("click", async () => {
+    const code = scannedCodeInput.value.trim();
+    const location = scanLocationInput.value.trim();
     if (!code || !location) {
-      setStatus("Please fill production code and location.", true);
+      alert(translations[currentLang].errorMissingFields);
       return;
     }
-
-    saveBtn.disabled = true;
-    setStatus("Saving movement...");
-
-    try {
-      await saveMovement({ code, location });
-      setStatus("Movement saved successfully.");
-      codeInput.value = "";
-      locationInput.value = "";
-      loadLatest();
-    } catch (err) {
-      console.error(err);
-      setStatus("Error saving movement: " + (err.message || "Unknown error"), true);
-    } finally {
-      saveBtn.disabled = false;
+    const ok = await saveUpdateToSupabase(code, location);
+    if (ok) {
+      scannedCodeInput.value = "";
+      scanLocationInput.value = "";
+      await loadSummaryList(tableBody, summaryCount, emptyState);
+      alert(translations[currentLang].toastSaved);
+    } else {
+      alert(translations[currentLang].toastErrorSave);
     }
   });
 
-  // Start scanner
-  startScanBtn.addEventListener("click", async () => {
-    if (isScanning) return;
-    if (!window.Html5Qrcode) {
-      setStatus("Scanner library not loaded.", true);
+  // Save from manual mode
+  btnSaveManual.addEventListener("click", async () => {
+    const code = manualCodeInput.value.trim();
+    const location = manualLocationInput.value.trim();
+    if (!code || !location) {
+      alert(translations[currentLang].errorMissingFields);
       return;
     }
-
-    scannerContainer.style.display = "block";
-    startScanBtn.disabled = true;
-    stopScanBtn.disabled = false;
-    setStatus("Starting camera scanner...");
-
-    const qrRegionId = "reader";
-    html5QrCode = new Html5Qrcode(qrRegionId);
-
-    const config = { fps: 10, qrbox: 250 }; // basic
-
-    const onScanSuccess = (decodedText) => {
-      // isi ke input code, tidak langsung save biar bisa dikoreksi
-      codeInput.value = decodedText;
-      setStatus(`Scanned: ${decodedText}`);
-    };
-
-    const onScanError = () => {
-      // bisa diabaikan, dipanggil berkali-kali saat tidak ada kode
-    };
-
-    try {
-      const cameras = await Html5Qrcode.getCameras();
-      if (!cameras || cameras.length === 0) {
-        setStatus("No camera found.", true);
-        stopScanner();
-        return;
-      }
-
-      // pakai camera pertama
-      await html5QrCode.start(
-        { deviceId: { exact: cameras[0].id } },
-        config,
-        onScanSuccess,
-        onScanError
-      );
-
-      isScanning = true;
-      setStatus("Scanner is running. Point camera to a barcode/QR.");
-    } catch (err) {
-      console.error(err);
-      setStatus("Failed to start scanner: " + (err.message || "Unknown error"), true);
-      stopScanner();
+    const ok = await saveUpdateToSupabase(code, location);
+    if (ok) {
+      manualCodeInput.value = "";
+      manualLocationInput.value = "";
+      await loadSummaryList(tableBody, summaryCount, emptyState);
+      alert(translations[currentLang].toastSaved);
+    } else {
+      alert(translations[currentLang].toastErrorSave);
     }
   });
 
-  // Stop scanner
-  stopScanBtn.addEventListener("click", () => {
-    stopScanner();
-    setStatus("Scanner stopped.");
-  });
-
-  // Close history dialog
-  closeHistoryBtn.addEventListener("click", () => {
-    historyDialog.close();
-  });
-
-  // If user clicks backdrop on some browsers
-  historyDialog.addEventListener("click", (e) => {
-    const rect = historyDialog.getBoundingClientRect();
-    const inDialog =
-      rect.top <= e.clientY &&
-      e.clientY <= rect.top + rect.height &&
-      rect.left <= e.clientX &&
-      e.clientX <= rect.left + rect.width;
-    if (!inDialog) {
-      historyDialog.close();
+  // Close history modal
+  historyBackdrop.addEventListener("click", (e) => {
+    if (e.target === historyBackdrop) {
+      historyBackdrop.classList.remove("show");
     }
   });
+  btnCloseHistory.addEventListener("click", () => {
+    historyBackdrop.classList.remove("show");
+  });
 
-  /**
-   * Load latest records and render table
-   */
-  async function loadLatest() {
-    setStatus("Loading latest movements...");
-    const tbody = document.getElementById("records-body");
-    tbody.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
+  // Load initial list
+  loadSummaryList(tableBody, summaryCount, emptyState);
 
-    try {
-      const rows = await fetchLatestMovements();
-      if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="4">No data yet.</td></tr>`;
-        setStatus("No data yet.");
-        return;
-      }
-
-      tbody.innerHTML = "";
-      for (const row of rows) {
-        const tr = document.createElement("tr");
-
-        const codeTd = document.createElement("td");
-        codeTd.textContent = row.code;
-
-        const locTd = document.createElement("td");
-        locTd.textContent = row.location;
-
-        const timeTd = document.createElement("td");
-        const createdAt = row.created_at ? new Date(row.created_at) : null;
-        timeTd.textContent = createdAt
-          ? createdAt.toLocaleString()
-          : "-";
-
-        const historyTd = document.createElement("td");
-        const historyBtn = document.createElement("button");
-        historyBtn.textContent = "History";
-        historyBtn.className = "secondary";
-        historyBtn.type = "button";
-        historyBtn.addEventListener("click", () => openHistory(row.code));
-        historyTd.appendChild(historyBtn);
-
-        tr.appendChild(codeTd);
-        tr.appendChild(locTd);
-        tr.appendChild(timeTd);
-        tr.appendChild(historyTd);
-        tbody.appendChild(tr);
-      }
-
-      setStatus("Latest movements loaded.");
-    } catch (err) {
-      console.error(err);
-      setStatus("Error loading data: " + (err.message || "Unknown error"), true);
-    }
-  }
-
-  /**
-   * Open history dialog for a specific code
-   */
-  async function openHistory(code) {
-    historyTitle.textContent = `History – ${code}`;
-    historyList.innerHTML = "<li>Loading...</li>";
-    historyDialog.showModal();
-
-    try {
-      const items = await fetchHistoryByCode(code);
-      if (!items.length) {
-        historyList.innerHTML = "<li>No history yet.</li>";
-        return;
-      }
-
-      historyList.innerHTML = "";
-      for (const item of items) {
-        const li = document.createElement("li");
-        const ts = item.created_at ? new Date(item.created_at).toLocaleString() : "-";
-        li.textContent = `${ts} → ${item.location}`;
-        historyList.appendChild(li);
-      }
-    } catch (err) {
-      console.error(err);
-      historyList.innerHTML = `<li>Error loading history: ${err.message || "Unknown error"}</li>`;
-    }
-  }
-
-  /**
-   * Stop scanner if running
-   */
-  async function stopScanner() {
-    const startScanBtn = document.getElementById("start-scan-btn");
-    const stopScanBtn = document.getElementById("stop-scan-btn");
-    const scannerContainer = document.getElementById("scanner-container");
-
-    if (html5QrCode && isScanning) {
-      try {
-        await html5QrCode.stop();
-        await html5QrCode.clear();
-      } catch (err) {
-        console.error("Error stopping scanner", err);
-      }
-    }
-
-    html5QrCode = null;
-    isScanning = false;
-    startScanBtn.disabled = false;
-    stopScanBtn.disabled = true;
-    scannerContainer.style.display = "none";
-  }
-
-  /**
-   * Status helper
-   */
-  function setStatus(message, isError = false) {
-    statusEl.textContent = message;
-    statusEl.style.color = isError ? "#dc2626" : "#4b5563";
-  }
+  // Expose function to open history globally (used by buttons)
+  window.openHistoryForCode = async (code) => {
+    await loadHistoryForCode(
+      code,
+      historyList,
+      historyCodeLabel,
+      historyCountTag
+    );
+    historyBackdrop.classList.add("show");
+  };
 });
+
+// ---------- Scanner functions ----------
+function setScannerStatus(textKey) {
+  const el = document.getElementById("scanner-status-text");
+  const dict = translations[currentLang];
+  if (!el || !dict) return;
+  el.textContent = dict[textKey] || "";
+}
+
+async function startScanner(statusElement, codeInput) {
+  if (isScanning) return;
+
+  try {
+    setScannerStatus("scannerScanning");
+
+    const cameras = await Html5Qrcode.getCameras();
+    if (!cameras || cameras.length === 0) {
+      setScannerStatus("scannerIdle");
+      alert("No camera found.");
+      return;
+    }
+
+    const cameraId = cameras[0].id;
+    const config = { fps: 10, qrbox: { width: 230, height: 230 } };
+
+    html5QrCode = new Html5Qrcode("qr-reader");
+    isScanning = true;
+
+    await html5QrCode.start(
+      cameraId,
+      config,
+      (decodedText) => {
+        // When code detected
+        codeInput.value = decodedText;
+        setScannerStatus("scannerDetected");
+
+        // Auto-stop after detect
+        stopScanner();
+      },
+      (err) => {
+        // ignore decode errors
+      }
+    );
+  } catch (err) {
+    console.error("Error starting scanner:", err);
+    setScannerStatus("scannerIdle");
+    alert("Cannot start camera scanner.");
+  }
+}
+
+async function stopScanner() {
+  if (html5QrCode && isScanning) {
+    try {
+      await html5QrCode.stop();
+      html5QrCode.clear();
+    } catch (err) {
+      console.warn("Error stopping scanner:", err);
+    }
+  }
+  isScanning = false;
+  setScannerStatus("scannerStopped");
+}
+
+// ---------- Supabase helper functions ----------
+
+async function saveUpdateToSupabase(code, location) {
+  try {
+    const { data, error } = await supabaseClient
+      .from("goods_updates")
+      .insert([{ code, location }]);
+
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("Unexpected error saving update:", err);
+    return false;
+  }
+}
+
+async function loadSummaryList(tableBody, summaryCountEl, emptyStateEl) {
+  try {
+    const { data, error } = await supabaseClient
+      .from("goods_updates")
+      .select("*")
+      .order("updated_at", { ascending: false });
+
+    if (error) {
+      console.error("Supabase select error:", error);
+      alert(translations[currentLang].toastErrorLoad);
+      return;
+    }
+
+    // Group by code → keep latest row per code
+    const byCode = new Map();
+    (data || []).forEach((row) => {
+      if (!row.code) return;
+      const existing = byCode.get(row.code);
+      if (!existing) {
+        byCode.set(row.code, row);
+      } else {
+        const a = new Date(existing.updated_at).getTime();
+        const b = new Date(row.updated_at).getTime();
+        if (b > a) {
+          byCode.set(row.code, row);
+        }
+      }
+    });
+
+    const rows = Array.from(byCode.values()).sort((a, b) => {
+      return (
+        new Date(b.updated_at).getTime() -
+        new Date(a.updated_at).getTime()
+      );
+    });
+
+    // Render
+    tableBody.innerHTML = "";
+    if (rows.length === 0) {
+      emptyStateEl.style.display = "block";
+    } else {
+      emptyStateEl.style.display = "none";
+    }
+
+    rows.forEach((row) => {
+      const tr = document.createElement("div");
+      tr.className = "table-row";
+
+      const codeCell = document.createElement("div");
+      codeCell.className = "table-cell badge-code";
+      codeCell.textContent = row.code;
+
+      const locCell = document.createElement("div");
+      locCell.className = "table-cell badge-location";
+      locCell.textContent = row.location || "-";
+
+      const timeCell = document.createElement("div");
+      timeCell.className = "table-cell badge-time";
+      const ts = row.updated_at
+        ? new Date(row.updated_at).toLocaleString()
+        : "";
+      timeCell.textContent = ts;
+
+      const actionCell = document.createElement("div");
+      actionCell.className = "table-cell";
+      const historyBtn = document.createElement("button");
+      historyBtn.className = "btn-history";
+      historyBtn.textContent = "⋯";
+      historyBtn.title = "View history";
+      historyBtn.addEventListener("click", () => {
+        window.openHistoryForCode(row.code);
+      });
+      actionCell.appendChild(historyBtn);
+
+      tr.appendChild(codeCell);
+      tr.appendChild(locCell);
+      tr.appendChild(timeCell);
+      tr.appendChild(actionCell);
+
+      tableBody.appendChild(tr);
+    });
+
+    summaryCountEl.textContent = rows.length.toString();
+  } catch (err) {
+    console.error("Unexpected error loading list:", err);
+    alert(translations[currentLang].toastErrorLoad);
+  }
+}
+
+async function loadHistoryForCode(
+  code,
+  historyListEl,
+  historyCodeLabelEl,
+  historyCountTagEl
+) {
+  try {
+    const { data, error } = await supabaseClient
+      .from("goods_updates")
+      .select("*")
+      .eq("code", code)
+      .order("updated_at", { ascending: false });
+
+    if (error) {
+      console.error("Supabase history error:", error);
+      alert(translations[currentLang].toastErrorHistory);
+      return;
+    }
+
+    historyListEl.innerHTML = "";
+    historyCodeLabelEl.textContent = code;
+
+    (data || []).forEach((row, idx) => {
+      const item = document.createElement("div");
+      item.className = "history-item";
+
+      const locEl = document.createElement("div");
+      locEl.className = "history-location";
+      locEl.textContent = row.location || "-";
+
+      const timeEl = document.createElement("div");
+      timeEl.className = "history-time";
+      const ts = row.updated_at
+        ? new Date(row.updated_at).toLocaleString()
+        : "";
+      timeEl.textContent = ts;
+
+      const seqEl = document.createElement("div");
+      seqEl.className = "history-seq";
+      seqEl.textContent = `#${idx + 1}`;
+
+      item.appendChild(locEl);
+      item.appendChild(timeEl);
+      item.appendChild(seqEl);
+
+      historyListEl.appendChild(item);
+    });
+
+    const dict = translations[currentLang];
+    historyCountTagEl.textContent = `${data?.length || 0} ${
+      dict.historyCountLabel
+    }`;
+  } catch (err) {
+    console.error("Unexpected error loading history:", err);
+    alert(translations[currentLang].toastErrorHistory);
+  }
+}
