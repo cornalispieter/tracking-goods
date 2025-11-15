@@ -225,43 +225,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // init lang
   applyTranslations();
-  langSelect.addEventListener("change", () => {
-    currentLang = langSelect.value;
-    applyTranslations();
-    renderSummaryList(tableBody, summaryCount, emptyState);
-  });
+  if (langSelect) {
+    langSelect.addEventListener("change", () => {
+      currentLang = langSelect.value;
+      applyTranslations();
+      renderSummaryList(tableBody, summaryCount, emptyState);
+    });
+  }
 
   // scanner code
-  btnStartScanCode.addEventListener("click", () => {
-    startScannerForCode(codeInput, step1Label);
-  });
+  if (btnStartScanCode && codeInput && step1Label) {
+    btnStartScanCode.addEventListener("click", () => {
+      startScannerForCode(codeInput, step1Label);
+    });
+  }
 
   // scanner location
-  btnStartScanLocation.addEventListener("click", () => {
-    startScannerForLocation(locationInput);
-  });
+  if (btnStartScanLocation && locationInput) {
+    btnStartScanLocation.addEventListener("click", () => {
+      startScannerForLocation(locationInput);
+    });
+  }
 
   // save update
-  btnSaveUpdate.addEventListener("click", async () => {
-    const code = codeInput.value.trim();
-    const location = locationInput.value.trim();
-    if (!code || !location) {
-      alert(translations[currentLang].errorMissingFields);
-      return;
-    }
-    const ok = await saveUpdateToSupabase(code, location);
-    if (ok) {
-      // lokasi dibuka lagi untuk next input, kode tetap
-      locationInput.readOnly = false;
-      locationInput.classList.remove("locked-input");
-      locationInput.value = "";
-      await loadSummaryList(tableBody, summaryCount, emptyState);
-      alert(translations[currentLang].toastSaved);
-      locationInput.focus();
-    } else {
-      alert(translations[currentLang].toastErrorSave);
-    }
-  });
+  if (btnSaveUpdate && codeInput && locationInput) {
+    btnSaveUpdate.addEventListener("click", async () => {
+      const code = codeInput.value.trim();
+      const location = locationInput.value.trim();
+      if (!code || !location) {
+        alert(translations[currentLang].errorMissingFields);
+        return;
+      }
+      const ok = await saveUpdateToSupabase(code, location);
+      if (ok) {
+        // lokasi dibuka lagi untuk next input, kode tetap
+        locationInput.readOnly = false;
+        locationInput.classList.remove("locked-input");
+        locationInput.value = "";
+        await loadSummaryList(tableBody, summaryCount, emptyState);
+        alert(translations[currentLang].toastSaved);
+        locationInput.focus();
+      } else {
+        alert(translations[currentLang].toastErrorSave);
+      }
+    });
+  }
 
   // search
   if (searchInput) {
@@ -271,20 +279,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // history modal
-  historyBackdrop.addEventListener("click", (e) => {
-    if (e.target === historyBackdrop) {
+  if (historyBackdrop) {
+    historyBackdrop.addEventListener("click", (e) => {
+      if (e.target === historyBackdrop) {
+        historyBackdrop.classList.remove("show");
+      }
+    });
+  }
+
+  if (btnCloseHistory && historyBackdrop) {
+    btnCloseHistory.addEventListener("click", () => {
       historyBackdrop.classList.remove("show");
-    }
-  });
-  btnCloseHistory.addEventListener("click", () => {
-    historyBackdrop.classList.remove("show");
-  });
+    });
+  }
 
   // load initial list
-  loadSummaryList(tableBody, summaryCount, emptyState);
+  if (tableBody && summaryCount && emptyState) {
+    loadSummaryList(tableBody, summaryCount, emptyState);
+  }
 
   // expose for history button
   window.openHistoryForCode = async (code) => {
+    if (!historyList || !historyCodeLabel || !historyCountTag || !historyBackdrop) return;
     await loadHistoryForCode(code, historyList, historyCodeLabel, historyCountTag);
     historyBackdrop.classList.add("show");
   };
@@ -339,7 +355,8 @@ async function startScannerForCode(codeInput, step1Label) {
         // stop kamera
         await stopScannerForCode();
         // fokus ke lokasi
-        document.getElementById("location-input").focus();
+        const locationInput = document.getElementById("location-input");
+        if (locationInput) locationInput.focus();
       },
       () => {}
     );
@@ -480,6 +497,8 @@ async function loadSummaryList(tableBody, summaryCountEl, emptyStateEl) {
 }
 
 function renderSummaryList(tableBody, summaryCountEl, emptyStateEl) {
+  if (!tableBody || !summaryCountEl || !emptyStateEl) return;
+
   const dict = translations[currentLang];
   const searchInput = document.getElementById("search-input");
   const term = (searchInput?.value || "").trim().toLowerCase();
