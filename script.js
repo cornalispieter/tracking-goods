@@ -12,7 +12,7 @@ const translations = {
     labelCode: "Item code",
     labelCodeHelper: "Fills from camera",
     labelLocation: "Location",
-    labelLocationHelper: 'Example: “Warehouse A”',
+    labelLocationHelper: "Example: “Warehouse A”",
     btnStartScanner: "Start scanner",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Save update",
@@ -34,6 +34,8 @@ const translations = {
     historyTitle: "History",
     historyHint: "Latest first. Each row = one update.",
     historyCountLabel: "logs",
+    searchLabel: "Search",
+    noResultsSearch: "No items match your search.",
     errorMissingFields: "Please fill item code and location first.",
     toastSaved: "Update saved.",
     toastErrorSave: "Failed to save update.",
@@ -51,7 +53,7 @@ const translations = {
     labelCode: "Artikelcode",
     labelCodeHelper: "Wordt ingevuld via camera",
     labelLocation: "Locatie",
-    labelLocationHelper: 'Bijv: “Magazijn A”',
+    labelLocationHelper: "Bijv: “Magazijn A”",
     btnStartScanner: "Scanner starten",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Opslaan",
@@ -74,6 +76,8 @@ const translations = {
     historyTitle: "Historie",
     historyHint: "Nieuwste bovenaan. Elke regel = één update.",
     historyCountLabel: "logs",
+    searchLabel: "Zoeken",
+    noResultsSearch: "Geen items komen overeen met je zoekopdracht.",
     errorMissingFields: "Vul eerst de artikelcode en locatie in.",
     toastSaved: "Update opgeslagen.",
     toastErrorSave: "Opslaan van update is mislukt.",
@@ -91,7 +95,7 @@ const translations = {
     labelCode: "Kode barang",
     labelCodeHelper: "Terisi dari hasil kamera",
     labelLocation: "Lokasi",
-    labelLocationHelper: 'Contoh: “Gudang A”',
+    labelLocationHelper: "Contoh: “Gudang A”",
     btnStartScanner: "Mulai scanner",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Simpan update",
@@ -115,6 +119,8 @@ const translations = {
     historyHint:
       "Terbaru di paling atas. Setiap baris = satu update.",
     historyCountLabel: "log",
+    searchLabel: "Cari",
+    noResultsSearch: "Tidak ada data yang cocok dengan pencarian.",
     errorMissingFields: "Isi dulu kode barang dan lokasi.",
     toastSaved: "Update tersimpan.",
     toastErrorSave: "Gagal menyimpan update.",
@@ -132,7 +138,7 @@ const translations = {
     labelCode: "Kod towaru",
     labelCodeHelper: "Uzupełniany z kamery",
     labelLocation: "Lokalizacja",
-    labelLocationHelper: 'Np. “Magazyn A”',
+    labelLocationHelper: "Np. “Magazyn A”",
     btnStartScanner: "Start skanera",
     btnStopScanner: "Stop",
     btnSaveUpdate: "Zapisz",
@@ -158,6 +164,8 @@ const translations = {
     historyHint:
       "Najnowsze na górze. Każdy wiersz = jedna aktualizacja.",
     historyCountLabel: "logów",
+    searchLabel: "Szukaj",
+    noResultsSearch: "Brak pozycji pasujących do wyszukiwania.",
     errorMissingFields:
       "Najpierw wprowadź kod towaru i lokalizację.",
     toastSaved: "Zapisano aktualizację.",
@@ -171,6 +179,7 @@ const translations = {
 };
 
 let currentLang = "en";
+let summaryRows = []; // cache list unik per kode
 
 function applyTranslations() {
   const dict = translations[currentLang] || translations.en;
@@ -207,6 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.getElementById("table-body");
   const summaryCount = document.getElementById("summary-count");
   const emptyState = document.getElementById("empty-state");
+  const searchInput = document.getElementById("search-input");
 
   // Modal elements
   const historyBackdrop = document.getElementById(
@@ -224,20 +234,21 @@ document.addEventListener("DOMContentLoaded", () => {
   langSelect.addEventListener("change", () => {
     currentLang = langSelect.value;
     applyTranslations();
+    // re-render list copy text (empty state, search, etc.)
+    renderSummaryList(tableBody, summaryCount, emptyState);
   });
 
-  // Default: Scan mode aktif → kode barang hanya dari kamera
+  // Default: Scan mode aktif → kode dari kamera
   scannedCodeInput.readOnly = true;
   scannedCodeInput.placeholder = "Scan item code with camera";
 
-  // Tabs: pilih dulu mau scan atau manual
+  // Tabs
   tabScan.addEventListener("click", () => {
     tabScan.classList.add("active");
     tabManual.classList.remove("active");
     scanMode.style.display = "";
     manualMode.style.display = "none";
 
-    // Dalam mode Scan, kode barang hanya bisa diisi kamera
     scannedCodeInput.readOnly = true;
     scannedCodeInput.placeholder = "Scan item code with camera";
   });
@@ -247,9 +258,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tabScan.classList.remove("active");
     scanMode.style.display = "none";
     manualMode.style.display = "";
-
-    // Mode Manual pakai field manual-code/manual-location,
-    // field scanned-code tetap readOnly (karena hidden di mode ini).
   });
 
   // Scanner buttons
@@ -298,6 +306,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Search filter
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      renderSummaryList(tableBody, summaryCount, emptyState);
+    });
+  }
+
   // Close history modal
   historyBackdrop.addEventListener("click", (e) => {
     if (e.target === historyBackdrop) {
@@ -311,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load initial list
   loadSummaryList(tableBody, summaryCount, emptyState);
 
-  // Expose function to open history globally (used by buttons)
+  // Global function for history button
   window.openHistoryForCode = async (code) => {
     await loadHistoryForCode(
       code,
@@ -323,7 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 });
 
-// ---------- Scanner functions ----------
+// ---------- Scanner helpers ----------
 function setScannerStatus(textKey) {
   const el = document.getElementById("scanner-status-text");
   const dict = translations[currentLang];
@@ -344,7 +359,7 @@ async function startScanner(codeInput) {
       return;
     }
 
-    // 🔥 Pilih kamera belakang kalau tersedia
+    // Cari kamera belakang dulu
     const backCam = cameras.find((cam) =>
       /back|rear|environment/i.test(cam.label || "")
     );
@@ -359,15 +374,13 @@ async function startScanner(codeInput) {
       cameraId,
       config,
       (decodedText) => {
-        // When code detected → isi field kode
         codeInput.value = decodedText;
         setScannerStatus("scannerDetected");
-
-        // Auto-stop after detect
+        // auto stop setelah berhasil
         stopScanner();
       },
-      (err) => {
-        // ignore decode errors
+      () => {
+        // ignore decode error
       }
     );
   } catch (err) {
@@ -390,7 +403,7 @@ async function stopScanner() {
   setScannerStatus("scannerStopped");
 }
 
-// ---------- Supabase helper functions ----------
+// ---------- Supabase helpers ----------
 
 async function saveUpdateToSupabase(code, location) {
   try {
@@ -422,7 +435,6 @@ async function loadSummaryList(tableBody, summaryCountEl, emptyStateEl) {
       return;
     }
 
-    // Group by code → keep latest row per code
     const byCode = new Map();
     (data || []).forEach((row) => {
       if (!row.code) return;
@@ -432,70 +444,89 @@ async function loadSummaryList(tableBody, summaryCountEl, emptyStateEl) {
       } else {
         const a = new Date(existing.updated_at).getTime();
         const b = new Date(row.updated_at).getTime();
-        if (b > a) {
-          byCode.set(row.code, row);
-        }
+        if (b > a) byCode.set(row.code, row);
       }
     });
 
-    const rows = Array.from(byCode.values()).sort((a, b) => {
+    summaryRows = Array.from(byCode.values()).sort((a, b) => {
       return (
         new Date(b.updated_at).getTime() -
         new Date(a.updated_at).getTime()
       );
     });
 
-    // Render
-    tableBody.innerHTML = "";
-    if (rows.length === 0) {
-      emptyStateEl.style.display = "block";
-    } else {
-      emptyStateEl.style.display = "none";
-    }
-
-    rows.forEach((row) => {
-      const tr = document.createElement("div");
-      tr.className = "table-row";
-
-      const codeCell = document.createElement("div");
-      codeCell.className = "table-cell badge-code";
-      codeCell.textContent = row.code;
-
-      const locCell = document.createElement("div");
-      locCell.className = "table-cell badge-location";
-      locCell.textContent = row.location || "-";
-
-      const timeCell = document.createElement("div");
-      timeCell.className = "table-cell badge-time";
-      const ts = row.updated_at
-        ? new Date(row.updated_at).toLocaleString()
-        : "";
-      timeCell.textContent = ts;
-
-      const actionCell = document.createElement("div");
-      actionCell.className = "table-cell";
-      const historyBtn = document.createElement("button");
-      historyBtn.className = "btn-history";
-      historyBtn.textContent = "⋯";
-      historyBtn.title = "View history";
-      historyBtn.addEventListener("click", () => {
-        window.openHistoryForCode(row.code);
-      });
-      actionCell.appendChild(historyBtn);
-
-      tr.appendChild(codeCell);
-      tr.appendChild(locCell);
-      tr.appendChild(timeCell);
-      tr.appendChild(actionCell);
-
-      tableBody.appendChild(tr);
-    });
-
-    summaryCountEl.textContent = rows.length.toString();
+    renderSummaryList(tableBody, summaryCountEl, emptyStateEl);
   } catch (err) {
     console.error("Unexpected error loading list:", err);
     alert(translations[currentLang].toastErrorLoad);
   }
+}
+
+function renderSummaryList(tableBody, summaryCountEl, emptyStateEl) {
+  const dict = translations[currentLang];
+  const searchInput = document.getElementById("search-input");
+  const term = (searchInput?.value || "").trim().toLowerCase();
+
+  let filtered = summaryRows;
+  if (term) {
+    filtered = summaryRows.filter((row) => {
+      const code = (row.code || "").toLowerCase();
+      const loc = (row.location || "").toLowerCase();
+      return code.includes(term) || loc.includes(term);
+    });
+  }
+
+  tableBody.innerHTML = "";
+
+  if (filtered.length === 0) {
+    emptyStateEl.style.display = "block";
+    const span = emptyStateEl.querySelector("[data-i18n='emptyState']");
+    if (span) {
+      span.textContent = term ? dict.noResultsSearch : dict.emptyState;
+    }
+  } else {
+    emptyStateEl.style.display = "none";
+  }
+
+  filtered.forEach((row) => {
+    const tr = document.createElement("div");
+    tr.className = "table-row";
+
+    const codeCell = document.createElement("div");
+    codeCell.className = "table-cell badge-code";
+    codeCell.textContent = row.code;
+
+    const locCell = document.createElement("div");
+    locCell.className = "table-cell badge-location";
+    locCell.textContent = row.location || "-";
+
+    const timeCell = document.createElement("div");
+    timeCell.className = "table-cell badge-time";
+    const ts = row.updated_at
+      ? new Date(row.updated_at).toLocaleString()
+      : "";
+    timeCell.textContent = ts;
+
+    const actionCell = document.createElement("div");
+    actionCell.className = "table-cell";
+    const historyBtn = document.createElement("button");
+    historyBtn.className = "btn-history";
+    historyBtn.textContent = "⋯";
+    historyBtn.title = "View history";
+    historyBtn.addEventListener("click", () => {
+      window.openHistoryForCode(row.code);
+    });
+    actionCell.appendChild(historyBtn);
+
+    tr.appendChild(codeCell);
+    tr.appendChild(locCell);
+    tr.appendChild(timeCell);
+    tr.appendChild(actionCell);
+
+    tableBody.appendChild(tr);
+  });
+
+  summaryCountEl.textContent = filtered.length.toString();
 }
 
 async function loadHistoryForCode(
@@ -546,9 +577,8 @@ async function loadHistoryForCode(
       historyListEl.appendChild(item);
     });
 
-    const dict = translations[currentLang];
     historyCountTagEl.textContent = `${data?.length || 0} ${
-      dict.historyCountLabel
+      translations[currentLang].historyCountLabel
     }`;
   } catch (err) {
     console.error("Unexpected error loading history:", err);
