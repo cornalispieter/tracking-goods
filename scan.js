@@ -1,33 +1,43 @@
-// scan.js - Camera QR/Barcode Scanner
-// Uses ZXing library
+// scan.js - Fixed ZXing Scanner
+// Working version for barcode & QR scan (mobile friendly)
+
+import {
+    BrowserMultiFormatReader,
+    NotFoundException
+} from "https://unpkg.com/@zxing/browser@latest";
 
 let scannerActive = false;
-let codeReader;
+let reader = new BrowserMultiFormatReader();
 
 async function startScanner() {
     if (scannerActive) return;
     scannerActive = true;
 
-    if (!codeReader) {
-        codeReader = new ZXing.BrowserMultiFormatReader();
-    }
-
-    const videoElement = document.getElementById("videoPreview");
+    const video = document.getElementById("videoPreview");
     const kodeInput = document.getElementById("kodeInput");
-    const lokasiInput = document.getElementById("lokasiInput");
 
     try {
-        const devices = await ZXing.BrowserMultiFormatReader.listVideoInputDevices();
-        const backCam = devices.find(d => d.label.toLowerCase().includes("back")) || devices[0];
+        // Get all cameras
+        const devices = await BrowserMultiFormatReader.listVideoInputDevices();
 
-        await codeReader.decodeFromVideoDevice(backCam.deviceId, videoElement, (result) => {
+        if (devices.length === 0) {
+            alert("No camera found on this device.");
+            return;
+        }
+
+        // Prefer back camera
+        let backCam = devices.find(d => d.label.toLowerCase().includes("back"))
+                   || devices[devices.length - 1];
+
+        await reader.decodeFromVideoDevice(backCam.deviceId, video, (result, err) => {
             if (result) {
-                kodeInput.value = result.text;
-                stopScanner();
+                kodeInput.value = result.getText();
+                stopScanner(); // auto stop after success
             }
         });
-    } catch (err) {
-        console.error(err);
+
+    } catch (e) {
+        console.error("Scanner start error:", e);
         stopScanner();
     }
 }
@@ -35,9 +45,10 @@ async function startScanner() {
 function stopScanner() {
     if (!scannerActive) return;
     scannerActive = false;
-    const videoElement = document.getElementById("videoPreview");
-    if (codeReader) codeReader.reset();
-    videoElement.srcObject = null;
+
+    const video = document.getElementById("videoPreview");
+    reader.reset();
+    video.srcObject = null;
 }
 
 window.startScanner = startScanner;
