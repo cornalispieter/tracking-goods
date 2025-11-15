@@ -2,6 +2,8 @@ import { loadData, saveRecord } from './db.js';
 import { renderTable, clearInputs } from './ui.js';
 import { startScanner } from './scan.js';
 import { attachHistoryClose } from './history.js';
+import { exportToCSV } from './ui.js';
+
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -76,5 +78,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // HISTORY MODAL CLOSE
   // ===========================
   attachHistoryClose();
+
+  const exportCsvBtn = document.getElementById('exportCsvBtn');
+if (exportCsvBtn) {
+  exportCsvBtn.onclick = () => exportToCSV(data);
+}
 
 }); // <--- CLOSE DOMContentLoaded

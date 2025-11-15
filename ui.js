@@ -38,3 +38,28 @@ export function clearInputs() {
   document.getElementById("kodebarang").value = "";
   document.getElementById("lokasi").value = "";
 }
+export function exportToCSV(data) {
+  if (!data || data.length === 0) {
+    alert("Tidak ada data untuk diexport!");
+    return;
+  }
+
+  const header = ["kodebarang", "lokasi", "updated"];
+  const rows = data.map(item => [
+    item.kodebarang,
+    item.lokasi,
+    new Date(item.updated).toLocaleString()
+  ]);
+
+  let csvContent =
+    "data:text/csv;charset=utf-8," +
+    [header, ...rows].map(e => e.join(",")).join("\n");
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "tracking-goods.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}

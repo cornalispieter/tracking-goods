@@ -39,6 +39,8 @@
     </thead>
     <tbody id="data-body"></tbody>
   </table>
+  <button id="exportCsvBtn" class="btn-export">⬇️ Export CSV</button>
+
 
   <!-- History Modal -->
   <div id="historyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); padding-top:60px;">
@@ -48,9 +50,10 @@
     </div>
   </div>
   <script src="https://unpkg.com/@zxing/library@latest"></script>
-  <script type="module" src="main.js"></script>
+  
   <script type="module" src="history.js"></script>
   <script type="module" src="scan.js"></script>
+  <script type="module" src="main.js"></script>
 
   <script type="module">
   import { attachHistoryClose } from "./history.js";
