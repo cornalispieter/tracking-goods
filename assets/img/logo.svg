@@ -1,1 +1,42 @@
-<svg></svg>
+<svg width="200" height="200" viewBox="0 0 200 200"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Background Glow -->
+  <circle cx="100" cy="100" r="75" fill="#00baff22">
+    <animate attributeName="opacity"
+             values="0.25;0.5;0.25"
+             dur="3s"
+             repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Outer Neon Ring -->
+  <circle cx="100" cy="100" r="70" stroke="#00baff"
+          stroke-width="4" fill="none"
+          filter="url(#glow)"/>
+
+  <!-- Aviation Wing + Tracking Arrow -->
+  <g fill="none" stroke="#00baff" stroke-width="6" stroke-linecap="round"
+     filter="url(#glow)">
+    
+    <!-- Left Wing -->
+    <path d="M40 110 L90 95" />
+
+    <!-- Right Wing -->
+    <path d="M160 110 L110 95" />
+
+    <!-- Nose/Arrow Tracking -->
+    <path d="M100 40 L100 140" />
+
+    <!-- Tail flare -->
+    <path d="M85 140 L115 140" />
+  </g>
+
+  <!-- Glow Filter -->
+  <defs>
+    <filter id="glow">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#00baff"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#00baff"/>
+    </filter>
+  </defs>
+
+</svg>
