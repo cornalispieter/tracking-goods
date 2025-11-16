@@ -73,3 +73,23 @@ export async function loadHistory(kodebarang) {
 
   return data;
 }
+// ========================================================
+// REALTIME LISTENER
+// ========================================================
+export function subscribeRealtime(callback) {
+  supabase
+    .channel("goods_changes")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "goods_summary"     // summary berubah karena trigger
+      },
+      (payload) => {
+        console.log("Realtime update:", payload);
+        callback(); // panggil refresh
+      }
+    )
+    .subscribe();
+}
