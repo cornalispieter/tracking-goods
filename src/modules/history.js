@@ -1,40 +1,42 @@
 // src/modules/history.js
-// ================================================================
+// ==================================================================
 // Handles:
-//  - Load history for specific kodebarang
-//  - Pagination
-//  - Search by date
-//  - Rendering table inside modal
-//  - Showing/hiding modal
+//   - Load history per kodebarang
+//   - Pagination (20 per page)
+//   - Search by date
+//   - Rendering content inside modal
 //
-// UI modal wrapper is created by ui.modal.js
-// ================================================================
+// UI modal wrapper is in: ui.modal.js
+//
+// 100% compatible with:
+//   db.js, lang.js, ui.table.js, main.js
+// ==================================================================
 
 import { loadHistory as dbLoadHistory } from "./db.js";
 import { LANG } from "../i18n/lang.js";
 import { formatDateTime } from "./utils.js";
 
-// ============================
+// ======================================================
 // GLOBAL STATE
-// ============================
-let historyFullData = [];     // all history
-let historyFiltered = [];     // filtered (search)
-let activeKodebarang = "";    // used for title
-let historyPage = 1;
+// ======================================================
+let historyFullData = [];
+let historyFiltered = [];
+let activeKodebarang = "";
+let page = 1;
 const pageSize = 20;
 
-// ============================
+// ======================================================
 // PUBLIC ENTRY POINT
-// ============================
+// ======================================================
 export async function showHistory(kodebarang) {
   activeKodebarang = kodebarang;
-  historyPage = 1;
+  page = 1;
 
   const modal = document.getElementById("historyModal");
   const content = document.getElementById("historyContent");
   const currentLang = localStorage.getItem("app-lang") || "en";
 
-  // Display loading
+  // Loading display
   content.innerHTML = `
     <div class="text-center py-6 text-gray-300">
       ${LANG[currentLang].loading}
@@ -42,16 +44,16 @@ export async function showHistory(kodebarang) {
   `;
   modal.classList.remove("hidden");
 
-  // Load history from DB
+  // Load from DB
   historyFullData = await dbLoadHistory(kodebarang);
   historyFiltered = [...historyFullData];
 
   renderHistoryTable();
 }
 
-// ============================
+// ======================================================
 // RENDER FULL HISTORY TABLE
-// ============================
+// ======================================================
 function renderHistoryTable() {
   const container = document.getElementById("historyContent");
   const currentLang = localStorage.getItem("app-lang") || "en";
@@ -61,11 +63,11 @@ function renderHistoryTable() {
   container.innerHTML = `
     <!-- TITLE -->
     <h3 class="text-xl mb-4 font-semibold text-neon-blue">
-      ${LANG[currentLang].historyTitle} : 
+      ${LANG[currentLang].historyTitle} :
       <span class="text-white">${activeKodebarang}</span>
     </h3>
 
-    <!-- SEARCH DATE -->
+    <!-- DATE SEARCH -->
     <div class="flex gap-3 mb-4">
       <input id="historyDateInput"
         type="date"
@@ -81,23 +83,30 @@ function renderHistoryTable() {
     <table class="w-full text-left border border-[#1f2937] rounded-xl overflow-hidden">
       <thead class="bg-[#1e2636] text-gray-300">
         <tr>
-          <th class="p-3">${LANG[currentLang].tableLocation}</th>
-          <th class="p-3 w-40">${LANG[currentLang].tableUpdated}</th>
+          <th class="p-2">${LANG[currentLang].tableLocation}</th>
+          <th class="p-2 w-40">${LANG[currentLang].tableUpdated}</th>
         </tr>
       </thead>
+
       <tbody>
-        ${paged.length > 0 ? paged.map(row => `
+        ${
+          paged.length > 0
+            ? paged
+                .map(
+                  (row) => `
           <tr class="hover:bg-[#121a28] border-b border-[#1e2636]">
             <td class="p-3">${row.lokasi}</td>
             <td class="p-3">${formatDateTime(row.updated)}</td>
-          </tr>
-        `).join("") : `
+          </tr>`
+                )
+                .join("")
+            : `
           <tr>
             <td colspan="2" class="text-center py-4 text-gray-400">
               ${LANG[currentLang].noDataHistory}
             </td>
-          </tr>
-        `}
+          </tr>`
+        }
       </tbody>
     </table>
 
@@ -109,7 +118,7 @@ function renderHistoryTable() {
       </button>
 
       <span class="px-3 py-1 bg-[#0f1624] border border-neon-blue rounded shadow-neonSm text-white">
-        Page ${historyPage} / ${Math.max(1, getTotalPages())}
+        Page ${page} / ${Math.max(getTotalPages(), 1)}
       </span>
 
       <button id="historyNext"
@@ -122,56 +131,56 @@ function renderHistoryTable() {
   attachHistoryEvents();
 }
 
-// ============================
+// ======================================================
 // PAGINATION HELPERS
-// ============================
+// ======================================================
 function getTotalPages() {
   return Math.ceil(historyFiltered.length / pageSize);
 }
 
 function getPagedData() {
-  const start = (historyPage - 1) * pageSize;
+  const start = (page - 1) * pageSize;
   return historyFiltered.slice(start, start + pageSize);
 }
 
-// ============================
-// SEARCH + PAGINATION EVENT HANDLERS
-// ============================
+// ======================================================
+// EVENT HANDLERS (SEARCH + PAGINATION)
+// ======================================================
 function attachHistoryEvents() {
-  const currentLang = localStorage.getItem("app-lang") || "en";
-
+  // Search by date
   document.getElementById("historySearchBtn").onclick = () => {
-    const selectedDate = document.getElementById("historyDateInput").value;
+    const selected = document.getElementById("historyDateInput").value;
 
-    if (!selectedDate) {
+    if (!selected) {
       historyFiltered = [...historyFullData];
     } else {
-      historyFiltered = historyFullData.filter(h =>
-        h.updated.startsWith(selectedDate)
+      historyFiltered = historyFullData.filter((h) =>
+        h.updated.startsWith(selected)
       );
     }
 
-    historyPage = 1;
+    page = 1;
     renderHistoryTable();
   };
 
+  // Prev page
   document.getElementById("historyPrev").onclick = () => {
-    if (historyPage > 1) {
-      historyPage--;
+    if (page > 1) {
+      page--;
       renderHistoryTable();
     }
   };
 
+  // Next page
   document.getElementById("historyNext").onclick = () => {
-    if (historyPage < getTotalPages()) {
-      historyPage++;
+    if (page < getTotalPages()) {
+      page++;
       renderHistoryTable();
     }
   };
 }
 
-// ================================================================
-// MAKE FUNCTION AVAILABLE TO main.js / table.js
-// ================================================================
-export { showHistory };
+// ======================================================
+// MAKE AVAILABLE TO WINDOW (but NOT exported twice)
+// ======================================================
 window.showHistory = showHistory;
