@@ -1,5 +1,5 @@
-// scan.js FINAL VERSION
-import { BrowserMultiFormatReader } from "https://unpkg.com/@zxing/library@latest/esm5/index.js";
+// scan.js FINAL (CORS FIXED)
+import { BrowserMultiFormatReader } from "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.2/esm/index.js";
 import { cleanScannedCode } from './utils.js';
 
 let codeReader = new BrowserMultiFormatReader();
