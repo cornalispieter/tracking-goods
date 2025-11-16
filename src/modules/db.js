@@ -20,30 +20,18 @@ export const SUPABASE_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ========================================================
-// SAVE DATA (insert into history + summary)
+// SAVE RECORD → hanya insert ke history
+// Summary akan diupdate oleh TRIGGER otomatis
 // ========================================================
 export async function saveRecord(kodebarang, lokasi) {
   const now = new Date().toISOString();
 
-  // Insert into history
-  const { error: errHistory } = await supabase
+  const { error } = await supabase
     .from("goods_history")
     .insert([{ kodebarang, lokasi, updated: now }]);
 
-  if (errHistory) {
-    console.error("History insert error:", errHistory);
-    return false;
-  }
-
-  // Update summary (upsert)
-  const { error: errSummary } = await supabase
-    .from("goods_summary")
-    .upsert([{ kodebarang, lokasi, updated: now }], {
-      onConflict: "kodebarang"
-    });
-
-  if (errSummary) {
-    console.error("Summary upsert error:", errSummary);
+  if (error) {
+    console.error("Save history error:", error);
     return false;
   }
 
@@ -51,14 +39,13 @@ export async function saveRecord(kodebarang, lokasi) {
 }
 
 // ========================================================
-// LOAD SUMMARY — show only LATEST per kodebarang
-// NOT from goods_summary table BUT from goods_history
+// LOAD SUMMARY (ambil data terbaru dari goods_summary)
+// Summary 1 row per kodebarang, tidak ada duplikat
 // ========================================================
 export async function loadData() {
-  // Ambil semua history diurutkan dari yang terbaru
   const { data, error } = await supabase
-    .from("goods_history")
-    .select("kodebarang, lokasi, updated")
+    .from("goods_summary")
+    .select("*")
     .order("updated", { ascending: false });
 
   if (error) {
@@ -66,20 +53,11 @@ export async function loadData() {
     return [];
   }
 
-  // Gunakan map agar hanya record pertama (terbaru) yg dipakai
-  const latestMap = {};
-
-  data.forEach((row) => {
-    if (!latestMap[row.kodebarang]) {
-      latestMap[row.kodebarang] = row; // row pertama = terbaru
-    }
-  });
-
-  return Object.values(latestMap); // summary bersih tanpa duplicate
+  return data;
 }
 
 // ========================================================
-// LOAD HISTORY DETAIL (for modal)
+// LOAD FULL HISTORY (modal)
 // ========================================================
 export async function loadHistory(kodebarang) {
   const { data, error } = await supabase
