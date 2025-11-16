@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tracking Goods – Neon Blue</title>
 
-  <!-- TAILWIND CDN -->
+  <!-- TAILwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- TAILWIND CUSTOM CONFIG -->
+  <!-- CUSTOM TAILWIND CONFIG -->
   <script>
     tailwind.config = {
       theme: {
@@ -83,7 +83,7 @@
       placeholder="Search..." />
   </div>
 
-  <!-- TABLE -->
+  <!-- TABLE (SUMMARY LIST) -->
   <div class="overflow-x-auto max-w-4xl mx-auto px-4">
     <table class="w-full text-left bg-[#0f1624] border border-[#1e2636] shadow-neonSm rounded-xl overflow-hidden">
       <thead class="bg-[#1e2636] text-gray-300">
@@ -98,6 +98,9 @@
     </table>
   </div>
 
+  <!-- PAGINATION LIST -->
+  <div id="pageControls" class="my-4"></div>
+
   <!-- EXPORT -->
   <button id="exportCsvBtn"
     class="block mx-auto mt-6 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl shadow-md font-semibold">
@@ -108,8 +111,12 @@
   <div id="historyModal"
     class="fixed inset-0 bg-black/60 hidden flex justify-center items-center z-[999]">
     <div class="bg-[#111827] border border-neon-blue p-6 rounded-xl w-11/12 max-w-xl shadow-neon relative">
+
       <button id="closeHistory"
-        class="absolute right-3 top-3 px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-white">✕</button>
+        class="absolute right-3 top-3 px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-white">
+        ✕
+      </button>
+
       <div id="historyContent" class="text-gray-200"></div>
     </div>
   </div>
@@ -120,10 +127,10 @@
     📷
   </button>
 
-  <!-- ZXING -->
+  <!-- ZXING SCANNER -->
   <script src="https://unpkg.com/@zxing/library@latest"></script>
 
-  <!-- MODULES -->
+  <!-- MODULE SCRIPTS -->
   <script type="module" src="db.js"></script>
   <script type="module" src="history.js"></script>
   <script type="module" src="scan.js"></script>
@@ -131,5 +138,4 @@
   <script type="module" src="main.js"></script>
 
 </body>
-
 </html>
