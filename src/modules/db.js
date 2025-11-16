@@ -19,68 +19,68 @@ export const SUPABASE_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// =========================================
-// SAVE RECORD
-// Automatically:
-//    - Insert/update summary table
-//    - Insert history entry
-// =========================================
+// ========================================================
+// SAVE DATA (insert into history + summary)
+// ========================================================
 export async function saveRecord(kodebarang, lokasi) {
+  const now = new Date().toISOString();
 
-  // 1) INSERT OR UPDATE SUMMARY
-  const { error: summaryErr } = await supabase
-    .from("goods_summary")
-    .upsert(
-      {
-        kodebarang,
-        lokasi,
-        updated: new Date().toISOString()
-      },
-      { onConflict: "kodebarang" }
-    );
+  // Insert into history
+  const { error: errHistory } = await supabase
+    .from("goods_history")
+    .insert([{ kodebarang, lokasi, updated: now }]);
 
-  if (summaryErr) {
-    console.error("Failed updating summary:", summaryErr);
+  if (errHistory) {
+    console.error("History insert error:", errHistory);
     return false;
   }
 
-  // 2) INSERT INTO HISTORY
-  const { error: historyErr } = await supabase
-    .from("goods_history")
-    .insert({
-      kodebarang,
-      lokasi,
-      updated: new Date().toISOString()
+  // Update summary (upsert)
+  const { error: errSummary } = await supabase
+    .from("goods_summary")
+    .upsert([{ kodebarang, lokasi, updated: now }], {
+      onConflict: "kodebarang"
     });
 
-  if (historyErr) {
-    console.error("Failed inserting history:", historyErr);
+  if (errSummary) {
+    console.error("Summary upsert error:", errSummary);
     return false;
   }
 
   return true;
 }
 
-// =========================================
-// LOAD SUMMARY LIST (DESC UPDATED)
-// =========================================
+// ========================================================
+// LOAD SUMMARY — show only LATEST per kodebarang
+// NOT from goods_summary table BUT from goods_history
+// ========================================================
 export async function loadData() {
+  // Ambil semua history diurutkan dari yang terbaru
   const { data, error } = await supabase
-    .from("goods_summary")
-    .select("*")
+    .from("goods_history")
+    .select("kodebarang, lokasi, updated")
     .order("updated", { ascending: false });
 
   if (error) {
-    console.error("Failed to load summary:", error);
+    console.error("Load summary error:", error);
     return [];
   }
 
-  return data || [];
+  // Gunakan map agar hanya record pertama (terbaru) yg dipakai
+  const latestMap = {};
+
+  data.forEach((row) => {
+    if (!latestMap[row.kodebarang]) {
+      latestMap[row.kodebarang] = row; // row pertama = terbaru
+    }
+  });
+
+  return Object.values(latestMap); // summary bersih tanpa duplicate
 }
 
-// =========================================
-// LOAD HISTORY FOR SPECIFIC KODEBARANG
-// =========================================
+// ========================================================
+// LOAD HISTORY DETAIL (for modal)
+// ========================================================
 export async function loadHistory(kodebarang) {
   const { data, error } = await supabase
     .from("goods_history")
@@ -89,9 +89,9 @@ export async function loadHistory(kodebarang) {
     .order("updated", { ascending: false });
 
   if (error) {
-    console.error("Failed to load history:", error);
+    console.error("Load history error:", error);
     return [];
   }
 
-  return data || [];
+  return data;
 }
