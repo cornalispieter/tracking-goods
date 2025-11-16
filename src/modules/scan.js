@@ -1,6 +1,6 @@
 // src/modules/scan.js
 // ================================================================
-// Small embedded scanner window (non-fullscreen)
+// Small embedded scanner window (non-fullscreen) with CANCEL button
 // ================================================================
 
 import { BrowserMultiFormatReader } from "https://esm.run/@zxing/browser@0.1.1";
@@ -15,51 +15,58 @@ export function startScanner(targetInputId) {
   const inputField = document.getElementById(targetInputId);
   if (!inputField) return;
 
-  // WRAPPER (background click to close)
+  // Overlay (darkened background)
   const overlay = document.createElement("div");
   overlay.className =
     "fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex justify-center items-center";
 
-  // CAMERA BOX (small, not fullscreen)
+  // Camera box wrapper
   const cameraBox = document.createElement("div");
   cameraBox.className =
-    "bg-[#0f1624] border border-neon-blue shadow-neon rounded-xl p-3";
+    "relative bg-[#0f1624] border border-neon-blue shadow-neon rounded-xl p-4 flex flex-col items-center";
   cameraBox.style.width = "260px";
-  cameraBox.style.height = "220px";
-  cameraBox.style.display = "flex";
-  cameraBox.style.flexDirection = "column";
-  cameraBox.style.justifyContent = "center";
-  cameraBox.style.alignItems = "center";
 
-  // VIDEO PREVIEW
+  // Video preview element
   const previewElem = document.createElement("video");
-  previewElem.className = "rounded-lg";
+  previewElem.className = "rounded-lg mb-3";
   previewElem.style.width = "240px";
   previewElem.style.height = "180px";
   previewElem.style.objectFit = "cover";
 
-  // Close button
+  // Close "X" button
   const closeBtn = document.createElement("button");
   closeBtn.textContent = "✕";
   closeBtn.className =
-    "absolute top-3 right-3 text-white text-2xl hover:text-neon-blue transition";
+    "absolute top-2 right-2 text-white text-2xl hover:text-neon-blue transition";
   closeBtn.onclick = () => {
     codeReader.reset();
     overlay.remove();
   };
 
-  // Assemble
+  // CANCEL button (NEW, visible clearly)
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.className =
+    "mt-2 px-4 py-2 rounded-lg bg-gray-600 text-white hover:bg-gray-500 transition";
+  cancelBtn.onclick = () => {
+    codeReader.reset();
+    overlay.remove();
+  };
+
+  // Assemble DOM
+  cameraBox.appendChild(closeBtn);
   cameraBox.appendChild(previewElem);
+  cameraBox.appendChild(cancelBtn);
   overlay.appendChild(cameraBox);
-  overlay.appendChild(closeBtn);
   document.body.appendChild(overlay);
 
-  // Start scanning
+  // Start camera scanning
   codeReader
     .decodeOnceFromVideoDevice(undefined, previewElem)
     .then((result) => {
       const rawText = result.getText();
       const cleaned = cleanScannedCode(rawText);
+
       inputField.value = cleaned;
 
       codeReader.reset();
@@ -67,6 +74,7 @@ export function startScanner(targetInputId) {
     })
     .catch((err) => {
       console.error("Scanner error:", err);
+
       codeReader.reset();
       overlay.remove();
     });
