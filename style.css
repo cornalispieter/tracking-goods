@@ -30,13 +30,17 @@ h2 {
 }
 
 input {
-  padding: 12px;
-  min-width: 180px;
-  border-radius: 8px;
-  border: 1px solid #333;
-  background: #1b1b1b;
+  background: #111;
+  border: 1px solid #2d2d2d;
   color: #fff;
-  font-size: 15px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  transition: 0.2s ease;
+}
+
+input:focus {
+  border-color: #4c6ef5;
+  box-shadow: 0 0 6px rgba(76, 110, 245, 0.5);
 }
 
 button {
@@ -64,13 +68,11 @@ button.danger:hover {
 
 /* ===== TABLE ===== */
 table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  background: #1b1b1b;
-  border-radius: 10px;
-  overflow: hidden;
+  background: rgba(20,20,20,0.75);
+  backdrop-filter: blur(6px);
+  border: 1px solid #2d2d2d;
 }
+
 
 th, td {
   padding: 14px 10px;
@@ -87,7 +89,7 @@ tr:nth-child(even) {
 }
 
 tr:hover {
-  background: #222;
+  background: rgba(255,255,255,0.06);
 }
 
 /* History Button */
@@ -112,15 +114,10 @@ tr:hover {
 }
 
 .modal-box {
-  background: #222;
-  margin: auto;
-  padding: 20px;
-  width: 90%;
-  max-width: 480px;
-  border-radius: 12px;
-  color: #fff;
-  position: relative;
-  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  background: #161616;
+  border: 1px solid #2e2e2e;
+  box-shadow: 0 0 24px rgba(0,0,0,0.6);
+  animation: zoomIn 0.25s ease;
 }
 
 #closeHistory {
@@ -170,6 +167,10 @@ tr:hover {
 .row-item {
   animation: fadeIn 0.3s ease;
 }
+@keyframes zoomIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
@@ -213,16 +214,11 @@ tr:hover {
 }
 /* Modern primary button (Save) */
 .btn-primary {
-  background: linear-gradient(135deg, #4c6ef5, #364fc7);
-  color: #fff;
-  padding: 12px 20px;
+  background: linear-gradient(135deg, #4c6ef5, #4254d0);
   border-radius: 10px;
-  border: none;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.25s ease;
-  box-shadow: 0 4px 10px rgba(76, 110, 245, 0.35);
+  padding: 14px 20px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
 .btn-primary:hover {
@@ -402,6 +398,17 @@ tr:hover {
 .popup-message.show {
     opacity: 1;
 }
+.app-header {
+  padding: 18px 0;
+  background: rgba(20,20,20,0.7);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #2a2a2a;
+}
 
+.app-logo {
+  width: 38px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
 
 

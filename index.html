@@ -9,8 +9,9 @@
 
 <body>
   <header class="app-header">
-  <h2>📦 Tracking Goods</h2>
-  </header>
+  <img src="logo.png" class="app-logo">
+  <h1>Tracking Goods System</h1>
+</header>
   <div id="form-section">
   <div class="field-group">
     <input type="text" id="kodebarang" placeholder="Item Code" />
@@ -50,6 +51,12 @@
       <div id="historyContent"></div>
     </div>
   </div>
+  <div id="popup" class="popup">
+  <div class="popup-content">
+    <p id="popup-message">Saved successfully!</p>
+    <button id="popup-ok">OK</button>
+  </div>
+</div>
   <button id="fab-scan" class="fab">📷</button>
   <script src="https://unpkg.com/@zxing/library@latest"></script>
   
