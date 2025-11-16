@@ -60,8 +60,17 @@
     </div>
   </header>
 
+  <!-- LANGUAGE SELECTOR -->
+  <div class="flex justify-center mt-2">
+    <select id="languageSelect"
+      class="px-3 py-2 bg-[#0f1624] border border-neon-blue rounded-xl shadow-neonSm text-white">
+      <option value="en">English</option>
+      <option value="nl">Nederlands</option>
+    </select>
+  </div>
+
   <!-- FORM -->
-  <section class="max-w-lg mx-auto px-4 space-y-4">
+  <section class="max-w-lg mx-auto px-4 space-y-4 mt-4">
 
     <div class="flex gap-3">
       <input id="kodebarang"
@@ -155,11 +164,12 @@
     📷
   </button>
 
-  <!-- ZXing Scanner Library -->
+  <!-- LIBRARIES -->
   <script src="https://unpkg.com/@zxing/library@latest"></script>
 
-  <!-- SCRIPTS -->
+  <!-- MODULE SCRIPTS -->
   <script type="module" src="db.js"></script>
+  <script type="module" src="lang.js"></script>
   <script type="module" src="history.js"></script>
   <script type="module" src="scan.js"></script>
   <script type="module" src="ui.js"></script>
