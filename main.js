@@ -1,8 +1,10 @@
+// main.js FINAL VERSION
 import { loadData, saveRecord } from './db.js';
 import { renderTable, clearInputs } from './ui.js';
 import { startScanner } from './scan.js';
 import { exportToCSV } from './ui.js';
 import { LANG } from './lang.js';
+import { cleanScannedCode } from './utils.js';
 
 // ============================
 // LANGUAGE
@@ -95,7 +97,7 @@ function renderPaginationControls() {
 }
 
 // ============================
-// MAIN LOADER
+// MAIN LOAD
 // ============================
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -122,10 +124,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderTable(getPagedData());
   renderPaginationControls();
 
-  // SAVE VALIDATION
+  // ============================
+  // SAVE BUTTON (with QR cleaner)
+  // ============================
   document.getElementById('saveBtn').onclick = async () => {
-    const kodebarang = document.getElementById('kodebarang').value.trim();
-    const lokasi     = document.getElementById('lokasi').value.trim();
+    const kodebarangRaw = document.getElementById('kodebarang').value.trim();
+    const lokasiRaw     = document.getElementById('lokasi').value.trim();
+
+    // CLEAN QR FORMAT HERE
+    const kodebarang = cleanScannedCode(kodebarangRaw);
+    const lokasi     = lokasiRaw.trim(); 
 
     if (!kodebarang) return showError("errorKodeEmpty");
     if (!lokasi)     return showError("errorLokasiEmpty");
@@ -139,6 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderTable(getPagedData());
     renderPaginationControls();
     clearInputs();
+
     showSuccess("successSave");
   };
 
@@ -147,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('scanLokasiBtn').onclick = () => startScanner('lokasi');
   document.getElementById('fab-scan').onclick      = () => startScanner('kodebarang');
 
-  // SEARCH
+  // SEARCH LIVE
   const searchInput = document.getElementById("searchInput");
   searchInput.addEventListener("input", () => {
     const keyword = searchInput.value.toLowerCase();
@@ -169,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================
-// POPUP SUCCESS (MULTI-LANG)
+// POPUP SUCCESS
 // ============================
 function showSuccess(key) {
   const message = LANG[currentLang][key];
@@ -183,7 +192,7 @@ function showSuccess(key) {
 }
 
 // ============================
-// POPUP ERROR (MULTI-LANG)
+// POPUP ERROR
 // ============================
 function showError(key) {
   const message = LANG[currentLang][key];
@@ -197,7 +206,7 @@ function showError(key) {
 }
 
 // ============================
-// GLOBAL LOADING SPINNER
+// GLOBAL LOADING
 // ============================
 function showLoading() {
   document.getElementById("loadingOverlay").classList.remove("hidden");

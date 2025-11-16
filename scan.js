@@ -1,48 +1,30 @@
-export function startScanner(targetFieldId = 'kodebarang') {
-  const codeInput = document.getElementById('kodebarang');
-  const locationInput = document.getElementById('lokasi');
-  const targetInput = document.getElementById(targetFieldId);
+import { BrowserMultiFormatReader } from '@zxing/library';
+import { cleanScannedCode } from './utils.js';
 
-  const preview = document.createElement('video');
-  preview.setAttribute('playsinline', true);
-  preview.className =
-    "w-full max-w-md mx-auto border border-neon-blue rounded-xl shadow-neon";
+let codeReader = new BrowserMultiFormatReader();
 
-  const scannerBox = document.createElement('div');
-  scannerBox.className =
-    "fixed inset-0 bg-black/80 p-6 z-[9999] flex flex-col items-center gap-4";
+export function startScanner(targetInputId) {
+  const inputField = document.getElementById(targetInputId);
+  if (!inputField) return;
 
-  const closeBtn = document.createElement('button');
-  closeBtn.innerText = "Close Scanner";
-  closeBtn.className =
-    "px-4 py-2 bg-red-600 hover:bg-red-700 rounded";
+  const previewElem = document.createElement("video");
+  previewElem.className =
+    "fixed inset-0 bg-black/80 z-[9999] w-full h-full object-cover";
 
-  scannerBox.appendChild(closeBtn);
-  scannerBox.appendChild(preview);
-  document.body.appendChild(scannerBox);
+  document.body.appendChild(previewElem);
 
-  const codeReader = new ZXing.BrowserMultiFormatReader();
+  codeReader.decodeOnceFromVideoDevice(undefined, previewElem)
+    .then(result => {
+      const raw = result.text;
+      const cleaned = cleanScannedCode(raw);
+      inputField.value = cleaned;
 
-  codeReader.decodeFromVideoDevice(null, preview, (result) => {
-    if (result) {
-      new Audio("wood_plank_flicks.ogg").play();
-      const text = result.text;
-
-      if (text.includes("|")) {
-        const [kode, lokasi] = text.split("|");
-        codeInput.value = kode;
-        locationInput.value = lokasi;
-      } else {
-        targetInput.value = text;
-      }
-
+      previewElem.remove();
       codeReader.reset();
-      scannerBox.remove();
-    }
-  });
-
-  closeBtn.onclick = () => {
-    codeReader.reset();
-    scannerBox.remove();
-  };
+    })
+    .catch(err => {
+      console.error(err);
+      previewElem.remove();
+      codeReader.reset();
+    });
 }
