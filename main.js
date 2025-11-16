@@ -16,7 +16,7 @@ function setLanguage(lang) {
   localStorage.setItem("app-lang", lang);
 }
 
-// apply language to visible UI
+// apply language to UI
 function applyLanguageToUI() {
   const t = LANG[currentLang];
 
@@ -67,8 +67,6 @@ function renderPaginationControls() {
   const totalPages = Math.ceil(data.length / pageSize);
   const container = document.getElementById("pageControls");
 
-  if (!container) return;
-
   container.innerHTML = `
     <div class="flex gap-3 justify-center mt-4">
       <button id="prevPage" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">Prev</button>
@@ -101,21 +99,17 @@ function renderPaginationControls() {
 // ============================
 document.addEventListener('DOMContentLoaded', async () => {
 
-  // language UI
+  // LANGUAGE
   const langSelect = document.getElementById("languageSelect");
-  if (langSelect) {
-    langSelect.value = currentLang;
-    applyLanguageToUI();
+  langSelect.value = currentLang;
+  applyLanguageToUI();
 
-    langSelect.onchange = () => {
-      setLanguage(langSelect.value);
-      applyLanguageToUI();
-    };
-  } else {
+  langSelect.onchange = () => {
+    setLanguage(langSelect.value);
     applyLanguageToUI();
-  }
+  };
 
-  // load summary
+  // LOAD SUMMARY
   showLoading();
   data = await loadData();
   hideLoading();
@@ -124,16 +118,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderTable(getPagedData());
   renderPaginationControls();
 
-  // ============================
-  // SAVE BUTTON (with QR cleaner)
-  // ============================
+  // SAVE BUTTON
   document.getElementById('saveBtn').onclick = async () => {
     const kodebarangRaw = document.getElementById('kodebarang').value.trim();
     const lokasiRaw     = document.getElementById('lokasi').value.trim();
 
-    // CLEAN QR FORMAT HERE
+    // Clean QR format!
     const kodebarang = cleanScannedCode(kodebarangRaw);
-    const lokasi     = lokasiRaw.trim(); 
+    const lokasi     = lokasiRaw.trim();  
 
     if (!kodebarang) return showError("errorKodeEmpty");
     if (!lokasi)     return showError("errorLokasiEmpty");
@@ -206,7 +198,7 @@ function showError(key) {
 }
 
 // ============================
-// GLOBAL LOADING
+// LOADING
 // ============================
 function showLoading() {
   document.getElementById("loadingOverlay").classList.remove("hidden");

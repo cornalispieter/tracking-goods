@@ -1,4 +1,5 @@
-import { BrowserMultiFormatReader } from '@zxing/library';
+// scan.js FINAL VERSION
+import { BrowserMultiFormatReader } from "https://unpkg.com/@zxing/library@latest/esm5/index.js";
 import { cleanScannedCode } from './utils.js';
 
 let codeReader = new BrowserMultiFormatReader();
@@ -17,6 +18,7 @@ export function startScanner(targetInputId) {
     .then(result => {
       const raw = result.text;
       const cleaned = cleanScannedCode(raw);
+
       inputField.value = cleaned;
 
       previewElem.remove();

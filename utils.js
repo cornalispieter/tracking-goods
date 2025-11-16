@@ -1,9 +1,9 @@
-// utils.js
+// utils.js FINAL VERSION
 export function cleanScannedCode(raw) {
   if (!raw) return "";
 
   return raw
-    .replace(/^pd/i, "")        // hapus prefix pd
-    .replace(/st\d+$/i, "")     // hapus suffix st + angka
+    .replace(/^pd/i, "")        // remove prefix pd
+    .replace(/st\d+$/i, "")     // remove suffix st###
     .trim();
 }
