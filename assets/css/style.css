@@ -1,0 +1,89 @@
+/* ============================================================
+   Global Styles for Tracking Goods (Neon Blue Theme)
+   ============================================================ */
+
+/* Smooth everything */
+* {
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+/* Prevent Safari zoom-in bug on inputs */
+input, select, button {
+  font-size: 16px !important;
+}
+
+/* Neon Blue Shadow */
+.shadow-neon {
+  box-shadow: 0 0 12px rgba(0, 170, 255, 0.7),
+              0 0 32px rgba(0, 170, 255, 0.4);
+}
+
+.shadow-neonSm {
+  box-shadow: 0 0 8px rgba(0, 170, 255, 0.4);
+}
+
+/* Custom Tailwind Color (ensure fallback) */
+:root {
+  --neon-blue: #00baff;
+}
+.text-neon-blue {
+  color: var(--neon-blue);
+}
+.border-neon-blue {
+  border-color: var(--neon-blue);
+}
+.bg-neon-blue {
+  background-color: var(--neon-blue);
+}
+
+/* Mobile table scroll fix */
+table {
+  border-spacing: 0;
+  width: 100%;
+}
+
+th, td {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* Smooth modal */
+#historyModal {
+  animation: fadeIn 0.2s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Toast animation */
+#toast {
+  transition: opacity 0.3s ease-out;
+}
+
+/* Floating Scan Button glow effect */
+#fab-scan {
+  animation: pulseGlow 2s infinite;
+}
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 10px rgba(0, 170, 255, 0.8); }
+  50% { box-shadow: 0 0 22px rgba(0, 170, 255, 0.5); }
+  100% { box-shadow: 0 0 10px rgba(0, 170, 255, 0.8); }
+}
+
+/* Custom Scrollbar (nice for history modal) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f1624;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 170, 255, 0.4);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 170, 255, 0.7);
+}
+/* Tailwind custom css */

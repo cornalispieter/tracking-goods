@@ -1,189 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
 
-  <meta name="viewport" 
+  <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 
-  <title>Tracking Goods – Neon Blue</title>
+  <title>Tracking Goods</title>
 
-  <!-- TAILWIND -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            neon: {
-              blue: "#3b82f6",
-            }
-          },
-          boxShadow: {
-            neon: "0 0 15px rgba(59,130,246,.6)",
-            neonSm: "0 0 8px rgba(59,130,246,.45)"
-          }
-        }
-      }
-    }
-  </script>
-
-  <style>
-    body {
-      background: linear-gradient(135deg, #06070a, #0a0d14, #0e111a);
-      background-attachment: fixed;
-
-      padding: env(safe-area-inset-top) env(safe-area-inset-right)
-               env(safe-area-inset-bottom) env(safe-area-inset-left);
-
-      -webkit-text-size-adjust: 100%;
-    }
-
-    td, th {
-      word-break: break-word;
-      white-space: normal !important;
-    }
-  </style>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 
-<body class="text-gray-200">
+<body class="bg-[#0d1320] text-gray-200 pb-24">
 
   <!-- HEADER -->
   <header class="py-6 flex justify-center">
     <div class="flex items-center gap-3">
-      <div class="w-12 h-12 bg-[#0f1624] border border-neon-blue rounded-xl 
-                  flex justify-center items-center shadow-neon text-neon-blue text-2xl">
-        📦
-      </div>
+      <img src="assets/img/logo.svg"
+           class="w-12 h-12 rounded-xl border border-neon-blue shadow-neon" />
       <h1 id="labelAppTitle" class="text-3xl font-semibold text-neon-blue drop-shadow-md">
         Tracking Goods
       </h1>
     </div>
   </header>
 
-  <!-- LANGUAGE -->
-  <div class="flex justify-center mt-2">
+  <!-- LANGUAGE SELECTOR -->
+  <div class="flex justify-center mt-1">
     <select id="languageSelect"
-      class="px-3 py-2 bg-[#0f1624] border border-neon-blue rounded-xl shadow-neonSm text-white">
+            class="px-3 py-2 bg-[#0f1624] border border-neon-blue rounded-xl shadow-neonSm text-white">
       <option value="en">English</option>
       <option value="nl">Nederlands</option>
     </select>
   </div>
 
-  <!-- FORM INPUT -->
-  <section class="max-w-lg mx-auto px-4 space-y-4 mt-4">
-
-    <div class="flex gap-3">
-      <input id="kodebarang"
-        class="flex-1 px-4 py-3 bg-[#0f1624] border border-[#1e2636] rounded-xl
-               focus:outline-none focus:border-neon-blue shadow-neonSm"
-        placeholder="Item Code" />
-      <button id="scanKodeBtn"
-        class="px-4 py-3 rounded-xl bg-[#1a2234] border border-[#2c3950]
-               hover:bg-[#223044] shadow-neonSm text-xl">📷</button>
-    </div>
-
-    <div class="flex gap-3">
-      <input id="lokasi"
-        class="flex-1 px-4 py-3 bg-[#0f1624] border border-[#1e2636] rounded-xl
-               focus:outline-none focus:border-neon-blue shadow-neonSm"
-        placeholder="Location" />
-      <button id="scanLokasiBtn"
-        class="px-4 py-3 rounded-xl bg-[#1a2234] border border-[#2c3950]
-               hover:bg-[#223044] shadow-neonSm text-xl">📷</button>
-    </div>
-
-    <button id="saveBtn"
-      class="w-full py-3 rounded-xl bg-neon-blue hover:brightness-110 text-black
-             font-semibold shadow-neon text-lg">
-      <span id="labelSaveBtn">Save</span>
-    </button>
+  <!-- FORM SECTION -->
+  <section class="max-w-lg mx-auto px-4 mt-5">
+    <div id="formSection"></div>
   </section>
 
   <!-- SEARCH -->
-  <div class="text-center my-6">
+  <div class="text-center my-6 px-4">
     <input id="searchInput"
-      class="w-72 max-w-full px-4 py-3 bg-[#0f1624] border border-[#1f2937]
-             rounded-xl focus:outline-none focus:border-neon-blue shadow-neonSm"
-      placeholder="Search..." />
+           placeholder="Search..."
+           class="w-full max-w-md px-4 py-3 bg-[#0f1624] border border-[#1f2937]
+                  rounded-xl focus:outline-none focus:border-neon-blue shadow-neonSm" />
   </div>
 
-  <!-- TABLE -->
-  <div class="overflow-x-auto mx-auto max-w-4xl px-4">
-    <table
-      class="min-w-full table-auto text-left bg-[#0f1624] border border-[#1e2636]
-             shadow-neonSm rounded-xl overflow-hidden text-sm">
+  <!-- TABLE SECTION -->
+  <section id="tableSection" class="max-w-4xl mx-auto px-4">
+    <div class="overflow-x-auto mx-auto">
+      <table class="min-w-full table-auto text-left bg-[#0f1624] border border-[#1e2636]
+                     shadow-neonSm rounded-xl overflow-hidden text-sm">
 
-      <thead class="bg-[#1e2636] text-gray-300">
-        <tr>
-          <th class="p-3 w-32" id="thItemCode">Item Code</th>
-          <th class="p-3 w-28" id="thLocation">Location</th>
-          <th class="p-3 w-40" id="thUpdated">Updated</th>
+        <thead class="bg-[#1e2636] text-gray-300">
+          <tr>
+            <th class="p-3 w-32" id="thItemCode">Item Code</th>
+            <th class="p-3 w-28" id="thLocation">Location</th>
+            <th class="p-3 w-40" id="thUpdated">Updated</th>
+            <th class="p-3 w-20 text-center" id="thHistory">
+              <span class="hidden md:inline">History</span>
+              <span class="md:hidden inline text-lg">📜</span>
+            </th>
+          </tr>
+        </thead>
 
-          <!-- HISTORY HEADER RESPONSIVE -->
-          <th class="p-3 w-20 text-center" id="thHistory">
-            <span class="hidden md:inline">History</span>
-            <span class="md:hidden inline text-lg">📜</span>
-          </th>
-
-        </tr>
-      </thead>
-
-      <tbody id="data-body"></tbody>
-    </table>
-  </div>
+        <tbody id="data-body"></tbody>
+      </table>
+    </div>
+  </section>
 
   <!-- PAGINATION -->
-  <div id="pageControls" class="my-4"></div>
+  <div id="pageControls" class="my-6"></div>
 
   <!-- EXPORT -->
-  <button id="exportCsvBtn"
-    class="block mx-auto mt-6 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black 
-           rounded-xl shadow-md font-semibold">
-    <span id="labelExportBtn">Export CSV</span>
-  </button>
-
-  <!-- HISTORY MODAL -->
-  <div id="historyModal"
-    class="fixed inset-0 bg-black/60 hidden flex justify-center items-center z-[999]">
-
-    <div class="bg-[#111827] border border-neon-blue p-6 rounded-xl 
-                 w-11/12 max-w-xl shadow-neon relative">
-
-      <button id="closeHistory"
-        class="absolute right-3 top-3 px-3 py-1 bg-red-600 hover:bg-red-700 
-               rounded text-white">✕</button>
-
-      <div id="historyContent" class="text-gray-200"></div>
-    </div>
+  <div class="text-center mt-4">
+    <button id="exportCsvBtn"
+            class="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black
+                   rounded-xl font-semibold shadow-md">
+      Export CSV
+    </button>
   </div>
 
-  <!-- LOADING -->
-  <div id="loadingOverlay"
-    class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999]
-           flex justify-center items-center">
+  <!-- HISTORY MODAL WRAPPER -->
+  <section id="historyModalWrapper"></section>
 
+  <!-- LOADING OVERLAY -->
+  <div id="loadingOverlay"
+       class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999]
+              flex justify-center items-center">
     <div class="w-16 h-16 border-4 border-neon-blue border-t-transparent
                 rounded-full animate-spin shadow-neon"></div>
   </div>
 
-  <!-- FAB SCAN -->
+  <!-- FLOATING SCAN BUTTON -->
   <button id="fab-scan"
-    class="fixed bottom-6 right-6 w-14 h-14 bg-neon-blue rounded-full shadow-neon 
-           text-black text-3xl flex justify-center items-center hover:scale-110 transition">
+          class="fixed bottom-6 right-6 w-14 h-14 bg-neon-blue rounded-full shadow-neon 
+                 text-black text-3xl flex justify-center items-center hover:scale-110 transition">
     📷
   </button>
 
-  <!-- MODULE SCRIPTS -->
-  <script type="module" src="utils.js"></script>
-  <script type="module" src="db.js"></script>
-  <script type="module" src="lang.js"></script>
-  <script type="module" src="history.js"></script>
-  <script type="module" src="scan.js"></script>
-  <script type="module" src="ui.js"></script>
-  <script type="module" src="main.js"></script>
+  <!-- MODULE IMPORTS -->
+  <script type="module" src="src/i18n/lang.js"></script>
+  <script type="module" src="src/modules/utils.js"></script>
+  <script type="module" src="src/modules/db.js"></script>
+  <script type="module" src="src/modules/scan.js"></script>
+  <script type="module" src="src/modules/history.js"></script>
+  <script type="module" src="src/ui/ui.table.js"></script>
+  <script type="module" src="src/ui/ui.modal.js"></script>
+  <script type="module" src="src/ui/ui.form.js"></script>
+  <script type="module" src="src/app/main.js"></script>
 
 </body>
 </html>

@@ -1,4 +1,8 @@
-// lang.js FINAL — English + Dutch full compatible
+// src/i18n/lang.js
+// =======================
+// Multi-language dictionary (EN + NL)
+// Fully compatible with main.js, ui.js, history.js, and modal
+// =======================
 
 export const LANG = {
   en: {
@@ -10,18 +14,22 @@ export const LANG = {
     formLocation: "Location",
     formSave: "Save",
 
+    // Search
+    searchPlaceholder: "Search...",
+    searchDate: "Search Date",
+
     // Table
     tableItemCode: "Item Code",
     tableLocation: "Location",
     tableUpdated: "Updated",
     tableHistory: "History",
 
-    // Search
-    searchPlaceholder: "Search...",
-    searchDate: "Search",
-
     // Export
     exportCsv: "Export CSV",
+
+    // History Modal
+    historyTitle: "History",
+    noDataHistory: "No history available.",
 
     // Messages
     successSave: "Data saved successfully!",
@@ -40,18 +48,22 @@ export const LANG = {
     formLocation: "Locatie",
     formSave: "Opslaan",
 
+    // Search
+    searchPlaceholder: "Zoeken...",
+    searchDate: "Datum Zoeken",
+
     // Table
     tableItemCode: "Artikelcode",
     tableLocation: "Locatie",
     tableUpdated: "Bijgewerkt",
     tableHistory: "Geschiedenis",
 
-    // Search
-    searchPlaceholder: "Zoeken...",
-    searchDate: "Zoeken",
-
     // Export
     exportCsv: "Exporteer CSV",
+
+    // History Modal
+    historyTitle: "Geschiedenis",
+    noDataHistory: "Geen geschiedenis beschikbaar.",
 
     // Messages
     successSave: "Gegevens succesvol opgeslagen!",
