@@ -14,6 +14,41 @@ function setLanguage(lang) {
   localStorage.setItem("app-lang", lang);
 }
 
+// apply language to visible UI
+function applyLanguageToUI() {
+  const t = LANG[currentLang];
+
+  const title = document.getElementById("labelAppTitle");
+  if (title) title.textContent = t.appTitle;
+
+  const kodeInput = document.getElementById("kodebarang");
+  if (kodeInput) kodeInput.placeholder = t.formItemCode;
+
+  const lokasiInput = document.getElementById("lokasi");
+  if (lokasiInput) lokasiInput.placeholder = t.formLocation;
+
+  const saveBtnLabel = document.getElementById("labelSaveBtn");
+  if (saveBtnLabel) saveBtnLabel.textContent = t.formSave;
+
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) searchInput.placeholder = t.searchPlaceholder;
+
+  const exportBtnLabel = document.getElementById("labelExportBtn");
+  if (exportBtnLabel) exportBtnLabel.textContent = t.exportCsv;
+
+  const thItemCode = document.getElementById("thItemCode");
+  if (thItemCode) thItemCode.textContent = t.tableItemCode;
+
+  const thLocation = document.getElementById("thLocation");
+  if (thLocation) thLocation.textContent = t.tableLocation;
+
+  const thUpdated = document.getElementById("thUpdated");
+  if (thUpdated) thUpdated.textContent = t.tableUpdated;
+
+  const thHistory = document.getElementById("thHistory");
+  if (thHistory) thHistory.textContent = t.tableHistory;
+}
+
 // ============================
 // GLOBAL STATE
 // ============================
@@ -35,7 +70,7 @@ function renderPaginationControls() {
   container.innerHTML = `
     <div class="flex gap-3 justify-center mt-4">
       <button id="prevPage" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">Prev</button>
-      <span class="px-4 py-2 bg-[#0f1624] border border-neon-blue rounded shadowneonSm text-white">
+      <span class="px-4 py-2 bg-[#0f1624] border border-neon-blue rounded shadow-neonSm text-white">
         Page ${currentPage} / ${totalPages}
       </span>
       <button id="nextPage" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">Next</button>
@@ -66,8 +101,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // language UI
   const langSelect = document.getElementById("languageSelect");
-  langSelect.value = currentLang;
-  langSelect.onchange = () => setLanguage(langSelect.value);
+  if (langSelect) {
+    langSelect.value = currentLang;
+    applyLanguageToUI();
+
+    langSelect.onchange = () => {
+      setLanguage(langSelect.value);
+      applyLanguageToUI();
+    };
+  } else {
+    applyLanguageToUI();
+  }
 
   // load summary
   showLoading();
@@ -131,11 +175,10 @@ function showSuccess(key) {
   const message = LANG[currentLang][key];
   const popup = document.createElement("div");
   popup.className =
-    "fixed top-6 right-6 bg-neon-blue text-black px-5 py-3 rounded-xl shadowneon font-semibold";
+    "fixed top-6 right-6 bg-neon-blue text-black px-5 py-3 rounded-xl shadow-neon font-semibold";
 
   popup.textContent = message;
   document.body.appendChild(popup);
-
   setTimeout(() => popup.remove(), 1600);
 }
 
@@ -150,7 +193,6 @@ function showError(key) {
 
   popup.textContent = message;
   document.body.appendChild(popup);
-
   setTimeout(() => popup.remove(), 1800);
 }
 

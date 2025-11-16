@@ -56,7 +56,9 @@
       <div class="w-12 h-12 bg-[#0f1624] border border-neon-blue rounded-xl flex justify-center items-center shadow-neon text-neon-blue text-2xl">
         📦
       </div>
-      <h1 class="text-3xl font-semibold text-neon-blue drop-shadow-md">Tracking Goods</h1>
+      <h1 id="labelAppTitle" class="text-3xl font-semibold text-neon-blue drop-shadow-md">
+        Tracking Goods
+      </h1>
     </div>
   </header>
 
@@ -95,7 +97,7 @@
     <button id="saveBtn"
       class="w-full py-3 rounded-xl bg-neon-blue hover:brightness-110 text-black 
       font-semibold shadow-neon text-lg">
-      Save
+      <span id="labelSaveBtn">Save</span>
     </button>
   </section>
 
@@ -113,10 +115,10 @@
       class="w-full text-left bg-[#0f1624] border border-[#1e2636] shadow-neonSm rounded-xl overflow-hidden">
       <thead class="bg-[#1e2636] text-gray-300">
         <tr>
-          <th class="p-4">Item Code</th>
-          <th class="p-4">Location</th>
-          <th class="p-4">Updated</th>
-          <th class="p-4">History</th>
+          <th class="p-4" id="thItemCode">Item Code</th>
+          <th class="p-4" id="thLocation">Location</th>
+          <th class="p-4" id="thUpdated">Updated</th>
+          <th class="p-4" id="thHistory">History</th>
         </tr>
       </thead>
       <tbody id="data-body"></tbody>
@@ -130,7 +132,7 @@
   <button id="exportCsvBtn"
     class="block mx-auto mt-6 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black 
     rounded-xl shadow-md font-semibold">
-    Export CSV
+    <span id="labelExportBtn">Export CSV</span>
   </button>
 
   <!-- HISTORY MODAL -->
