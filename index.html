@@ -9,6 +9,7 @@
 
   <title>Tracking Goods – Neon Blue</title>
 
+  <!-- TAILWIND -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <script>
@@ -18,7 +19,6 @@
           colors: {
             neon: {
               blue: "#3b82f6",
-              blueGlow: "rgba(59,130,246,0.45)"
             }
           },
           boxShadow: {
@@ -34,12 +34,13 @@
     body {
       background: linear-gradient(135deg, #06070a, #0a0d14, #0e111a);
       background-attachment: fixed;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) 
+
+      padding: env(safe-area-inset-top) env(safe-area-inset-right)
                env(safe-area-inset-bottom) env(safe-area-inset-left);
+
       -webkit-text-size-adjust: 100%;
     }
 
-    /* prevent text overflow table */
     td, th {
       word-break: break-word;
       white-space: normal !important;
@@ -71,7 +72,7 @@
     </select>
   </div>
 
-  <!-- FORM -->
+  <!-- FORM INPUT -->
   <section class="max-w-lg mx-auto px-4 space-y-4 mt-4">
 
     <div class="flex gap-3">
@@ -109,7 +110,7 @@
       placeholder="Search..." />
   </div>
 
-  <!-- RESPONSIVE TABLE -->
+  <!-- TABLE -->
   <div class="overflow-x-auto mx-auto max-w-4xl px-4">
     <table
       class="min-w-full table-auto text-left bg-[#0f1624] border border-[#1e2636]
@@ -120,7 +121,13 @@
           <th class="p-3 w-32" id="thItemCode">Item Code</th>
           <th class="p-3 w-28" id="thLocation">Location</th>
           <th class="p-3 w-40" id="thUpdated">Updated</th>
-          <th class="p-3 w-20 text-center" id="thHistory">History</th>
+
+          <!-- HISTORY HEADER RESPONSIVE -->
+          <th class="p-3 w-20 text-center" id="thHistory">
+            <span class="hidden md:inline">History</span>
+            <span class="md:hidden inline text-lg">📜</span>
+          </th>
+
         </tr>
       </thead>
 
@@ -169,10 +176,7 @@
     📷
   </button>
 
-  <!-- LIBRARIES -->
-  <!-- ZXing removed, now using @zxing/browser (ESM) -->
-
-  <!-- MODULES -->
+  <!-- MODULE SCRIPTS -->
   <script type="module" src="utils.js"></script>
   <script type="module" src="db.js"></script>
   <script type="module" src="lang.js"></script>
