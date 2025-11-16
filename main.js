@@ -51,7 +51,9 @@ function renderPaginationControls() {
 document.addEventListener('DOMContentLoaded', async () => {
 
   // LOAD DATA + RENDER PAGINATION
+  showLoading();
   data = await loadData();
+  hideLoading();
   currentPage = 1;
   renderTable(getPagedData());
   renderPaginationControls();
@@ -65,9 +67,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!kodebarang) return showError("Kode barang tidak boleh kosong!");
     if (!lokasi)     return showError("Lokasi tidak boleh kosong!");
-
+    showLoading();
     await saveRecord(kodebarang, lokasi);
     data = await loadData();
+    hideLoading();
     currentPage = 1;
 
     renderTable(getPagedData());
@@ -131,3 +134,15 @@ function showError(message) {
   document.body.appendChild(popup);
   setTimeout(() => popup.remove(), 1800);
 }
+// ============================
+// GLOBAL LOADING SPINNER
+// ============================
+function showLoading() {
+  document.getElementById("loadingOverlay").classList.remove("hidden");
+}
+
+function hideLoading() {
+  document.getElementById("loadingOverlay").classList.add("hidden");
+}
+window.showLoading = showLoading;
+window.hideLoading = hideLoading;

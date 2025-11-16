@@ -123,10 +123,10 @@ function attachHistorySearch() {
 // ============================
 export async function showHistory(kodebarang) {
   historyPage = 1;
-
+  showLoading();
   originalHistoryData = await loadHistory(kodebarang);
   historyData = [...originalHistoryData];
-
+  hideLoading();
   renderHistoryTable();
   document.getElementById("historyModal").classList.remove("hidden");
 }
