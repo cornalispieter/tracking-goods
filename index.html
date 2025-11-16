@@ -1,80 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tracking Goods</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Tracking Goods – Neon Blue</title>
+
+  <!-- TAILWIND CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- TAILWIND CUSTOM CONFIG -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            neon: {
+              blue: "#3b82f6",
+              blueGlow: "rgba(59,130,246,0.45)"
+            }
+          },
+          boxShadow: {
+            neon: "0 0 15px rgba(59,130,246,.6)",
+            neonSm: "0 0 8px rgba(59,130,246,.45)"
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #06070a, #0a0d14, #0e111a);
+      background-attachment: fixed;
+    }
+  </style>
 </head>
 
-<body>
+<body class="text-gray-200">
 
-  <!-- ===== HEADER ===== -->
-  <header class="app-header">
-    <div class="logo-area">
-      <div class="logo-circle">📦</div>
-      <h1>Tracking Goods</h1>
+  <!-- HEADER -->
+  <header class="py-6 flex justify-center">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 bg-[#0f1624] border border-neon-blue rounded-xl flex justify-center items-center shadow-neon text-neon-blue text-2xl">
+        📦
+      </div>
+      <h1 class="text-3xl font-semibold text-neon-blue drop-shadow-md">
+        Tracking Goods
+      </h1>
     </div>
   </header>
 
-  <!-- ===== FORM SECTION ===== -->
-  <section class="form-section">
-    <div class="field-row">
-      <input type="text" id="kodebarang" placeholder="Item Code" />
-      <button id="scanKodeBtn" class="btn-icon">📷</button>
+  <!-- FORM -->
+  <section class="max-w-lg mx-auto px-4 space-y-4">
+
+    <div class="flex gap-3">
+      <input id="kodebarang"
+        class="flex-1 px-4 py-3 bg-[#0f1624] border border-[#1e2636] rounded-xl focus:outline-none focus:border-neon-blue shadow-neonSm"
+        placeholder="Item Code" />
+      <button id="scanKodeBtn"
+        class="px-4 py-3 rounded-xl bg-[#1a2234] border border-[#2c3950] hover:bg-[#223044] shadow-neonSm text-xl">📷</button>
     </div>
 
-    <div class="field-row">
-      <input type="text" id="lokasi" placeholder="Location" />
-      <button id="scanLokasiBtn" class="btn-icon">📷</button>
+    <div class="flex gap-3">
+      <input id="lokasi"
+        class="flex-1 px-4 py-3 bg-[#0f1624] border border-[#1e2636] rounded-xl focus:outline-none focus:border-neon-blue shadow-neonSm"
+        placeholder="Location" />
+      <button id="scanLokasiBtn"
+        class="px-4 py-3 rounded-xl bg-[#1a2234] border border-[#2c3950] hover:bg-[#223044] shadow-neonSm text-xl">📷</button>
     </div>
 
-    <button id="saveBtn" class="btn-primary">Save</button>
+    <button id="saveBtn"
+      class="w-full py-3 rounded-xl bg-neon-blue hover:brightness-110 text-black font-semibold shadow-neon text-lg">
+      Save
+    </button>
   </section>
 
   <!-- SEARCH BOX -->
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Search..." />
+  <div class="text-center my-6">
+    <input id="searchInput"
+      class="w-72 max-w-full px-4 py-3 bg-[#0f1624] border border-[#1f2937] rounded-xl focus:outline-none focus:border-neon-blue shadow-neonSm"
+      placeholder="Search..." />
   </div>
 
-  <!-- ===== TABLE ===== -->
-  <table id="data-table">
-    <thead>
-      <tr>
-        <th>Item Code</th>
-        <th>Location</th>
-        <th>Updated</th>
-        <th>History</th>
-      </tr>
-    </thead>
-    <tbody id="data-body"></tbody>
-  </table>
+  <!-- TABLE -->
+  <div class="overflow-x-auto max-w-4xl mx-auto px-4">
+    <table class="w-full text-left bg-[#0f1624] border border-[#1e2636] shadow-neonSm rounded-xl overflow-hidden">
+      <thead class="bg-[#1e2636] text-gray-300">
+        <tr>
+          <th class="p-4">Item Code</th>
+          <th class="p-4">Location</th>
+          <th class="p-4">Updated</th>
+          <th class="p-4">History</th>
+        </tr>
+      </thead>
+      <tbody id="data-body"></tbody>
+    </table>
+  </div>
 
-  <button id="exportCsvBtn" class="btn-export">Export CSV</button>
+  <!-- EXPORT -->
+  <button id="exportCsvBtn"
+    class="block mx-auto mt-6 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl shadow-md font-semibold">
+    Export CSV
+  </button>
 
-  <!-- ===== MODAL (HISTORY) ===== -->
-  <div id="historyModal" class="modal">
-    <div class="modal-box">
-      <button id="closeHistory" class="modal-close">✕</button>
-      <div id="historyContent"></div>
+  <!-- HISTORY MODAL -->
+  <div id="historyModal"
+    class="fixed inset-0 bg-black/60 hidden flex justify-center items-center z-[999]">
+    <div class="bg-[#111827] border border-neon-blue p-6 rounded-xl w-11/12 max-w-xl shadow-neon relative">
+      <button id="closeHistory"
+        class="absolute right-3 top-3 px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-white">✕</button>
+      <div id="historyContent" class="text-gray-200"></div>
     </div>
   </div>
 
-  <!-- FAB SCAN BUTTON -->
-  <button id="fab-scan" class="fab">📷</button>
+  <!-- FAB BUTTON -->
+  <button id="fab-scan"
+    class="fixed bottom-6 right-6 w-14 h-14 bg-neon-blue rounded-full shadow-neon text-black text-3xl flex justify-center items-center hover:scale-110 transition">
+    📷
+  </button>
 
-  <!-- ZXing Scanner -->
+  <!-- ZXING -->
   <script src="https://unpkg.com/@zxing/library@latest"></script>
 
-  <!-- MAIN SCRIPTS -->
+  <!-- MODULES -->
+  <script type="module" src="db.js"></script>
   <script type="module" src="history.js"></script>
   <script type="module" src="scan.js"></script>
+  <script type="module" src="ui.js"></script>
   <script type="module" src="main.js"></script>
 
-  <script type="module">
-    import { attachHistoryClose } from "./history.js";
-    attachHistoryClose();
-  </script>
-
 </body>
+
 </html>

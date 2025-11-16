@@ -1,7 +1,3 @@
-// Barcode/QR Scanner using ZXing
-// Pastikan tambahkan CDN ZXing di index.html:
-// <script src="https://unpkg.com/@zxing/library@latest"></script>
-
 export function startScanner(targetFieldId = 'kodebarang') {
   const codeInput = document.getElementById('kodebarang');
   const locationInput = document.getElementById('lokasi');
@@ -9,67 +5,44 @@ export function startScanner(targetFieldId = 'kodebarang') {
 
   const preview = document.createElement('video');
   preview.setAttribute('playsinline', true);
-  preview.style.width = '100%';
-  preview.style.maxHeight = '300px';
-  preview.style.border = '2px solid #444';
-  preview.style.borderRadius = '10px';
+  preview.className =
+    "w-full max-w-md mx-auto border border-neon-blue rounded-xl shadow-neon";
 
   const scannerBox = document.createElement('div');
-  scannerBox.style.position = 'fixed';
-  scannerBox.style.top = '0';
-  scannerBox.style.left = '0';
-  scannerBox.style.width = '100%';
-  scannerBox.style.height = '100%';
-  scannerBox.style.background = 'rgba(0,0,0,0.8)';
-  scannerBox.style.padding = '20px';
-  scannerBox.style.zIndex = '9999';
+  scannerBox.className =
+    "fixed inset-0 bg-black/80 p-6 z-[9999] flex flex-col items-center gap-4";
 
   const closeBtn = document.createElement('button');
-  closeBtn.innerText = 'Close Scanner';
-  closeBtn.style.background = '#900';
-  closeBtn.style.color = '#fff';
-  closeBtn.style.padding = '10px 15px';
-  closeBtn.style.border = 'none';
-  closeBtn.style.borderRadius = '5px';
-  closeBtn.style.cursor = 'pointer';
-  closeBtn.style.marginBottom = '10px';
+  closeBtn.innerText = "Close Scanner";
+  closeBtn.className =
+    "px-4 py-2 bg-red-600 hover:bg-red-700 rounded";
 
   scannerBox.appendChild(closeBtn);
   scannerBox.appendChild(preview);
   document.body.appendChild(scannerBox);
 
-  // ZXing reader
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
-  // Start scanning using camera
-  codeReader
-    .decodeFromVideoDevice(null, preview, (result, err) => {
-      if (result) {
-        // PLAY BEEP SOUND
-          const beep = new Audio("wood_plank_flicks.ogg");
-          beep.play();
-        const text = result.text;
+  codeReader.decodeFromVideoDevice(null, preview, (result) => {
+    if (result) {
+      new Audio("wood_plank_flicks.ogg").play();
+      const text = result.text;
 
-        // Kalau format "kode|lokasi" → isi dua-duanya
-        if (text.includes('|')) {
-          const [kode, lokasi] = text.split('|');
-          codeInput.value = kode;
-          locationInput.value = lokasi;
-        } else {
-          // Kalau tidak, isi hanya target input
-          if (targetInput) {
-            targetInput.value = text;
-          }
-        }
-
-        codeReader.reset();
-        document.body.removeChild(scannerBox);
+      if (text.includes("|")) {
+        const [kode, lokasi] = text.split("|");
+        codeInput.value = kode;
+        locationInput.value = lokasi;
+      } else {
+        targetInput.value = text;
       }
-    })
-    .catch((e) => console.error(e));
+
+      codeReader.reset();
+      scannerBox.remove();
+    }
+  });
 
   closeBtn.onclick = () => {
     codeReader.reset();
-    document.body.removeChild(scannerBox);
+    scannerBox.remove();
   };
 }

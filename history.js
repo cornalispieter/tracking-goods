@@ -1,48 +1,35 @@
-import { loadHistory } from './db.js';
+import { loadHistory } from "./db.js";
 
 export async function showHistory(kodebarang) {
   const modal = document.getElementById("historyModal");
   const container = document.getElementById("historyContent");
 
-  container.innerHTML = `<h3>History for: ${kodebarang}</h3>`;
-
   const data = await loadHistory(kodebarang);
 
-  if (!data.length) {
-    container.innerHTML += `<p>No history found.</p>`;
-  } else {
-    container.innerHTML += `
-      <table class="history-table">
-        <thead>
-          <tr>
-            <th>Location</th>
-            <th>Updated</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${data
-            .map(
-              (row) => `
-                <tr>
-                  <td>${row.lokasi}</td>
-                  <td>${new Date(row.updated).toLocaleString()}</td>
-                </tr>
-              `
-            )
-            .join("")}
-        </tbody>
-      </table>
-    `;
-  }
+  container.innerHTML = `
+    <h3 class="text-xl mb-3 text-neon-blue font-semibold drop-shadow">History for: ${kodebarang}</h3>
+    <table class="w-full text-left border border-[#1f2937]">
+      <thead class="bg-[#1e2636]">
+        <tr>
+          <th class="p-3">Location</th>
+          <th class="p-3">Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `
+          <tr class="hover:bg-[#1a2234]">
+            <td class="p-3">${row.lokasi}</td>
+            <td class="p-3">${new Date(row.updated).toLocaleString()}</td>
+          </tr>`).join("")}
+      </tbody>
+    </table>
+  `;
 
-  modal.style.display = "block";
+  modal.classList.remove("hidden");
 }
 
-export function attachHistoryClose() {
-  document.getElementById("closeHistory").onclick = () => {
-    document.getElementById("historyModal").style.display = "none";
-  };
-}
+document.getElementById("closeHistory").onclick = () =>
+  document.getElementById("historyModal").classList.add("hidden");
 
-// 🔥 FIX untuk error showHistory is not defined
+// Biar global
 window.showHistory = showHistory;
