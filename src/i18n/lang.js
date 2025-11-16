@@ -1,13 +1,12 @@
 // src/i18n/lang.js
 // =======================
 // Multi-language dictionary (EN + NL)
-// Fully compatible with main.js, ui.js, history.js, and modal
 // =======================
 
 export const LANG = {
   en: {
     // App Title
-    appTitle: "Tracking Goods",
+    appTitle: "Track My Sparepart",
 
     // Form
     formItemCode: "Item Code",
@@ -41,7 +40,7 @@ export const LANG = {
 
   nl: {
     // App Title
-    appTitle: "Goederen Tracking",
+    appTitle: "Volg Mijn Reserveonderdelen",
 
     // Form
     formItemCode: "Artikelcode",
