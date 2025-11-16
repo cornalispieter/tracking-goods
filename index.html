@@ -3,33 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tracking Goods App</title>
+  <title>Tracking Goods</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+
+  <!-- ===== HEADER ===== -->
   <header class="app-header">
-  <img src="logo.png" class="app-logo">
-  <h1>Tracking Goods System</h1>
-</header>
-  <div id="form-section">
-  <div class="field-group">
-    <input type="text" id="kodebarang" placeholder="Item Code" />
-    <button type="button" id="scanKodeBtn" class="btn-icon">📷</button>
+    <div class="logo-area">
+      <div class="logo-circle">📦</div>
+      <h1>Tracking Goods</h1>
+    </div>
+  </header>
+
+  <!-- ===== FORM SECTION ===== -->
+  <section class="form-section">
+    <div class="field-row">
+      <input type="text" id="kodebarang" placeholder="Item Code" />
+      <button id="scanKodeBtn" class="btn-icon">📷</button>
+    </div>
+
+    <div class="field-row">
+      <input type="text" id="lokasi" placeholder="Location" />
+      <button id="scanLokasiBtn" class="btn-icon">📷</button>
+    </div>
+
+    <button id="saveBtn" class="btn-primary">Save</button>
+  </section>
+
+  <!-- SEARCH BOX -->
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search..." />
   </div>
-  <div id="toast"></div>
 
-  <div class="field-group">
-    <input type="text" id="lokasi" placeholder="Location" />
-    <button type="button" id="scanLokasiBtn" class="btn-icon">📷</button>
-  </div>
-
-  <button id="saveBtn" class="btn-primary">💾 Save</button>
-
-</div>
-<div class="search-box">
-  <input type="text" id="searchInput" placeholder="Search item or location..." />
-</div>
+  <!-- ===== TABLE ===== -->
   <table id="data-table">
     <thead>
       <tr>
@@ -41,33 +49,32 @@
     </thead>
     <tbody id="data-body"></tbody>
   </table>
-  <button id="exportCsvBtn" class="btn-export">⬇️ Export CSV</button>
 
+  <button id="exportCsvBtn" class="btn-export">Export CSV</button>
 
-  <!-- History Modal -->
-  <div id="historyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); padding-top:60px;">
-    <div style="background:#222; margin:auto; padding:20px; width:90%; max-width:500px; border-radius:10px; color:#fff; position:relative;">
-      <button id="closeHistory" style="position:absolute; top:10px; right:10px; background:#900; padding:5px 10px; border:none; border-radius:5px; cursor:pointer;">X</button>
+  <!-- ===== MODAL (HISTORY) ===== -->
+  <div id="historyModal" class="modal">
+    <div class="modal-box">
+      <button id="closeHistory" class="modal-close">✕</button>
       <div id="historyContent"></div>
     </div>
   </div>
-  <div id="popup" class="popup">
-  <div class="popup-content">
-    <p id="popup-message">Saved successfully!</p>
-    <button id="popup-ok">OK</button>
-  </div>
-</div>
+
+  <!-- FAB SCAN BUTTON -->
   <button id="fab-scan" class="fab">📷</button>
+
+  <!-- ZXing Scanner -->
   <script src="https://unpkg.com/@zxing/library@latest"></script>
-  
+
+  <!-- MAIN SCRIPTS -->
   <script type="module" src="history.js"></script>
   <script type="module" src="scan.js"></script>
   <script type="module" src="main.js"></script>
 
   <script type="module">
-  import { attachHistoryClose } from "./history.js";
-  attachHistoryClose();
-</script>
+    import { attachHistoryClose } from "./history.js";
+    attachHistoryClose();
+  </script>
 
 </body>
 </html>
