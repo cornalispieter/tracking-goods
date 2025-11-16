@@ -3,13 +3,17 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- FIX SAFARI iOS VIEWPORT -->
+  <meta name="viewport" 
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+
   <title>Tracking Goods – Neon Blue</title>
 
-  <!-- TAILwind CDN -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- CUSTOM TAILWIND CONFIG -->
+  <!-- Custom Tailwind Theme -->
   <script>
     tailwind.config = {
       theme: {
@@ -33,6 +37,13 @@
     body {
       background: linear-gradient(135deg, #06070a, #0a0d14, #0e111a);
       background-attachment: fixed;
+
+      /* FIX notch / dynamic island */
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) 
+               env(safe-area-inset-bottom) env(safe-area-inset-left);
+
+      /* FIX safari auto zoom text */
+      -webkit-text-size-adjust: 100%;
     }
   </style>
 </head>
@@ -45,9 +56,7 @@
       <div class="w-12 h-12 bg-[#0f1624] border border-neon-blue rounded-xl flex justify-center items-center shadow-neon text-neon-blue text-2xl">
         📦
       </div>
-      <h1 class="text-3xl font-semibold text-neon-blue drop-shadow-md">
-        Tracking Goods
-      </h1>
+      <h1 class="text-3xl font-semibold text-neon-blue drop-shadow-md">Tracking Goods</h1>
     </div>
   </header>
 
@@ -56,36 +65,43 @@
 
     <div class="flex gap-3">
       <input id="kodebarang"
-        class="flex-1 px-4 py-3 bg-[#0f1624] border border-[#1e2636] rounded-xl focus:outline-none focus:border-neon-blue shadow-neonSm"
+        class="flex-1 px-4 py-3 bg-[#0f1624] border border-[#1e2636] rounded-xl 
+        focus:outline-none focus:border-neon-blue shadow-neonSm"
         placeholder="Item Code" />
       <button id="scanKodeBtn"
-        class="px-4 py-3 rounded-xl bg-[#1a2234] border border-[#2c3950] hover:bg-[#223044] shadow-neonSm text-xl">📷</button>
+        class="px-4 py-3 rounded-xl bg-[#1a2234] border border-[#2c3950] 
+        hover:bg-[#223044] shadow-neonSm text-xl">📷</button>
     </div>
 
     <div class="flex gap-3">
       <input id="lokasi"
-        class="flex-1 px-4 py-3 bg-[#0f1624] border border-[#1e2636] rounded-xl focus:outline-none focus:border-neon-blue shadow-neonSm"
+        class="flex-1 px-4 py-3 bg-[#0f1624] border border-[#1e2636] rounded-xl 
+        focus:outline-none focus:border-neon-blue shadow-neonSm"
         placeholder="Location" />
       <button id="scanLokasiBtn"
-        class="px-4 py-3 rounded-xl bg-[#1a2234] border border-[#2c3950] hover:bg-[#223044] shadow-neonSm text-xl">📷</button>
+        class="px-4 py-3 rounded-xl bg-[#1a2234] border border-[#2c3950] 
+        hover:bg-[#223044] shadow-neonSm text-xl">📷</button>
     </div>
 
     <button id="saveBtn"
-      class="w-full py-3 rounded-xl bg-neon-blue hover:brightness-110 text-black font-semibold shadow-neon text-lg">
+      class="w-full py-3 rounded-xl bg-neon-blue hover:brightness-110 text-black 
+      font-semibold shadow-neon text-lg">
       Save
     </button>
   </section>
 
-  <!-- SEARCH BOX -->
+  <!-- SEARCH -->
   <div class="text-center my-6">
     <input id="searchInput"
-      class="w-72 max-w-full px-4 py-3 bg-[#0f1624] border border-[#1f2937] rounded-xl focus:outline-none focus:border-neon-blue shadow-neonSm"
+      class="w-72 max-w-full px-4 py-3 bg-[#0f1624] border border-[#1f2937] 
+      rounded-xl focus:outline-none focus:border-neon-blue shadow-neonSm"
       placeholder="Search..." />
   </div>
 
-  <!-- TABLE (SUMMARY LIST) -->
+  <!-- TABLE -->
   <div class="overflow-x-auto max-w-4xl mx-auto px-4">
-    <table class="w-full text-left bg-[#0f1624] border border-[#1e2636] shadow-neonSm rounded-xl overflow-hidden">
+    <table
+      class="w-full text-left bg-[#0f1624] border border-[#1e2636] shadow-neonSm rounded-xl overflow-hidden">
       <thead class="bg-[#1e2636] text-gray-300">
         <tr>
           <th class="p-4">Item Code</th>
@@ -98,24 +114,26 @@
     </table>
   </div>
 
-  <!-- PAGINATION LIST -->
+  <!-- PAGINATION -->
   <div id="pageControls" class="my-4"></div>
 
-  <!-- EXPORT -->
+  <!-- EXPORT CSV -->
   <button id="exportCsvBtn"
-    class="block mx-auto mt-6 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl shadow-md font-semibold">
+    class="block mx-auto mt-6 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black 
+    rounded-xl shadow-md font-semibold">
     Export CSV
   </button>
 
   <!-- HISTORY MODAL -->
   <div id="historyModal"
     class="fixed inset-0 bg-black/60 hidden flex justify-center items-center z-[999]">
-    <div class="bg-[#111827] border border-neon-blue p-6 rounded-xl w-11/12 max-w-xl shadow-neon relative">
+
+    <div class="bg-[#111827] border border-neon-blue p-6 rounded-xl 
+      w-11/12 max-w-xl shadow-neon relative">
 
       <button id="closeHistory"
-        class="absolute right-3 top-3 px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-white">
-        ✕
-      </button>
+        class="absolute right-3 top-3 px-3 py-1 bg-red-600 hover:bg-red-700 
+        rounded text-white">✕</button>
 
       <div id="historyContent" class="text-gray-200"></div>
     </div>
@@ -123,23 +141,24 @@
 
   <!-- LOADING OVERLAY -->
   <div id="loadingOverlay"
-  class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] 
-  flex justify-center items-center">
+    class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] 
+    flex justify-center items-center">
 
-  <div class="w-16 h-16 border-4 border-neon-blue border-t-transparent 
-    rounded-full animate-spin shadow-neon"></div>
+    <div class="w-16 h-16 border-4 border-neon-blue border-t-transparent 
+      rounded-full animate-spin shadow-neon"></div>
   </div>
 
-  <!-- FAB BUTTON -->
+  <!-- FAB SCAN BUTTON -->
   <button id="fab-scan"
-    class="fixed bottom-6 right-6 w-14 h-14 bg-neon-blue rounded-full shadow-neon text-black text-3xl flex justify-center items-center hover:scale-110 transition">
+    class="fixed bottom-6 right-6 w-14 h-14 bg-neon-blue rounded-full shadow-neon 
+    text-black text-3xl flex justify-center items-center hover:scale-110 transition">
     📷
   </button>
 
-  <!-- ZXING SCANNER -->
+  <!-- ZXing Scanner Library -->
   <script src="https://unpkg.com/@zxing/library@latest"></script>
 
-  <!-- MODULE SCRIPTS -->
+  <!-- SCRIPTS -->
   <script type="module" src="db.js"></script>
   <script type="module" src="history.js"></script>
   <script type="module" src="scan.js"></script>
