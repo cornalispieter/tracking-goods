@@ -1,107 +1,91 @@
 import { loadData, saveRecord } from './db.js';
 import { renderTable, clearInputs } from './ui.js';
 import { startScanner } from './scan.js';
-import { attachHistoryClose } from './history.js';
 import { exportToCSV } from './ui.js';
-
-
-
 
 document.addEventListener('DOMContentLoaded', async () => {
 
-  // ===========================
-  // LOAD DATA
-  // ===========================
   let data = await loadData();
   renderTable(data);
 
-  // ===========================
-  // SAVE BUTTON
-  // ===========================
+  // ==================================================
+  // SAVE BUTTON + VALIDASI INPUT
+  // ==================================================
   document.getElementById('saveBtn').onclick = async () => {
     const kodebarang = document.getElementById('kodebarang').value.trim();
-    const lokasi = document.getElementById('lokasi').value.trim();
+    const lokasi     = document.getElementById('lokasi').value.trim();
 
-    if (!kodebarang || !lokasi) {
-      alert('Isi kedua field!');
+    // VALIDASI
+    if (!kodebarang) {
+      showError("Kode barang tidak boleh kosong!");
       return;
     }
 
+    if (!lokasi) {
+      showError("Lokasi tidak boleh kosong!");
+      return;
+    }
+
+    // SIMPAN
     await saveRecord(kodebarang, lokasi);
     data = await loadData();
     renderTable(data);
     clearInputs();
-   showPopup("Data Saved");
+    showSuccess("Data Saved!");
   };
 
-  // ===========================
-  // SCAN BUTTON (KODE)
-  // ===========================
-  const scanKodeBtn = document.getElementById('scanKodeBtn');
-  if (scanKodeBtn) {
-    scanKodeBtn.onclick = () => startScanner('kodebarang');
-  }
-
-  // ===========================
-  // SCAN BUTTON (LOKASI)
-  // ===========================
-  const scanLokasiBtn = document.getElementById('scanLokasiBtn');
-  if (scanLokasiBtn) {
-    scanLokasiBtn.onclick = () => startScanner('lokasi');
-  }
-
-  // ===========================
-  // FAB SCAN BUTTON
-  // ===========================
-  const fabScan = document.getElementById('fab-scan');
-  if (fabScan) {
-    fabScan.onclick = () => startScanner('kodebarang');
-  }
-
-  // ===========================
-  // REALTIME SEARCH
-  // ===========================
-  const searchInput = document.getElementById("searchInput");
-
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      const keyword = searchInput.value.toLowerCase();
-
-      const filtered = data.filter(item =>
-        item.kodebarang.toLowerCase().includes(keyword) ||
-        item.lokasi.toLowerCase().includes(keyword) ||
-        new Date(item.updated).toLocaleString().toLowerCase().includes(keyword)
-      );
-
-      renderTable(filtered);
-    });
-  }  // <--- CLOSE IF
-
- // ==================================================
-  // POPUP MESSAGE
   // ==================================================
-  function showPopup(message = "Saved successfully!") {
-    const popup = document.createElement("div");
-    popup.className = "popup-message";
-    popup.innerText = message;
+  // SCAN BUTTONS
+  // ==================================================
+  document.getElementById('scanKodeBtn').onclick  = () => startScanner('kodebarang');
+  document.getElementById('scanLokasiBtn').onclick = () => startScanner('lokasi');
+  document.getElementById('fab-scan').onclick      = () => startScanner('kodebarang');
 
-    document.body.appendChild(popup);
+  // ==================================================
+  // REALTIME SEARCH
+  // ==================================================
+  document.getElementById("searchInput").addEventListener("input", () => {
+    const keyword = searchInput.value.toLowerCase();
 
-    setTimeout(() => {
-        popup.classList.add("show");
-    }, 10);
+    const filtered = data.filter(item =>
+      item.kodebarang.toLowerCase().includes(keyword) ||
+      item.lokasi.toLowerCase().includes(keyword) ||
+      new Date(item.updated).toLocaleString().toLowerCase().includes(keyword)
+    );
+    renderTable(filtered);
+  });
 
-    setTimeout(() => {
-        popup.classList.remove("show");
-        setTimeout(() => popup.remove(), 300);
-    }, 1500);
-  } // <--- FIXED: fungsi ditutup benar
+  // ==================================================
+  // EXPORT CSV
+  // ==================================================
+  document.getElementById('exportCsvBtn').onclick = () => exportToCSV(data);
 
+});
 
-  const exportCsvBtn = document.getElementById('exportCsvBtn');
-if (exportCsvBtn) {
-  exportCsvBtn.onclick = () => exportToCSV(data);
+// ==================================================
+// POPUP SUCCESS (NEON BLUE)
+// ==================================================
+function showSuccess(message) {
+  const popup = document.createElement("div");
+  popup.className =
+    "fixed top-6 right-6 bg-neon-blue text-black px-5 py-3 rounded-xl shadow-neon font-semibold transition";
+  popup.textContent = message;
+
+  document.body.appendChild(popup);
+
+  setTimeout(() => popup.remove(), 1600);
 }
 
+// ==================================================
+// POPUP ERROR (MERAH NEON)
+// ==================================================
+function showError(message) {
+  const popup = document.createElement("div");
+  popup.className =
+    "fixed top-6 right-6 bg-red-600 text-white px-5 py-3 rounded-xl shadow-lg font-semibold";
+  popup.textContent = message;
 
-}); // <--- CLOSE DOMContentLoaded
+  document.body.appendChild(popup);
+
+  setTimeout(() => popup.remove(), 1800);
+}
