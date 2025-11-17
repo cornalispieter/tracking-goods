@@ -72,8 +72,7 @@ export async function loadHistory(kodebarang) {
   }
 
   return data;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
 }
 // ========================================================
 // REALTIME LISTENER
