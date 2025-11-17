@@ -13,6 +13,9 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="assets/css/style.css" />
+
+  <!-- ZXing UMD (QR + BARCODE Scanner) -->
+  <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6"></script>
 </head>
 
 <body class="bg-[#0d1320] text-gray-200 pb-24">
@@ -70,7 +73,7 @@
           </tr>
         </thead>
 
-        <!-- FIX ID: wajib pakai summary-body -->
+        <!-- FIXED REQUIRED ID -->
         <tbody id="summary-body"></tbody>
 
       </table>
@@ -111,7 +114,10 @@
   <script type="module" src="src/i18n/lang.js"></script>
   <script type="module" src="src/modules/utils.js"></script>
   <script type="module" src="src/modules/db.js"></script>
-  <script type="module" src="src/modules/scan.js"></script>
+
+  <!-- SCAN.JS HARUS NON-MODULE -->
+  <script src="src/modules/scan.js"></script>
+
   <script type="module" src="src/modules/history.js"></script>
   <script type="module" src="src/ui/ui.table.js"></script>
   <script type="module" src="src/ui/ui.modal.js"></script>

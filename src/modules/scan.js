@@ -1,36 +1,24 @@
-// src/modules/scan.js
-// ======================================================
-// Camera Scanner Module using ZXing (WASM version)
-// Semua fitur lama dipertahankan:
-//  - Scan QR & barcode
-//  - Auto clean PDxxxxxSTxxx
-//  - Auto stop
-//  - Cancel button
-//  - UI proportional
-// ======================================================
+// scan.js – FINAL (QR + BARCODE) for GitHub Pages
+// ================================================
 
 import { cleanScannedCode } from "./utils.js";
 
 let stream = null;
 let reader = null;
 
-// =============================
-// LOAD ZXING (browser WASM version)
-// =============================
-async function loadZXing() {
-  if (reader) return reader;
-
-  const { BrowserQRCodeReader } = await import(
-    "https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.4/esm/index.js"
-  );
-
-  reader = new BrowserQRCodeReader();
-  return reader;
+// ================================================
+// LOAD ZXING (UMD version, NO module imports)
+// ================================================
+function loadZXing() {
+  if (!reader) {
+    // Support QR + all 1D barcodes
+    reader = new ZXing.BrowserMultiFormatReader();
+  }
 }
 
-// =============================
-// CREATE UI
-// =============================
+// ================================================
+// CREATE SCANNER UI
+// ================================================
 function createScannerUI() {
   const div = document.createElement("div");
   div.id = "scannerContainer";
@@ -39,7 +27,7 @@ function createScannerUI() {
 
   div.innerHTML = `
     <div class="bg-[#0f1624] p-4 rounded-xl shadow-lg text-center">
-      <video id="preview" style="width: 280px; border-radius: 10px;"></video>
+      <video id="preview" style="width: 260px; border-radius: 10px;"></video>
 
       <button id="cancelScanBtn"
         class="mt-4 px-4 py-2 rounded-lg bg-red-500 text-white font-semibold">
@@ -51,11 +39,11 @@ function createScannerUI() {
   document.body.appendChild(div);
 }
 
-// =============================
-// START SCANNER
-// =============================
+// ================================================
+// START SCANNER (SCAN QR + BARCODE)
+// ================================================
 export async function startScanner(targetField) {
-  await loadZXing();
+  loadZXing();
 
   if (!document.getElementById("scannerContainer")) {
     createScannerUI();
@@ -65,7 +53,7 @@ export async function startScanner(targetField) {
   document.getElementById("cancelScanBtn").onclick = stopScanner;
 
   try {
-    // always try back camera
+    // Always try back camera
     stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "environment" },
     });
@@ -73,23 +61,26 @@ export async function startScanner(targetField) {
     video.srcObject = stream;
     video.play();
 
+    // ZXing callback
     reader.decodeFromVideoDevice(null, video, (result, err) => {
       if (result) {
-        const raw = result.getText();
+        const raw = result.text;
         const cleaned = cleanScannedCode(raw);
+
         document.getElementById(targetField).value = cleaned;
+
         stopScanner();
       }
     });
   } catch (e) {
-    alert("Unable to access camera.");
+    alert("Camera access denied or not available.");
     stopScanner();
   }
 }
 
-// =============================
+// ================================================
 // STOP SCANNER
-// =============================
+// ================================================
 export function stopScanner() {
   if (stream) {
     stream.getTracks().forEach(t => t.stop());
@@ -98,4 +89,8 @@ export function stopScanner() {
 
   const ui = document.getElementById("scannerContainer");
   if (ui) ui.remove();
+
+  if (reader) {
+    reader.reset();
+  }
 }
