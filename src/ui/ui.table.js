@@ -5,7 +5,7 @@
 // ===================================================================
 
 import { formatDateTime } from "../modules/utils.js";
-import { openHistoryModal } from "../history/history.js";
+import { openHistoryModal } from "../modules/history.js";
 
 // ===================================================================
 // RENDER TABLE (dipanggil dari main.js)
