@@ -69,3 +69,4 @@ function stopScanner() {
 
     if (reader) reader.reset();
 }
+export { startScanner, stopScanner };
