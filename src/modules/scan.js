@@ -1,9 +1,28 @@
 // scan.js – FINAL FIXED (UMD ZXing, NON-MODULE)
 
+// =====================
+// CLEAN SCANNED DATA
+// =====================
 function cleanScannedCode(code) {
-    return code.trim();
+    if (!code) return "";
+
+    // Normalisasi
+    let c = code.trim().toLowerCase();
+
+    // Hapus prefix "pd"
+    if (c.startsWith("pd")) {
+        c = c.substring(2);
+    }
+
+    // Hapus suffix "st" + angka (st001, st999, st25)
+    c = c.replace(/st\d+$/i, "");
+
+    return c.toUpperCase(); 
 }
 
+// =====================
+// SCANNER CORE
+// =====================
 let stream = null;
 let reader = null;
 
@@ -17,12 +36,14 @@ function createScannerUI() {
     const div = document.createElement("div");
     div.id = "scannerContainer";
     div.className =
-      "fixed inset-0 bg-black/80 flex flex-col justify-center items-center z-[9999]";
+        "fixed inset-0 bg-black/80 flex flex-col justify-center items-center z-[9999]";
 
     div.innerHTML = `
       <div class="bg-[#0f1624] p-4 rounded-xl shadow-lg text-center">
         <video id="preview" style="width:260px; border-radius:10px;"></video>
-        <button id="cancelScanBtn" class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg">Cancel</button>
+        <button id="cancelScanBtn" class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg">
+            Cancel
+        </button>
       </div>
     `;
 
@@ -47,7 +68,8 @@ function startScanner(targetField) {
 
             reader.decodeFromVideoDevice(null, video, (result, err) => {
                 if (result) {
-                    document.getElementById(targetField).value = cleanScannedCode(result.text);
+                    const cleaned = cleanScannedCode(result.text);
+                    document.getElementById(targetField).value = cleaned;
                     stopScanner();
                 }
             });
@@ -69,5 +91,7 @@ function stopScanner() {
 
     if (reader) reader.reset();
 }
+
+// Expose to global
 window.startScanner = startScanner;
 window.stopScanner = stopScanner;
