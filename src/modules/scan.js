@@ -1,34 +1,43 @@
 // src/modules/scan.js
 // ======================================================
-// Camera Scanner Module using ZXing
-// Features:
+// Camera Scanner Module using ZXing (WASM version)
+// Semua fitur lama dipertahankan:
 //  - Scan QR & barcode
-//  - Auto-fill target input
-//  - Auto-clean scanned code (PDxxxxxST999 → xxxxx)
-//  - Auto-stop scanner after success
-//  - Cancel button to close scanner
-//  - Non-fullscreen preview (more proportional)
+//  - Auto clean PDxxxxxSTxxx
+//  - Auto stop
+//  - Cancel button
+//  - UI proportional
 // ======================================================
 
 import { cleanScannedCode } from "./utils.js";
 
-// ZXing Loader
-const ZXING_LINK =
-  "https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/esm/index.min.js";
-
-let codeReader = null;
 let stream = null;
+let reader = null;
 
-// ======================================================
-// Create scanner container dynamically
-// ======================================================
+// =============================
+// LOAD ZXING (browser WASM version)
+// =============================
+async function loadZXing() {
+  if (reader) return reader;
+
+  const { BrowserQRCodeReader } = await import(
+    "https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.4/esm/index.js"
+  );
+
+  reader = new BrowserQRCodeReader();
+  return reader;
+}
+
+// =============================
+// CREATE UI
+// =============================
 function createScannerUI() {
-  const container = document.createElement("div");
-  container.id = "scannerContainer";
-  container.className =
-    "fixed inset-0 bg-black bg-opacity-80 flex flex-col justify-center items-center z-[9999]";
+  const div = document.createElement("div");
+  div.id = "scannerContainer";
+  div.className =
+    "fixed inset-0 bg-black/80 flex flex-col justify-center items-center z-[9999]";
 
-  container.innerHTML = `
+  div.innerHTML = `
     <div class="bg-[#0f1624] p-4 rounded-xl shadow-lg text-center">
       <video id="preview" style="width: 280px; border-radius: 10px;"></video>
 
@@ -39,75 +48,54 @@ function createScannerUI() {
     </div>
   `;
 
-  document.body.appendChild(container);
+  document.body.appendChild(div);
 }
 
-// ======================================================
+// =============================
 // START SCANNER
-// targetField = "kodebarang" atau "lokasi"
-// ======================================================
+// =============================
 export async function startScanner(targetField) {
-  // load ZXing only once
-  if (!codeReader) {
-    const module = await import(ZXING_LINK);
-    codeReader = new module.BrowserMultiFormatReader();
-  }
+  await loadZXing();
 
-  // Create UI if not exist
   if (!document.getElementById("scannerContainer")) {
     createScannerUI();
   }
 
   const video = document.getElementById("preview");
-
-  // Cancel button
   document.getElementById("cancelScanBtn").onclick = stopScanner;
 
-  // Start camera
   try {
-    const devices = await codeReader.listVideoInputDevices();
-
-    const backCam =
-      devices.find(d => d.label.toLowerCase().includes("back")) ||
-      devices[0];
-
+    // always try back camera
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { deviceId: backCam.deviceId },
+      video: { facingMode: "environment" },
     });
 
     video.srcObject = stream;
     video.play();
 
-    // Begin decode loop
-    codeReader.decodeFromVideoDevice(backCam.deviceId, video, (result, err) => {
+    reader.decodeFromVideoDevice(null, video, (result, err) => {
       if (result) {
-        let raw = result.text;
-        let cleaned = cleanScannedCode(raw);
-
+        const raw = result.getText();
+        const cleaned = cleanScannedCode(raw);
         document.getElementById(targetField).value = cleaned;
         stopScanner();
       }
     });
   } catch (e) {
-    console.error("Scanner error:", e);
-    alert("Camera scan not available on this device.");
+    alert("Unable to access camera.");
     stopScanner();
   }
 }
 
-// ======================================================
-// STOP SCANNER (auto or cancel)
-// ======================================================
+// =============================
+// STOP SCANNER
+// =============================
 export function stopScanner() {
-  if (codeReader) {
-    codeReader.reset();
-  }
-
   if (stream) {
-    stream.getTracks().forEach(track => track.stop());
+    stream.getTracks().forEach(t => t.stop());
     stream = null;
   }
 
-  const container = document.getElementById("scannerContainer");
-  if (container) container.remove();
+  const ui = document.getElementById("scannerContainer");
+  if (ui) ui.remove();
 }
