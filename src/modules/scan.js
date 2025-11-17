@@ -1,96 +1,71 @@
-// scan.js – FINAL (QR + BARCODE) for GitHub Pages
-// ================================================
+// scan.js – FINAL FIXED (UMD ZXing, NON-MODULE)
 
-import { cleanScannedCode } from "./utils.js";
+function cleanScannedCode(code) {
+    return code.trim();
+}
 
 let stream = null;
 let reader = null;
 
-// ================================================
-// LOAD ZXING (UMD version, NO module imports)
-// ================================================
 function loadZXing() {
-  if (!reader) {
-    // Support QR + all 1D barcodes
-    reader = new ZXing.BrowserMultiFormatReader();
-  }
+    if (!reader) {
+        reader = new ZXing.BrowserMultiFormatReader();
+    }
 }
 
-// ================================================
-// CREATE SCANNER UI
-// ================================================
 function createScannerUI() {
-  const div = document.createElement("div");
-  div.id = "scannerContainer";
-  div.className =
-    "fixed inset-0 bg-black/80 flex flex-col justify-center items-center z-[9999]";
+    const div = document.createElement("div");
+    div.id = "scannerContainer";
+    div.className =
+      "fixed inset-0 bg-black/80 flex flex-col justify-center items-center z-[9999]";
 
-  div.innerHTML = `
-    <div class="bg-[#0f1624] p-4 rounded-xl shadow-lg text-center">
-      <video id="preview" style="width: 260px; border-radius: 10px;"></video>
+    div.innerHTML = `
+      <div class="bg-[#0f1624] p-4 rounded-xl shadow-lg text-center">
+        <video id="preview" style="width:260px; border-radius:10px;"></video>
+        <button id="cancelScanBtn" class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg">Cancel</button>
+      </div>
+    `;
 
-      <button id="cancelScanBtn"
-        class="mt-4 px-4 py-2 rounded-lg bg-red-500 text-white font-semibold">
-        Cancel
-      </button>
-    </div>
-  `;
-
-  document.body.appendChild(div);
+    document.body.appendChild(div);
 }
 
-// ================================================
-// START SCANNER (SCAN QR + BARCODE)
-// ================================================
-export async function startScanner(targetField) {
-  loadZXing();
+function startScanner(targetField) {
+    loadZXing();
 
-  if (!document.getElementById("scannerContainer")) {
-    createScannerUI();
-  }
+    if (!document.getElementById("scannerContainer")) {
+        createScannerUI();
+    }
 
-  const video = document.getElementById("preview");
-  document.getElementById("cancelScanBtn").onclick = stopScanner;
+    const video = document.getElementById("preview");
+    document.getElementById("cancelScanBtn").onclick = stopScanner;
 
-  try {
-    // Always try back camera
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment" },
-    });
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }})
+        .then(streamData => {
+            stream = streamData;
+            video.srcObject = stream;
+            video.play();
 
-    video.srcObject = stream;
-    video.play();
-
-    // ZXing callback
-    reader.decodeFromVideoDevice(null, video, (result, err) => {
-      if (result) {
-        const raw = result.text;
-        const cleaned = cleanScannedCode(raw);
-
-        document.getElementById(targetField).value = cleaned;
-
-        stopScanner();
-      }
-    });
-  } catch (e) {
-    alert("Camera access denied or not available.");
-    stopScanner();
-  }
+            reader.decodeFromVideoDevice(null, video, (result, err) => {
+                if (result) {
+                    document.getElementById(targetField).value = cleanScannedCode(result.text);
+                    stopScanner();
+                }
+            });
+        })
+        .catch(err => {
+            alert("Camera access denied.");
+            stopScanner();
+        });
 }
 
-// ================================================
-// STOP SCANNER
-// ================================================
-export function stopScanner() {
-  if (stream) {
-    stream.getTracks().forEach(t => t.stop());
-    stream = null;
-  }
+function stopScanner() {
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+    }
 
-  const ui = document.getElementById("scannerContainer");
-  if (ui) ui.remove();
+    const ui = document.getElementById("scannerContainer");
+    if (ui) ui.remove();
 
-  if (reader) {
-    reader.reset();
-  }
+    if (reader) reader.reset();
 }
