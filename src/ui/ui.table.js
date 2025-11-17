@@ -1,62 +1,31 @@
-// src/ui/ui.table.js
-// =====================================================
-// UI generator for summary table (goods_summary)
-// - Displays Item Code, Location, Updated, History button
-// - Responsive (History text on desktop, 📜 icon on mobile)
-// - Multi-language support
-// =====================================================
+import { formatDate } from "./utils.js";
 
-import { LANG } from "../i18n/lang.js";
-import { showHistory } from "../modules/history.js";
-
-// Render summary table
-export function renderTable(list) {
-  const tbody = document.getElementById("data-body");
-  const currentLang = localStorage.getItem("app-lang") || "en";
+//
+// Render tabel summary
+//
+export function renderSummaryTable(list) {
+  const tbody = document.getElementById("summary-body");
+  if (!tbody) return;
 
   tbody.innerHTML = "";
 
-  if (!list || list.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="4" class="text-center py-4 text-gray-400">
-          ${LANG[currentLang].noData}
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  list.forEach(row => {
+  list.forEach(item => {
     const tr = document.createElement("tr");
-    tr.className =
-      "border-b border-[#1e2636] hover:bg-[#121a28] transition";
+    tr.className = "border-b border-gray-700";
 
     tr.innerHTML = `
-      <td class="p-3">${row.kodebarang}</td>
-      <td class="p-3">${row.lokasi}</td>
-      <td class="p-3">${new Date(row.updated).toLocaleString()}</td>
-
-      <!-- HISTORY BUTTON (responsive) -->
-      <td class="p-3 text-center">
-        <button data-kode="${row.kodebarang}"
-          class="bg-neon-blue px-2 py-1 rounded text-black flex justify-center items-center gap-1
-                 hover:brightness-110 transition text-sm">
-
-          <!-- Desktop label -->
-          <span class="hidden md:inline">${LANG[currentLang].tableHistory}</span>
-
-          <!-- Mobile icon -->
-          <span class="md:hidden inline text-lg">📜</span>
+      <td class="px-3 py-2 text-sm">${item.kodebarang}</td>
+      <td class="px-3 py-2 text-sm">${item.lokasi}</td>
+      <td class="px-3 py-2 text-sm">${formatDate(item.updated)}</td>
+      <td class="px-3 py-2 text-center">
+        <button 
+          class="history-btn bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-sm"
+          data-kode="${item.kodebarang}">
+          🔍
         </button>
       </td>
     `;
 
     tbody.appendChild(tr);
-  });
-
-  // Attach history button click events
-  document.querySelectorAll("button[data-kode]").forEach(btn => {
-    btn.onclick = () => showHistory(btn.dataset.kode);
   });
 }

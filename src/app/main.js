@@ -202,6 +202,23 @@ function attachFABScan() {
     startScanner("kodebarang");
   };
 }
+<<<<<<< Updated upstream
 window.addEventListener("refresh-summary", async () => {
     await loadSummaryData();
+=======
+
+//
+// GLOBAL: dapat dipanggil dari ui.form.js setelah save
+//
+window.refreshSummaryList = async function () {
+  const data = await loadSummary();
+  renderSummaryTable(data);
+};
+
+//
+// Load pertama kali ketika halaman dibuka
+//
+document.addEventListener("DOMContentLoaded", async () => {
+  await window.refreshSummaryList();
+>>>>>>> Stashed changes
 });

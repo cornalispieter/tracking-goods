@@ -72,6 +72,7 @@ export async function loadHistory(kodebarang) {
   }
 
   return data;
+<<<<<<< Updated upstream
 }
 // ========================================================
 // REALTIME LISTENER
@@ -92,4 +93,22 @@ export function subscribeRealtime(callback) {
       }
     )
     .subscribe();
+=======
+
+  //
+// Ambil daftar summary terbaru untuk ditampilkan di tabel utama
+//
+export async function loadSummary() {
+  const { data, error } = await supabase
+    .from("goods_summary")
+    .select("*")
+    .order("updated", { ascending: false });
+
+  if (error) {
+    console.error("Summary load error:", error);
+    return [];
+  }
+
+  return data;
+>>>>>>> Stashed changes
 }
