@@ -7,7 +7,6 @@
 import { LANG } from "../i18n/lang.js";
 import { saveRecord } from "../modules/db.js";
 import { isEmpty } from "../modules/utils.js";
-import { startScanner } from "../modules/scan.js";
 import { loadSummaryData } from "../app/main.js";
 
 export function renderFormUI() {
