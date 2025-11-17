@@ -1,11 +1,11 @@
 // src/ui/ui.table.js
 // ===================================================================
 // Summary Table Renderer
-// Works with pagination & search from main.js
+// Works with pagination & search handled by main.js
 // ===================================================================
 
 import { formatDateTime } from "../modules/utils.js";
-import { openHistoryModal } from "../modules/history.js";
+import { showHistory } from "../modules/history.js";
 
 // ===================================================================
 // RENDER TABLE (dipanggil dari main.js)
@@ -39,19 +39,19 @@ export function renderTable(list) {
     tbody.appendChild(tr);
   });
 
-  bindHistoryButtons();
+  attachHistoryHandlers();
 }
 
 // ===================================================================
-// BIND HISTORY BUTTONS
+// EVENT LISTENERS FOR HISTORY BUTTONS
 // ===================================================================
-function bindHistoryButtons() {
+function attachHistoryHandlers() {
   const buttons = document.querySelectorAll(".history-btn");
 
   buttons.forEach((btn) => {
     btn.onclick = () => {
       const kode = btn.getAttribute("data-kode");
-      openHistoryModal(kode);
+      showHistory(kode); // ← fungsi resmi dari history.js
     };
   });
 }
