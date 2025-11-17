@@ -69,4 +69,5 @@ function stopScanner() {
 
     if (reader) reader.reset();
 }
-export { startScanner, stopScanner };
+window.startScanner = startScanner;
+window.stopScanner = stopScanner;

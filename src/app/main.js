@@ -16,7 +16,6 @@ import { loadData, subscribeRealtime } from "../modules/db.js";
 import { renderFormUI } from "../ui/ui.form.js";
 import { renderTable } from "../ui/ui.table.js";
 import { renderHistoryModal } from "../ui/ui.modal.js";
-import { startScanner } from "../modules/scan.js";
 
 // ======================================================================
 // GLOBAL STATE
