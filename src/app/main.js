@@ -1,25 +1,22 @@
 // src/app/main.js
 // ======================================================================
-// Main application controller
-// Coordinates:
+// Main Application Controller
+// Handles:
 //   - UI rendering (form, table, modal)
-//   - Loading summary data
+//   - Loading & refreshing summary data
 //   - Pagination
-//   - Searching
+//   - Search
 //   - Language switching
-//   - Scan FAB button
-//
-// Works together with:
-//   db.js, ui.table.js, ui.form.js, ui.modal.js, history.js, utils.js
+//   - FAB Scan Button
+//   - Realtime update listener
 // ======================================================================
 
 import { LANG } from "../i18n/lang.js";
-import { loadData } from "../modules/db.js";
+import { loadData, subscribeRealtime } from "../modules/db.js";
 import { renderFormUI } from "../ui/ui.form.js";
 import { renderTable } from "../ui/ui.table.js";
 import { renderHistoryModal } from "../ui/ui.modal.js";
 import { startScanner } from "../modules/scan.js";
-import { subscribeRealtime } from "../modules/db.js";
 
 // ======================================================================
 // GLOBAL STATE
@@ -37,17 +34,16 @@ window.onload = async () => {
   renderFormUI();
   renderHistoryModal();
 
-  await loadSummaryData();
+  await loadSummaryData(); // initial table load
+  
   attachSearchBox();
   attachLanguageControl();
   attachFABScan();
   renderPagination();
 
-  // ======================================================
-  // REALTIME LISTENER — Harus dipasang setelah UI siap
-  // ======================================================
+  // Realtime listener from Supabase
   subscribeRealtime(async () => {
-    await loadSummaryData(); // auto refresh
+    await loadSummaryData(); // auto refresh when db changes
   });
 };
 
@@ -59,7 +55,6 @@ async function loadSummaryData() {
 
   summaryData = await loadData();
   filteredData = [...summaryData];
-
   page = 1;
 
   renderTablePage();
@@ -69,7 +64,7 @@ async function loadSummaryData() {
 }
 
 // ======================================================================
-// RENDER TABLE PAGE (20 per page)
+// RENDER TABLE PAGE (20 rows per page)
 // ======================================================================
 function renderTablePage() {
   const start = (page - 1) * pageSize;
@@ -79,7 +74,7 @@ function renderTablePage() {
 }
 
 // ======================================================================
-// PAGINATION CONTROL
+// PAGINATION UI
 // ======================================================================
 function renderPagination() {
   const totalPages = Math.ceil(filteredData.length / pageSize);
@@ -124,10 +119,11 @@ function renderPagination() {
 }
 
 // ======================================================================
-// SEARCH MAIN TABLE
+// SEARCH BOX (FILTER DATA)
 // ======================================================================
 function attachSearchBox() {
   const input = document.getElementById("searchInput");
+  if (!input) return;
 
   input.oninput = () => {
     const term = input.value.toLowerCase();
@@ -138,7 +134,6 @@ function attachSearchBox() {
     );
 
     page = 1;
-
     renderTablePage();
     renderPagination();
   };
@@ -166,7 +161,7 @@ function attachLanguageControl() {
 
     applyLanguage();
     renderFormUI();
-    loadSummaryData(); // reload table text
+    loadSummaryData(); // re-render table text
     renderHistoryModal();
   };
 }
@@ -189,42 +184,23 @@ function applyLanguage() {
 // ======================================================================
 function showLoading(state) {
   const overlay = document.getElementById("loadingOverlay");
+  if (!overlay) return;
 
   if (state) overlay.classList.remove("hidden");
   else overlay.classList.add("hidden");
 }
 
 // ======================================================================
-// FLOATING ACTION BUTTON (FAB) SCAN
+// FLOATING ACTION BUTTON (SCAN)
 // ======================================================================
 function attachFABScan() {
-  document.getElementById("fab-scan").onclick = () => {
-    startScanner("kodebarang");
-  };
+  const fab = document.getElementById("fab-scan");
+  if (!fab) return;
+
+  fab.onclick = () => startScanner("kodebarang");
 }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-window.addEventListener("refresh-summary", async () => {
-    await loadSummaryData();
-=======
-=======
->>>>>>> Stashed changes
 
-//
-// GLOBAL: dapat dipanggil dari ui.form.js setelah save
-//
-window.refreshSummaryList = async function () {
-  const data = await loadSummary();
-  renderSummaryTable(data);
-};
-
-//
-// Load pertama kali ketika halaman dibuka
-//
-document.addEventListener("DOMContentLoaded", async () => {
-  await window.refreshSummaryList();
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-});
+// ======================================================================
+// EXPORTS (used by ui.form.js after saving record)
+// ======================================================================
+export { loadSummaryData };
