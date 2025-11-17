@@ -202,3 +202,6 @@ function attachFABScan() {
     startScanner("kodebarang");
   };
 }
+window.addEventListener("refresh-summary", async () => {
+    await loadSummaryData();
+});

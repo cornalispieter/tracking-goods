@@ -8,7 +8,7 @@ import { LANG } from "../i18n/lang.js";
 import { saveRecord } from "../modules/db.js";
 import { isEmpty } from "../modules/utils.js";
 import { startScanner } from "../modules/scan.js";
-import { loadSummaryData } from "../app/main.js";
+
 
 export function renderFormUI() {
   const currentLang = localStorage.getItem("app-lang") || "en";
@@ -118,7 +118,7 @@ async function saveFormData() {
     document.getElementById("lokasi").value = "";
 
     // 🔥 REFRESH TABLE LIST
-    await loadSummaryData();
+    window.dispatchEvent(new CustomEvent("refresh-summary"));
   }
 }
 
