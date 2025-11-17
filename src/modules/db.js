@@ -1,28 +1,31 @@
 // src/modules/db.js
-// =========================================
-// Supabase database integration module
-// Handles:
-//  - Saving summary
-//  - Updating summary
-//  - Inserting into history
-//  - Loading summary list
-//  - Loading history items
-// =========================================
+// ======================================================================
+// Supabase database module
+// Features:
+//  - Save record (insert into history only)
+//  - Summary auto-updated by trigger
+//  - Load summary list
+//  - Load full history for modal
+//  - Realtime listener on goods_summary
+// ======================================================================
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// =========================================
-// CONFIG — GANTI DENGAN DATA MILIKMU SENDIRI
-// =========================================
-export const SUPABASE_URL  = "https://ifynrranqixyoxombfck.supabase.co";
-export const SUPABASE_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmeW5ycmFucWl4eW94b21iZmNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNjgwNzIsImV4cCI6MjA3ODc0NDA3Mn0.UqDQd0rrE4vsYjjj5hHNKsBU3c62lgvNjYp4uUEu2GY";
+// ======================================================================
+// CONFIG (sesuai punya kamu)
+// ======================================================================
+export const SUPABASE_URL =
+  "https://ifynrranqixyoxombfck.supabase.co";
+
+export const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmeW5ycmFucWl4eW94b21iZmNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNjgwNzIsImV4cCI6MjA3ODc0NDA3Mn0.UqDQd0rrE4vsYjjj5hHNKsBU3c62lgvNjYp4uUEu2GY";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ========================================================
-// SAVE RECORD → hanya insert ke history
-// Summary akan diupdate oleh TRIGGER otomatis
-// ========================================================
+// ======================================================================
+// SAVE RECORD → Insert hanya ke goods_history
+// Summary akan update otomatis via TRIGGER Supabase
+// ======================================================================
 export async function saveRecord(kodebarang, lokasi) {
   const now = new Date().toISOString();
 
@@ -38,10 +41,9 @@ export async function saveRecord(kodebarang, lokasi) {
   return true;
 }
 
-// ========================================================
-// LOAD SUMMARY (ambil data terbaru dari goods_summary)
-// Summary 1 row per kodebarang, tidak ada duplikat
-// ========================================================
+// ======================================================================
+// LOAD SUMMARY → Ambil 1 row per kodebarang dari goods_summary
+// ======================================================================
 export async function loadData() {
   const { data, error } = await supabase
     .from("goods_summary")
@@ -56,9 +58,9 @@ export async function loadData() {
   return data;
 }
 
-// ========================================================
-// LOAD FULL HISTORY (modal)
-// ========================================================
+// ======================================================================
+// LOAD FULL HISTORY → Tampil di History Modal
+// ======================================================================
 export async function loadHistory(kodebarang) {
   const { data, error } = await supabase
     .from("goods_history")
@@ -72,11 +74,11 @@ export async function loadHistory(kodebarang) {
   }
 
   return data;
-
 }
-// ========================================================
-// REALTIME LISTENER
-// ========================================================
+
+// ======================================================================
+// REALTIME LISTENER (Trigger ketika goods_summary berubah)
+// ======================================================================
 export function subscribeRealtime(callback) {
   supabase
     .channel("goods_changes")
@@ -85,19 +87,21 @@ export function subscribeRealtime(callback) {
       {
         event: "*",
         schema: "public",
-        table: "goods_summary"     // summary berubah karena trigger
+        table: "goods_summary",
       },
       (payload) => {
         console.log("Realtime update:", payload);
-        callback(); // panggil refresh
+        callback(); // refresh UI
       }
     )
     .subscribe();
+}
 
-
-  //
-// Ambil daftar summary terbaru untuk ditampilkan di tabel utama
-//
+// ======================================================================
+// (OPTIONAL) loadSummary() — versi lama
+// DIBIARKAN AGAR TIDAK ADA FITUR YANG HILANG
+// Tapi tidak dipakai lagi di main.js
+// ======================================================================
 export async function loadSummary() {
   const { data, error } = await supabase
     .from("goods_summary")
@@ -110,3 +114,4 @@ export async function loadSummary() {
   }
 
   return data;
+}
