@@ -203,9 +203,12 @@ function attachFABScan() {
   };
 }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 window.addEventListener("refresh-summary", async () => {
     await loadSummaryData();
 =======
+=======
+>>>>>>> Stashed changes
 
 //
 // GLOBAL: dapat dipanggil dari ui.form.js setelah save
@@ -220,5 +223,8 @@ window.refreshSummaryList = async function () {
 //
 document.addEventListener("DOMContentLoaded", async () => {
   await window.refreshSummaryList();
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 });
