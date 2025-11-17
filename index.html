@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport"
@@ -7,7 +8,7 @@
 
   <title>Track My Sparepart</title>
 
-  <!-- Tailwind -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Custom CSS -->
@@ -22,8 +23,8 @@
       <img src="assets/img/logo.svg"
            class="w-12 h-12 rounded-xl border border-neon-blue shadow-neon" />
 
-      <!-- DEFAULT TITLE (later replaced by LANG.js) -->
-      <h1 id="labelAppTitle" class="text-3xl font-semibold text-neon-blue drop-shadow-md">
+      <h1 id="labelAppTitle"
+          class="text-3xl font-semibold text-neon-blue drop-shadow-md">
         Track My Sparepart
       </h1>
     </div>
@@ -54,8 +55,8 @@
   <!-- TABLE SECTION -->
   <section id="tableSection" class="max-w-4xl mx-auto px-4">
     <div class="overflow-x-auto mx-auto">
-      <table class="min-w-full table-auto text-left bg-[#0f1624] border border-[#1e2636]
-                     shadow-neonSm rounded-xl overflow-hidden text-sm">
+      <table class="min-w-full table-auto text-left bg-[#0f1624]
+                     border border-[#1e2636] shadow-neonSm rounded-xl text-sm">
 
         <thead class="bg-[#1e2636] text-gray-300">
           <tr>
@@ -69,7 +70,9 @@
           </tr>
         </thead>
 
-        <tbody id="data-body"></tbody>
+        <!-- FIX ID: wajib pakai summary-body -->
+        <tbody id="summary-body"></tbody>
+
       </table>
     </div>
   </section>
@@ -99,12 +102,12 @@
 
   <!-- FLOATING SCAN BUTTON -->
   <button id="fab-scan"
-          class="fixed bottom-6 right-6 w-14 h-14 bg-neon-blue rounded-full shadow-neon 
+          class="fixed bottom-6 right-6 w-14 h-14 bg-neon-blue rounded-full shadow-neon
                  text-black text-3xl flex justify-center items-center hover:scale-110 transition">
     📷
   </button>
 
-  <!-- MODULE IMPORTS -->
+  <!-- MODULE SCRIPTS -->
   <script type="module" src="src/i18n/lang.js"></script>
   <script type="module" src="src/modules/utils.js"></script>
   <script type="module" src="src/modules/db.js"></script>
