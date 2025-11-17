@@ -93,9 +93,7 @@ export function subscribeRealtime(callback) {
       }
     )
     .subscribe();
-=======
-=======
->>>>>>> Stashed changes
+
 
   //
 // Ambil daftar summary terbaru untuk ditampilkan di tabel utama
@@ -112,8 +110,3 @@ export async function loadSummary() {
   }
 
   return data;
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-}
