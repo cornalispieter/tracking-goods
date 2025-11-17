@@ -1,23 +1,30 @@
 // scan.js – FINAL FIXED (UMD ZXing, NON-MODULE)
 
 // =====================
-// CLEAN SCANNED DATA
+// CLEAN SCANNED DATA (smart cleaning based on field)
 // =====================
-function cleanScannedCode(code) {
+function cleanScannedCode(code, targetField) {
     if (!code) return "";
 
-    // Normalisasi
-    let c = code.trim().toLowerCase();
+    let c = code.trim();
 
-    // Hapus prefix "pd"
-    if (c.startsWith("pd")) {
-        c = c.substring(2);
+    // HANYA bersihkan PD...STxxx untuk field kodebarang
+    if (targetField === "kodebarang") {
+        let x = c.toLowerCase();
+
+        // Hapus prefix "pd"
+        if (x.startsWith("pd")) {
+            x = x.substring(2);
+        }
+
+        // Hapus suffix "st" + angka
+        x = x.replace(/st\d+$/i, "");
+
+        return x.toUpperCase();
     }
 
-    // Hapus suffix "st" + angka (st001, st999, st25)
-    c = c.replace(/st\d+$/i, "");
-
-    return c.toUpperCase(); 
+    // Jika field lokasi → jangan diubah
+    return c;
 }
 
 // =====================
@@ -68,7 +75,7 @@ function startScanner(targetField) {
 
             reader.decodeFromVideoDevice(null, video, (result, err) => {
                 if (result) {
-                    const cleaned = cleanScannedCode(result.text);
+                    const cleaned = cleanScannedCode(result.text, targetField);
                     document.getElementById(targetField).value = cleaned;
                     stopScanner();
                 }
